@@ -1,0 +1,20 @@
+.captcha {
+    font-family: "Comic Sans MS", cursive, sans-serif;
+    font-style: italic;
+    font-weight: bold;
+    font-size: 1em;
+    width: 85px;
+    text-align: center;
+    padding: 3px;
+    border-radius: 5px;
+    text-decoration: line-through;
+    color: #a0a0a0;
+    background-color: #0c0c0c;
+}
+
+.change-captcha {
+    text-decoration: none;
+    font-size: 12px;
+    text-align: center;
+    width: 85px;
+}

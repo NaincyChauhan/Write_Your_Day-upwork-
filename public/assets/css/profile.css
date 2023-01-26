@@ -1,0 +1,147 @@
+.setting_icon {
+    color: #000;
+    transition: color .2s ease;
+}
+
+.profile-detail-content .more_option_toggle:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 5px rgba(40, 40, 40, .5);
+}
+
+.profile-detail-content .more_option_toggle {
+    border: 1px solid #000;
+    padding: 5px;
+    border-radius: 100vmax;
+    display: flex;
+    margin-left: 15px;
+    transition: all .3s ease;
+}
+
+.profile-detail-content .more_option_toggle .dot {
+    width: 5px;
+    height: 5px;
+    background-color: #000;
+    display: inline-block;
+    border-radius: 50%;
+    margin: 5px 2px;
+}
+
+.overlay_container .more_options {
+    background-color: #fff;
+    border-radius: 15px;
+    font-weight: 500;
+    max-width: 20em;
+    width: 80vw;
+    font-size: 1.2em;
+    overflow: hidden;
+}
+
+.overlay_container .more_options .option {
+    transition: background-color, color.1s ease;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-bottom: 1px solid #2323;
+    text-align: center;
+}
+
+.overlay_container .more_options .option:hover {
+    background-color: var(--main_color);
+    color: #fff;
+}
+
+.followers_box,
+.following_box {
+    background: #fff;
+    border-radius: 1em;
+    max-width: 30em;
+    width: 80vw;
+    overflow: hidden;
+    height: 75vh;
+    max-height: 30em;
+}
+
+.followers_box .head .title,
+.following_box .head .title {
+    width: 100%;
+    font-size: 1.3em;
+    text-align: center;
+}
+
+.followers_box .head,
+.following_box .head {
+    padding: 0.7em 1em;
+    box-shadow: 0 1px 3px #777;
+}
+
+.followers_box .head .close_followers,
+.following_box .head .close_following {
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.followers_box .follower_list,
+.following_box .following_list {
+    overflow-y: scroll;
+    padding: 1em;
+    height: 67vh;
+}
+
+.followers_box .follower_list .follower,
+.following_box .following_list .follower {
+    padding-bottom: 1em;
+    font-weight: 500;
+    flex-wrap: wrap;
+}
+
+.followers_box .follower_list .follower .follower_name,
+.following_box .following_list .follower .follower_name {
+    margin-left: .5em;
+    min-width: calc(100% - 3.5em);
+}
+
+.follower_name .username {
+    color: rgba(40, 40, 40, .5);
+}
+
+.follower_list .follow_btn {
+    border: 0;
+    background: transparent;
+    color: var(--main_color);
+    font-weight: 500;
+    margin-left: 3em;
+}
+
+.followers_box .follower_list .follower .main_btn,
+.following_box .following_list .follower .main_btn {
+    width: auto;
+    padding: 7px 10px;
+    margin-left: auto;
+    transition: transform, box-shadow .3s ease;
+    margin-top: 0.5em;
+}
+
+.following_box .following_list .follower .main_btn {
+    background-color: transparent;
+    color: var(--main_color);
+
+}
+
+@media screen and (max-width: 768px) {
+    .msg_box .msg_extras_container {
+        position: relative;
+        top: 0;
+        left: 0;
+        margin-bottom: 1em;
+    }
+}
+
+@media screen and (min-width: 768px) {
+
+    .followers_box .follower_list .follower .follower_name,
+    .following_box .following_list .follower .follower_name {
+        min-width: auto;
+    }
+    .followers_box .follower_list .follower .follow_btn{
+        margin-left: .5em;
+    }
+}
