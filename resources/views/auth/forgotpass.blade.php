@@ -23,6 +23,7 @@
         <div class="d-flex flex-column flex-sm-row">
             <main>
                 <section class="main">
+                    <p id="message" class="text-center"></p>
                     <h1 class="title"><i class="fa fa-link"></i> Password Recovery</h1>
                     <form id="resetPasswordform" class="form" method="POST" action="{{route('forget-password')}}">
                         @csrf
@@ -31,7 +32,7 @@
                                 <label for="user-email">Email:</label>
                                 <div class="input-group d-flex align-items-center">
                                     <i class="fa fa-envelope icon"></i>
-                                    <input type="email" required name="email" id="user-email"
+                                    <input type="email"  name="email" id="user-email"
                                         placeholder="youremail@address.aim">
                                 </div>
                                 <p id="email_error" class="error"></p>
@@ -41,9 +42,10 @@
                                 <label for="code">Code:</label>
                                 <div class="input-group d-flex justify-content-end">
                                     <i class="fa fa-shield-alt icon"></i>
-                                    <input type="tel" required name="otp"  maxlength="12"  id="code" />
+                                    <input type="tel" name="otp"  maxlength="12"  id="code" />
                                     <button class="code_btn" type="button" id="send_otp"><span id="code_btn_txt">Send code</span> <span id="countdown"></span></button>
                                 </div>
+                                <p id="otp_error" class="error"></p>
                             </legend>
                         </fieldset>
                         <fieldset class="password_field">
@@ -51,7 +53,7 @@
                                 <label for="user-password">Password:</label>
                                 <div class="input-group d-flex align-items-center">
                                     <i class="fa fa-key icon"></i>
-                                    <input type="password" name="password" max="32" class="password" id="user-password"
+                                    <input type="password" name="password" class="password" 
                                         placeholder="New Password">
                                     <i class="fa fa-eye-slash password-toogle"></i>
                                 </div>
@@ -61,11 +63,11 @@
                                 <label for="confirm-password">Confirm Password:</label>
                                 <div class="input-group d-flex align-items-center">
                                     <i class="fa fa-key-skeleton icon"></i>
-                                    <input type="password" max="32" min="5" class="password" name="password_confirmation" id="confirm-password"
+                                    <input type="password" class="password" name="password_confirmation" 
                                         placeholder="Confirm New Password">
                                     <i class="fa fa-eye-slash password-toogle"></i>
                                 </div>
-                                <p id="confirm_password_error" class="error"></p>
+                                <p id="password_confirmation_error" class="error"></p>
                             </legend>
                             <legend
                                 class="d-flex hide justify-content-end flex-column flex-sm-row justify-content-sm-between confirm">

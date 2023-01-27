@@ -28,6 +28,7 @@
         <div class="d-flex flex-column flex-sm-row">
             <main>
                 <section class="main">
+                    <p id="message"></p>
                     <h1 class="title"><i class="fa fa-link"></i> Sign In</h1>
                     <form id="LogInForm" class="form" method="POST" action="{{route('login')}}">
                         @csrf

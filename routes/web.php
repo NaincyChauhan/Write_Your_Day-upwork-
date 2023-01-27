@@ -32,8 +32,12 @@ Route::get('/clear-cache', function () {
 Auth::routes();
 Route::post('login-user', [SiteUserController::class, 'loginuser'])->name('loginuser');
 Route::post('registeruser', [SiteUserController::class, 'registeruser'])->name('registeruser');
-Route::get('forgotmypassword', [SiteUserController::class, 'forgetPasswordView'])->name('forget-password-view');
+Route::get('forget/password', [SiteUserController::class, 'forgetPasswordView'])->name('forget-password-view');
 Route::post('forget-password', [SiteUserController::class, 'forgetPassword'])->name('forget-password');
+
+Route::get('get/session/data', function () {
+    return Session::get('user_register_otp');
+});
 
 // password/reset
 

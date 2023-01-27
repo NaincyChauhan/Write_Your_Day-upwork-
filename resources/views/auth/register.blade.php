@@ -30,6 +30,7 @@
         <div class="d-flex flex-column flex-sm-row">
             <main>
                 <section class="main">
+                    <p id="message" class="text-center"></p>
                     <h1 class="title"><i class="fa fa-link"></i> Sign Up</h1>
                     <form class="form" id="registerform" method="POST" action="{{route('registeruser')}}">
                         @csrf
@@ -37,7 +38,7 @@
                             <label for="user-email">Email:</label>
                             <div class="input-group d-flex align-items-center">
                                 <i class="fa fa-envelope icon"></i>
-                                <input type="email" name="email" id="user-email"
+                                <input type="email"  name="email" id="user-email"
                                     placeholder="youremail@address.aim" />
                             </div>
                             <p id="email_error" class="error"></p>
@@ -49,7 +50,7 @@
                                 <input type="tel" name="phone" id="user-tel" pattern="[0-9]{10}" maxlength="10"
                                     placeholder="1234567890" />
                             </div>
-                            <p id="number_error" class="error"></p>
+                            <p id="phone_error" class="error"></p>
                         </legend>
                         <legend class="legend">
                             <label for="name">Full Name:</label>
@@ -57,6 +58,7 @@
                                 <i class="fa fa-user-alt icon"></i>
                                 <input type="text" name="name" id="name" placeholder="John Joe" />
                             </div>
+                            <p id="name_error" class="error"></p>
                         </legend>
                         <legend class="legend">
                             <label for="username">Username:</label>
@@ -64,6 +66,7 @@
                                 <i class="fa fa-user-plus icon"></i>
                                 <input type="text" required name="username" id="username" placeholder="@Jonny" />
                             </div>
+                            <p id="username_error" class="error"></p>
                         </legend>
                         <legend class="legend">
                             <label for="name">Date Of Birth:</label>
@@ -71,6 +74,7 @@
                                 <i class="fas fa-calendar-check icon"></i>
                                 <input type="date" name="dob" id="DOB" pattern="dd/mm/yy" />
                             </div>
+                            <p id="dob_error" class="error"></p>
                         </legend>
                         <legend class="legend">
                             <label for="user-password">Password:</label>
@@ -90,7 +94,7 @@
                                     placeholder="Confirm Password" />
                                 <i class="fa fa-eye-slash password-toogle"></i>
                             </div>
-                            <p id="confirm_password_error" class="error"></p>
+                            <p id="password_confirmation_error" class="error"></p>
                         </legend>
                         <hr>
                         <legend class="legend" id="verify-otp" style="display: none;">
@@ -106,6 +110,7 @@
                             <label for="agreement"><input required type="checkbox" name="privacypolicy" id="agreement" />
                                 I agree to the <span class="privacy_link">Privacy Policy</span></label>
                                 <br>
+                            <p id="privacypolicy_error" class="error"></p>
                         </legend>
                         <legend class="d-flex justify-content-end">
                             <button id="registerBtn" type="submit" class="submit">Sign Up</button>

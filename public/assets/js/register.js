@@ -1,5 +1,6 @@
 const userPasswords = document.querySelectorAll(".password");
 const tooglePasswords = document.querySelectorAll(".password-toogle");
+const Error_Messages = ['email','username','name','dob','phone','password','privacypolicy'];
 
 for (let i = 0; i < tooglePasswords.length; i++) {
     tooglePasswords[i].onclick = () => {
@@ -51,20 +52,12 @@ $(function() {
                 url: form.attr('action'),
                 data: new FormData(form[0]), // serializes the form's elements.
                 success: function(data) {
-                    form[0].reset();
                     location.reload();                    
-                    btn.attr("disabled", false);
-                    btn.html('Login');
                 },
                 error: function(data) {
-                    var msg = data.responseJSON.message,
-                        error = "<ul>";
-
-                    $.each(data.responseJSON.errors, function(key, value) {
-                        error += "<li>" + value + "</li>";
-                    });
-                    error += "</ul>";
-                    errorsHTMLMessage(error);                    
+                    $('#message').css('color','#dc3545');                
+                    $('#message').html(data.responseJSON.message);                
+                    window.scrollTo(0, 0);
                     btn.attr("disabled", false);
                     btn.html('Login');
                 }
@@ -111,7 +104,9 @@ $(function() {
         },
         submitHandler: function(f) {
             var btn = $('#registerBtn'),
+                message = $('#message'),
                 form = $('#registerform');
+            var formdata = new FormData(form[0]);
             btn.attr('disabled', true);
             btn.html('Requesting <i class="mdi mdi-cloud-circle"></i>');
             $.ajax({
@@ -119,75 +114,46 @@ $(function() {
                 processData: false,
                 contentType: false,
                 url: form.attr('action'),
-                data: new FormData(form[0]), // serializes the form's elements.
+                data: formdata, // serializes the form's elements.
                 success: function(data) {
+                    clearErrors();
                     if (parseInt(data.status) == 1) {
-                        ajaxMessage(1, data.message);
+                        message.css('color','#198754');
+                        message.html(data.message);
+                        window.scrollTo(0, 0);
                         if (data.type != 1) {
                             $('#verify-otp').show();
+                            $('#user-email').attr('readonly', true);
                         } else {
-                            form[0].reset();
                             location.reload();
                         }
                     } else {
-                        ajaxMessage(0, data.message);
+                        message.css('color','#dc3545');
+                        message.html(data.message);
+                        window.scrollTo(0, 0);
                     }
                     btn.attr("disabled", false);
                     // form[0].reset();
                     btn.html('Sign Up');
                 },
                 error: function(data) {
-                    var msg = data.responseJSON.message,
-                        error = "<ul>";
-
+                    clearErrors();
                     $.each(data.responseJSON.errors, function(key, value) {
-                        error += "<li>" + value + "</li>";
+                        $(`#${key}`+"_error").html(value);
                     });
-                    error += "</ul>";
-                    errorsHTMLMessage(error);
                     btn.attr("disabled", false);
                     btn.html('Sign Up');
                 }
             });
-
             return false;
         }
     });
 });
 
-// Resend OTP
-function resendOTP($this) {
-    var btn = $('#registerBtn'),
-        form = $('#registerform');
-    btn.attr('disabled', true);
-    btn.html('Requesting <i class="mdi mdi-cloud-circle"></i>');
-    $.ajax({
-        type: "POST",
-        processData: false,
-        contentType: false,
-        url: form.attr('action'),
-        data: new FormData(form[0]), // serializes the form's elements.
-        success: function(data) {
-            if (parseInt(data.status) == 1) {
-                ajaxMessage(1, data.message);
-            } else {
-                ajaxMessage(0, data.message);
-            }
-            btn.attr("disabled", false);
-            btn.html('Submit');
-        },
-        error: function(data) {
-            var msg = data.responseJSON.message,
-                error = "<ul>";
 
-            $.each(data.responseJSON.errors, function(key, value) {
-                error += "<li>" + value + "</li>";
-            });
-            error += "</ul>";
-            errorsHTMLMessage(msg + "<br>" + error);
-            btn.attr("disabled", false);
-            btn.html('Submit');
-        }
+function clearErrors() {
+    $.each(Error_Messages, function(key, value) {
+        $(`#${value}`+"_error").html("");
     });
 }
 

@@ -57,21 +57,29 @@ class UserController extends Controller
         {
             if(Session::get('user_register_otp') == $request->otp)
             {
-                $user = new User();
-                $user->name = $request->name;
-                $user->username = $request->username;
-                $user->phone = $request->phone;
-                $user->email = $request->email;
-                $user->dob = $request->dob;
-                $user->password =Hash::make($request->password);
-                $user->save();
-
-                $role = Role::where('slug', 'user')->first();
-                $user->roles()->attach($role);
-                $user->permissions()->attach($role->permissions);
-
-                Auth::loginUsingId($user->id);
-                return response()->json(['status' => 1, 'message' => 'User registered successfully.', 'type' => 1]);
+                if(Session::has('user_register_email') && isset($request->email))
+                {
+                    if (Session::get('user_register_email') == $request->email) {
+                        $user = new User();
+                        $user->name = $request->name;
+                        $user->username = $request->username;
+                        $user->phone = $request->phone;
+                        $user->email = $request->email;
+                        $user->dob = $request->dob;
+                        $user->password =Hash::make($request->password);
+                        $user->save();
+        
+                        $role = Role::where('slug', 'user')->first();
+                        $user->roles()->attach($role);
+                        $user->permissions()->attach($role->permissions);
+        
+                        Auth::loginUsingId($user->id);
+                        return response()->json(['status' => 1, 'message' => 'User registered successfully.', 'type' => 1]);
+                    }else
+                    {
+                        return response()->json(['status' => 0, 'message' => 'Do not try to scam , Email-Id must be same where OTP is sened..', 'type' => 1]);
+                    }
+                }
             }
             else
             {
@@ -84,6 +92,7 @@ class UserController extends Controller
         $mailData = [ 'name' => $request->name,'otp' => $otp,'template' => 'mail.otp','subject' => 'One Time Password'];
         Mail::to($request->email)->send(new UserMail($mailData));
         Session::put('user_register_otp', $otp);
+        Session::put('user_register_email', $request->email);
         return response()->json(['status' => 1, 'message' => 'OTP has been sent In your email('.substr($request->email, 0, 10).'****). if  you missed  please check your spam folder.', 'type' => 0]);        
     }
 
@@ -137,55 +146,53 @@ class UserController extends Controller
     }
 
     public function forgetPasswordView(){
+        if (Auth::check() && Auth::user()) {
+            return redirect()->route('home');
+        }
         return view('auth.forgotpass');
     }
 
 
     public function forgetPassword(Request $request)
     {
-        $request->validate(['email' => 'required']);
-
+        $request->validate(['email' => 'required']);        
         if(!User::where('email', $request->email)->exists())
         {
             return response()->json([
                 'status' => 0, 
-                'message' => 'We could not find your account with '.$request->email.' email.',  
+                'message' => 'We could not find your account with '.$request->email.'. ',  
             ], 200);
         }
-        
+        $user = User::where('email',$request->email)->first(); 
+
         if (isset($request->type) && $request->type=='otp') {
-            $otp = rand(100000, 99999999);
-            $user = User::where('email', $request->email)->get()->first();
-    
+            $otp = rand(100000, 99999999);    
             $mailData = [ 'name' =>  $user->name,'otp' => $otp,'template' => 'mail.email','subject' => 'Password Reset OTP'];
             Mail::to($request->email)->send(new UserMail($mailData));
             Session::put('user_forget_password_otp', $otp);
             return response()->json([
                 'status' => 1, 
-                'message' => 'A OTP has been sent to your registered '.substr($user->email, 0, 10). "***** email. if you missed please check your spam folder",  
+                'message' => 'A OTP has been sent to your registered '.substr($user->email, 0, 10). "***** email. if you missed please check your spam folder.OTP Valid only for 10 mintues",  
+            ], 200);
+        }elseif(!Session::has('user_forget_password_otp')){
+            return response()->json([
+                'status' => 0, 
+                'message' => 'You did not send request for Email OTP, for change password send otp request!',  
             ], 200);
         }else{
             if(Session::has('user_forget_password_otp') && isset($request->otp))
             {
-                if(Session::get('user_register_otp') == $request->otp)
+                if(Session::get('user_forget_password_otp') == $request->otp)
                 {
                     $request->validate([
                         'password' => ['required', 'string', 'min:8', 'confirmed'],
                     ]);
-
-                    $user = User::where('email',$request->email)->first();
-                    if($user)
-                    {
-                        return response()->json([
-                            'status' => 0, 
-                            'message' => 'We could not find your account with '.$request->email.' email.',  
-                        ], 200);
-                    }
+                                       
                     $user->password =Hash::make($request->password);
                     $user->save();
+                    Session::forget('user_forget_password_otp');
                     Auth::loginUsingId($user->id);
-                    // return response()->json(['status' => 1, 'message' => 'User Password Reset Successfully.', 'type' => 1]);
-                    return redirect()->route('home');
+                    return response()->json(['status' => 1, 'message' => 'User Password Reset Successfully.', 'type' => 1]);
                 }
                 else
                 {
