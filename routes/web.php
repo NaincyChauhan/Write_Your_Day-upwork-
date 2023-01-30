@@ -35,9 +35,7 @@ Route::post('registeruser', [SiteUserController::class, 'registeruser'])->name('
 Route::get('forget/password', [SiteUserController::class, 'forgetPasswordView'])->name('forget-password-view');
 Route::post('forget-password', [SiteUserController::class, 'forgetPassword'])->name('forget-password');
 
-Route::get('get/session/data', function () {
-    return Session::get('user_register_otp');
-});
+Route::get('get/session/data', [SiteUserController::class, 'callMailFunc']);
 
 // password/reset
 

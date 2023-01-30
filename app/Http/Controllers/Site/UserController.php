@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Role;
 use App\Http\Controllers\Controller;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\Rules\Password;
 use Session, Auth,Hash,Mail;
 use App\Mail\UserMail;
 
@@ -44,11 +45,12 @@ class UserController extends Controller
     public function registeruser(Request $request)
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'username' => ['required','unique:users'],
-            'phone' => 'required|unique:users',
+            'name' => ['required', 'string', 'max:20'],
+            'email' => ['required', 'string', 'email:rfc,dns', 'max:50', 'unique:users'],
+            'password' => ['required', 'string', 'confirmed',Password::min(8)
+            ->letters()->numbers()->symbols()],
+            'username' => ['required','unique:users','max:20'],
+            'phone' => ['required','min:10','max:10'],
             'dob' => 'required',
             'privacypolicy' => 'required',
         ]);
@@ -90,7 +92,11 @@ class UserController extends Controller
 
         $otp = rand(100000, 999999);
         $mailData = [ 'name' => $request->name,'otp' => $otp,'template' => 'mail.otp','subject' => 'One Time Password'];
-        Mail::to($request->email)->send(new UserMail($mailData));
+        try {
+            Mail::to($request->email)->send(new UserMail($mailData));
+        } catch (error) {
+            return response()->json(['status' => 0, 'message' => $error, 'type' => 1]);
+        }
         Session::put('user_register_otp', $otp);
         Session::put('user_register_email', $request->email);
         return response()->json(['status' => 1, 'message' => 'OTP has been sent In your email('.substr($request->email, 0, 10).'****). if  you missed  please check your spam folder.', 'type' => 0]);        

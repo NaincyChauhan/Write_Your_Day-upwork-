@@ -38,7 +38,7 @@
                             <label for="user-email">Email:</label>
                             <div class="input-group d-flex align-items-center">
                                 <i class="fa fa-envelope icon"></i>
-                                <input type="email"  name="email" id="user-email"
+                                <input type="email" maxlength="50" minlength="10" name="email" id="user-email"
                                     placeholder="youremail@address.aim" />
                             </div>
                             <p id="email_error" class="error"></p>
@@ -47,7 +47,7 @@
                             <label for="user-tel">Phone Number:</label>
                             <div class="input-group d-flex align-items-center">
                                 <i class="fa fa-phone-alt icon"></i>
-                                <input type="tel" name="phone" id="user-tel" pattern="[0-9]{10}" maxlength="10"
+                                <input type="number" name="phone" id="user-tel" pattern="[0-9]{10}"
                                     placeholder="1234567890" />
                             </div>
                             <p id="phone_error" class="error"></p>
@@ -56,7 +56,7 @@
                             <label for="name">Full Name:</label>
                             <div class="input-group d-flex">
                                 <i class="fa fa-user-alt icon"></i>
-                                <input type="text" name="name" id="name" placeholder="John Joe" />
+                                <input type="text" maxlength="20" name="name" id="name" placeholder="John Joe" />
                             </div>
                             <p id="name_error" class="error"></p>
                         </legend>
@@ -64,7 +64,7 @@
                             <label for="username">Username:</label>
                             <div class="input-group d-flex">
                                 <i class="fa fa-user-plus icon"></i>
-                                <input type="text" required name="username" id="username" placeholder="@Jonny" />
+                                <input type="text"  pattern=[a-z] maxlength="20" required name="username" id="username" placeholder="@Jonny" />
                             </div>
                             <p id="username_error" class="error"></p>
                         </legend>
@@ -80,7 +80,7 @@
                             <label for="user-password">Password:</label>
                             <div class="input-group d-flex align-items-center">
                                 <i class="fa fa-key icon"></i>
-                                <input type="password" name="password" class="password" id="user-password"
+                                <input autocomplete="true" type="password" name="password" class="password" id="user-password"
                                     placeholder="Password" />
                                 <i class="fa fa-eye-slash password-toogle"></i>
                             </div>
@@ -97,12 +97,13 @@
                             <p id="password_confirmation_error" class="error"></p>
                         </legend>
                         <hr>
-                        <legend class="legend" id="verify-otp" style="display: none;">
+                        <legend class="legend verify" id="verify-otp" style="display: none;">
                             <label for="user-otp">OTP:</label>
-                            <div class="input-group d-flex align-items-center">
+                            <div class="input-group d-flex justify-content-end">
                                 <i class="fa fa-envelope icon"></i>
-                                <input type="text" name="otp" id="user-otp"
+                                <input type="text" name="otp" maxlength="6" id="user-otp"
                                     placeholder="Enter OTP" />
+                                <button class="code_btn" type="button" id="send_otp" onclick="event.preventDefault(); resendOTP($('#registerBtn'), 0)"><span id="code_btn_txt">Resend OTP</span> <span id="countdown"></span></button>
                             </div>
                         </legend>
 

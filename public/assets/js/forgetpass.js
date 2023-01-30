@@ -41,7 +41,7 @@ function resendOTP() {
         success: function(data) {
             clearErrors();
             if (parseInt(data.status) == 1) {
-                MessageShow('#198754',data.message);
+                MessageShow('#fff',data.message);
             } else {
                 MessageShow('#dc3545',data.message);
             }
@@ -111,7 +111,7 @@ $(function() {
                 success: function(data) {
                     clearErrors();
                     if (parseInt(data.status) == 1) {
-                        MessageShow('#198754',data.message);
+                        MessageShow('#fff',data.message);
                         if (data.type == 1) {
                             form[0].reset();
                             location.reload();

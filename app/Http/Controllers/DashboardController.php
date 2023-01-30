@@ -31,21 +31,7 @@ class DashboardController extends Controller
         }
         else
         {
-            return view('admin.dashboard', [
-                'active' => 'dashboard',            
-                'today' => Userapplication::where('staff_id', Auth::user()->staff()->first()->id)
-                ->whereDate('assign_date', Carbon::now())->count(),            
-                'pending' => Userapplication::where('staff_id', Auth::user()->staff()->first()->id)
-                ->whereDate('assign_date', Carbon::now())
-                ->where('status', '!=', 1)
-                ->count(),            
-                'complete' => Userapplication::where('staff_id', Auth::user()->staff()->first()->id)
-                ->whereDate('assign_date', Carbon::now())
-                ->where('status', 1)
-                ->count(),            
-                'applications' => Userapplication::where('staff_id', $user->staff()->first()->id)
-                ->latest()->take(10)->get(),           
-            ]);
+            return  redirect()->route('home');
         }
     }
 
