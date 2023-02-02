@@ -27,6 +27,13 @@ class HomeController extends Controller
         ]);
     }
 
+    public function profileSearch()
+    {
+        return view('site.profile-search',[
+            'active' => 'profile-search',
+        ]);
+    }
+
     public function about()
     {
         return view('site.about',[

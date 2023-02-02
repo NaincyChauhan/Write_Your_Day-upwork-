@@ -42,6 +42,7 @@ Route::get('get/session/data', [SiteUserController::class, 'callMailFunc']);
 // User Routes
 Route::group(['middleware' => ['auth:sanctum',  'verified']], function () {
     Route::get('/', [SiteHomeController::class, 'index'])->name('home');
+    Route::get('/friends', [SiteHomeController::class, 'profileSearch'])->name('friends');
 });
 
 Route::group(['middleware' => ['auth:sanctum',  'verified', 'role']], function () {

@@ -27,7 +27,7 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = RouteServiceProvider::HOME;
+    protected $redirectTo = RouteServiceProvider::USER_HOME;
     protected $username = ['email', 'username', 'mobile'];
 
     /**
@@ -39,25 +39,6 @@ class LoginController extends Controller
     {
         $this->middleware('guest')->except('logout');
     }
-
-    // protected function credentials(Request $request)
-    // {
-    //     if(is_numeric($request->get('email'))){
-    //         // return ['phone'=>$request->get('email'),'password'=>$request->get('password')];
-    //         return $request->only('phone', 'password');
-    //     }
-    //     elseif (filter_var($request->get('email'), FILTER_VALIDATE_EMAIL)) {
-    //         // return ['email' => $request->get('email'), 'password'=>$request->get('password')];
-    //         return $request->only('email', 'password');
-    //     }
-    //     //   return ['username' => $request->get('email'), 'password'=>$request->get('password')];
-    //     return $request->only('username','password');
-    // }
-
-    // public function username()
-    // {
-    //     return 'username';
-    // }
 
     public function username()
     {

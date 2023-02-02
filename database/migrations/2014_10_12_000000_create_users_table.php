@@ -23,6 +23,8 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->date('dob')->nullable();
             $table->string('password');
+            $table->string('phone')->nullable();
+            $table->date('dob')->nullable();
             $table->rememberToken();
             $table->timestamps();
             $table->tinyInteger('status')->default(1);
