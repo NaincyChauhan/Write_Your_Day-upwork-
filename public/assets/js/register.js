@@ -123,7 +123,7 @@ $(function() {
                                 if (data.type != 1) {
                                     $('#verify-otp').show();
                                 } else {
-                                    location.reload();
+                                    window.location.pathname = "/friends";
                                 }
                             } else {
                                 MessageShow('#dc3545',data.message);

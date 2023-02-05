@@ -43,6 +43,11 @@ Route::get('get/session/data', [SiteUserController::class, 'callMailFunc']);
 Route::group(['middleware' => ['auth:sanctum',  'verified']], function () {
     Route::get('/', [SiteHomeController::class, 'index'])->name('home');
     Route::get('/friends', [SiteHomeController::class, 'profileSearch'])->name('friends');
+    
+    // User Sections
+    Route::get('/edit/profile', [SiteUserController::class, 'editProfile'])->name('user-profile');
+    Route::post('/update/profile', [SiteUserController::class, 'updateProfile'])->name('edit-profile');
+
 });
 
 Route::group(['middleware' => ['auth:sanctum',  'verified', 'role']], function () {

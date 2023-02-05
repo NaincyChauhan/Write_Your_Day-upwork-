@@ -13,7 +13,6 @@ use App\Mail\UserMail;
 
 class UserController extends Controller
 {
-
     public  function loginuser(Request $request){
         $request->validate([
             'password' => 'required',
@@ -109,14 +108,59 @@ class UserController extends Controller
     }
 
     public function editProfile(Request $request){
-        return view('site.user.update-profile',[
-            'user' => User::where('id',Auth::user()->id)->select('name','email','address','image','mobile')->first(),
-            'active' => $request->active,
+        return view('site.user.profile-edit',[
+            'user' => User::where('id',Auth::user()->id)->
+                      select('name','email','username','image','phone','thought_of_the_day','website','gender','bio')->first(),
         ]);
     }
 
     public function updateProfile(Request $request){
         $user = User::where('id',Auth::user()->id)->first();
+
+        // dd($request->json()->all(),"first is ",$request->type, "second is here" ,$request);
+
+        // Type 1 describe the change and Verify the Email Id
+        if(isset($request->type) && $request->type == 1){
+            $request->validate([
+                'email' => 'required|unique:users,email,'.$user->id,
+            ]);
+
+            if(isset($request->otp) && Session::has('change_email_otp')){
+                if($request->otp == Session::get('change_email_otp')){
+                    if($request->email == Session::get('change_email_id')){
+                        $user->email = $request->email;
+                        $user->save();
+                        return response()->json([
+                            'status' => 1, 
+                            'message' => 'Email Id has been Changed', 
+                        ]);  
+                    }else{
+                        return response()->json([
+                            'status' => 0, 
+                            'message' => 'Email Id must be same where you send OTP request', 
+                        ]);  
+                    }
+                }else{
+                    return response()->json([
+                        'status' => 0, 
+                        'message' => 'Invalid OTP', 
+                    ]);  
+                }
+            }
+
+            $otp = rand(100000, 999999);
+            $mailData = [ 'name' => $user->name,'otp' => $otp,'template' => 'mail.otp','subject' => 'One Time Password'];
+            Mail::to($request->email)->send(new UserMail($mailData));
+            Session::put('change_email_otp', $otp);
+            Session::put('change_email_id', $request->email);
+            return response()->json([
+                'status' => 1, 
+                'message' => 'OTP has been sent In your email('.substr($request->email, 0, 10).'****). if  you missed  please check your spam folder.', 
+                'type' => 0
+            ]);        
+            
+        }
+        
         $request->validate([
             'name' => 'required',
             'email' => 'required|unique:users,email,'.$user->id,
