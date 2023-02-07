@@ -29,7 +29,7 @@
                     aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <a class="navbar-brand" href="./index.html">write <span>your</span> day ...</a>
+                <a class="navbar-brand" href="{{route('home')}}">write <span>your</span> day ...</a>
                 <div class="header-search mbl-search">
                     <div class="dropdown">
                         <span class="dropdown-toggle" id="dropdownMenuButton1" data-bs-toggle="dropdown"
@@ -74,7 +74,7 @@
                             </div>
                         </li>
                         <li class="nav-item write-btn">
-                            <a href="./write-page.html"><span class="header-btn" href="./write-page.html">Write
+                            <a href="{{route('home')}}"><span class="header-btn" href="{{route('home')}}">Write
                                     Now</span></a>
                         </li>
                         <li class="nav-item saved d-lg-none">
@@ -83,52 +83,62 @@
                             </a>
                         </li>
                         <li class="nav-item messages">
-                            <a class="header-message-box" href="./chat.html">
+                            <a class="header-message-box" href="{{route('home')}}">
                                 <small>Message</small>
                                 <span class="header-message d-none" href="#">2</span>
                             </a>
                         </li>
                         <li class="nav-item profile">
-                            <a href="./profile.html">
+                            <a href="{{route('user-profile')}}">
                                 <div class="nav-link">
-                                    <img class="header-img" src="{{ asset('assets/images/radious-img.png') }}">
-                                    <h4>Birget Marrie</h4>
+                                    <img class="header-img" src="{{ isset(Auth::user()->image) ? asset('storage/users/'.Auth::user()->image) : asset('assets/images/images.png') }}">
+                                    <h4>{{Auth::user()->name}}</h4>
 
                                 </div>
                             </a>
                         </li>
                         <li class="nav-item notifiction">
-                            <a href="./Notification.html">
-                                <span class="header-notifiction" href="./Notification.html">
+                            <a href="{{route('home')}}">
+                                <span class="header-notifiction" href="{{route('home')}}">
                                     <small class="d-block d-lg-none">Notification</small>
-                                    <img src="{{ asset('assets/images/bell.png') }}" alt="bell.png') }}">
+                                    <img src="{{ asset('assets/images/bell.png') }}" alt="bell.png">
                                     <p>2</p>
                                 </span>
                             </a>
                         </li>
                         <li class="nav-item user-icon">
                             <div class="nav-link">
-                                <img class="header-img" src="{{ asset('assets/images/radious-img.png') }}">
-                                <h4 class="d-lg-none">Birget Marrie</h4>
+                                <img class="header-img" src="{{ isset(Auth::user()->image) ? asset('storage/users/'.Auth::user()->image) : asset('assets/images/images.png') }}">
+                                <h4 class="d-lg-none">{{Auth::user()->name}}</h4>
                             </div>
                             <ul class="submenu">
                                 <li>
-                                    <a href="./profile.html">
-                                        <img class="header-img" src="{{ asset('assets/images/radious-img.png') }}">
-                                        <h4>Birget Marrie</h4>
+                                    <a href="{{route('view-user-profile')}}">
+                                        <img class="header-img" src="{{ isset(Auth::user()->image) ? asset('storage/users/'.Auth::user()->image) : asset('assets/images/images.png') }}">
+                                        <h4>{{Auth::user()->name}}</h4>
                                     </a>
                                 </li>
-                                <li><a href="./edit.html">Settings</a></li>
+                                <li><a href="{{route('user-profile')}}">Settings</a></li>
+                                @if (Auth::user()->hasRole('superadmin'))
+                                <li><a href="{{route('dashboard')}}">Dashboard</a></li>                                    
+                                @endif
                                 <li><a href="./profile-search.html">Saved</a></li>
                                 <li class="logout_link"><a href="#">Logout</a></li>
                             </ul>
                         </li>
 
                         <li class="nav-item settings d-lg-none">
-                            <a class="header-message-box" href="./edit.html">
+                            <a class="header-message-box" href="{{route('user-profile')}}">
                                 <small>Settings</small>
                             </a>
                         </li>
+                        @if (Auth::user()->hasRole('superadmin'))
+                                <li class="nav-item logout d-lg-none ">
+                                    <a class="header-message-box logout_link" href="{{route('dashboard')}}">
+                                        <small>Dashboard</small>
+                                    </a>
+                                </li>
+                        @endif
                         <li class="nav-item logout d-lg-none ">
                             <a class="header-message-box logout_link" href="#">
                                 <small>Logout</small>
@@ -143,16 +153,22 @@
     @yield('content')
 
     {{-- Logout Modal --}}
-    <div class="logout_container overlay hide">
-        <div class="logout_box">
-            <p class="logout_ques">Do you really want to leave us :( ?</p>
-            <div class="d-flex justify-content-between">
-                <button class="logout_btn" id="logout">Yes, I'm sorry</button>
-                <button class="logout_btn cancel_btn" id="cancel_logout">No, I'm here</button>
+    <form id="logout-form" action="{{ url('logout') }}" method="POST" >
+        @csrf 
+        <div class="overlay hide logout_container">
+            <div class="ques_box">
+              <p class="ques_txt">Do you really want to leave us :( ?</p>
+              <div class="d-flex justify-content-between">
+                <button type="submit" class="ques_btn" id="logout">Yes, I'm sorry</button>
+                <button type="button" onclick="$('.overlay').hide();" class="ques_btn cancel_btn" id="cancel_logout">
+                  No, I'm here
+                </button>
+                {{-- <button type="button" onclick="$('.overlay').hide();"  class="ques_btn" id="">Yes, I'm sorry</button> --}}
+              </div>
             </div>
-        </div>
-    </div>
-
+          </div>
+    </form>
+    
     {{-- Footer --}}
     <div class="footer text-center">
         <div class="container">
@@ -162,7 +178,6 @@
 
     <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
     <script src="{{ asset('assets/js/bootstrap.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('assets/js/custom.js') }}"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     {{-- <script src="{{ asset('assets/js/msg_extras.js') }}"></script> --}}
     @yield('js')
@@ -304,6 +319,7 @@
         });
         // });
     </script>
+    <script type="text/javascript" src="{{ asset('assets/js/custom.js') }}"></script>
 </body>
 
 </html>

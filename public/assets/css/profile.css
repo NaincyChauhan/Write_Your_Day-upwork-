@@ -1,29 +1,86 @@
+header.header {
+    border-bottom: 0;
+    box-shadow: none;
+}
+
 .setting_icon {
     color: #000;
     transition: color .2s ease;
 }
 
-.profile-detail-content .more_option_toggle:hover {
-    transform: scale(1.1);
-    box-shadow: 0 0 5px rgba(40, 40, 40, .5);
+
+.suspender {
+    height: 5rem;
+    width: 100%;
+    left: 0;
+    top: 0;
 }
 
-.profile-detail-content .more_option_toggle {
-    border: 1px solid #000;
+.profile-thought {
+    background-color: var(--main_color);
+}
+
+.thoughtoday h3:before {
+    content: "";
+    position: absolute;
+    bottom: -0.5rem;
+    width: 10ch;
+    height: 0.2rem;
+    background: #fff;
+    border-radius: 1rem;
+}
+
+.thoughtoday h3:after {
+    content: "";
+    position: absolute;
+    bottom: -0.5rem;
+    width: 0.25rem;
+    height: 0.25rem;
+    background: #fff;
+    border-radius: 50%;
+    left: 10.07ch;
+}
+
+.profile-thought .profile-detail-img img {
+    border-color: #fff;
+}
+
+.profile-name {
+    border-bottom: 2px solid rgba(40, 40, 40, .3);
+}
+@media screen and (max-width: 600px){
+    .profile-name h4{
+        border-bottom: 2px solid rgba(40, 40, 40, .3);
+        padding-bottom: .5rem;
+    } 
+    .profile-name {
+        border-bottom: none;
+    }
+}
+/* .profile-thought */
+.more_option_toggle:hover {
+    transform: scale(1.1);
+}
+
+ .more_option_toggle {
+    border: 0;
+    background: transparent;
     padding: 5px;
     border-radius: 100vmax;
     display: flex;
     margin-left: 15px;
     transition: all .3s ease;
+    right: 1rem;
+    top: 1rem;
 }
 
-.profile-detail-content .more_option_toggle .dot {
+ .more_option_toggle .dot {
     width: 5px;
     height: 5px;
-    background-color: #000;
+    background-color: #fff;
     display: inline-block;
     border-radius: 50%;
-    margin: 5px 2px;
+    margin: 2px 0;
 }
 
 .overlay_container .more_options {
@@ -141,7 +198,8 @@
     .following_box .following_list .follower .follower_name {
         min-width: auto;
     }
-    .followers_box .follower_list .follower .follow_btn{
+
+    .followers_box .follower_list .follower .follow_btn {
         margin-left: .5em;
     }
 }

@@ -51,7 +51,7 @@
                             </div>
                             <p id="password_error" class="error"></p>
                         </legend>
-                        <p class="forgot"><a href="/forgotpass.html">Forgot Password</a></p>
+                        <p class="forgot"><a href="{{route('forget-password-view')}}">Forgot Password</a></p>
 
                         <legend class="d-flex flex-column flex-sm-row justify-content-sm-between confirm">
                             <label for="rememberpass"><input type="checkbox" name="remember" id="remeberpass">
@@ -67,7 +67,7 @@
             <div class="alert hide"></div>
             <aside class="d-flex flex-column justify-content-center align-items-center">
                 <nav>
-                    <p class="navbar-brand" href="./index.html">write <span>your</span> day ...</p>
+                    <p class="navbar-brand" href="{{route('home')}}">write <span>your</span> day ...</p>
                 </nav>
                 <div>
                     <div class="login_img">

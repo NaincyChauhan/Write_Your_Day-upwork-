@@ -120,6 +120,9 @@ ul{
 .user-friend:hover{
     background-color: #407ad6;
 }
+.user-friend.selected .avatar{
+    border: 3px solid rgb(26, 151, 26) ;
+}
 .user-friend .friends-messages{
     position: absolute;
     right: 1rem;
@@ -159,7 +162,6 @@ ul{
     margin-right: .8rem;
     vertical-align: middle;
     overflow: hidden;
-
 }
 .avatar img{
     max-width: 100%;

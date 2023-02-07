@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Messages;
+use App\Models\Helpcenter;
 use Illuminate\Http\Request;
-use Mail;
+use Auth,Mail;
 use App\Mail\UserMail;
 
-class MessageController extends Controller
+class HelpcenterController extends Controller
 {
     function __construct()
     {
         // set permission
-        $this->middleware('permission:read-Enquiry', ['only' => ['index','show']]);
+        // $this->middleware('permission:read-help-messages', ['only' => ['index','show']]);
     }
     /**
      * Display a listing of the resource.
@@ -21,9 +21,9 @@ class MessageController extends Controller
      */
     public function index()
     {
-        return view('admin.messages.index', [
-            'active' => 'message',
-            'messages' => Messages::orderBy('id', 'DESC')->get()
+        return view('admin.help-request.index', [
+            'active' => 'help-message',
+            'messages' => Helpcenter::orderBy('id', 'DESC')->get()
         ]);
     }
 
@@ -45,42 +45,38 @@ class MessageController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required',
-            'email' => 'required',
-            'mobile' => 'required',
-            'subject' => 'required',
-            'message' => 'required',
-        ]);
-
-        $message = new Messages();
-        $message->name = $request->name;
-        $message->email = $request->email;
-        $message->mobile = $request->mobile;
-        $message->subject = $request->subject;
-        $message->message = $request->message;
-        $message->save();
+        $helpcenter = new Helpcenter();
+        $helpcenter->user_id = Auth::user()->id;
+        $helpcenter->name = $request->name;
+        $helpcenter->email = $request->email;
+        $helpcenter->phone = $request->phone;
+        $helpcenter->message = $request->message;
+        $helpcenter->save();
 
         $mailData = [
             'name' => $request->name,
             'email' => $request->email,
-            'mobile' => $request->mobile,
-            'subject' => $request->subject,
+            'phone' => $request->phone,
             'user_message' => $request->message,
-            'template' => 'mail.message',
+            'subject' => "Help Request",
+            'template' => 'mail.help',
         ];
         Mail::to(env('MAIL_USERNAME'))->send(new UserMail($mailData));
 
-        return back()->with('success', 'Success.! Message has been sent successfull.!');
+        return response()->json([
+            'status' => 1,
+            'message' => 'Success! Your Request Has been send successfully. We will contact you soon.',
+        ], 200);
+
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Message  $message
+     * @param  \App\Models\Helpcenter  $helpcenter
      * @return \Illuminate\Http\Response
      */
-    public function show(Message $message)
+    public function show(Helpcenter $helpcenter)
     {
         //
     }
@@ -88,10 +84,10 @@ class MessageController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Message  $message
+     * @param  \App\Models\Helpcenter  $helpcenter
      * @return \Illuminate\Http\Response
      */
-    public function edit(Message $message)
+    public function edit(Helpcenter $helpcenter)
     {
         //
     }
@@ -100,10 +96,10 @@ class MessageController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Message  $message
+     * @param  \App\Models\Helpcenter  $helpcenter
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Message $message)
+    public function update(Request $request, Helpcenter $helpcenter)
     {
         //
     }
@@ -111,16 +107,15 @@ class MessageController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Message  $message
+     * @param  \App\Models\Helpcenter  $helpcenter
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Helpcenter $helpcenter)
     {
-        $message = Messages::where('id',$id)->first();
-        $message->delete();
+        $helpcenter->delete();
         return response()->json([
             'status' => 1, 
-            'message' => "Success.! Blog has been deleted successfully.!", 
+            'message' => "Success.! Help Request has been deleted successfully.!", 
         ], 200);
     }
 
@@ -129,18 +124,18 @@ class MessageController extends Controller
         $request->validate([
             'ids' => 'required',
         ]);
-        Messages::whereIn('id',explode(",",$request->ids))->delete();
+        Helpcenter::whereIn('id',explode(",",$request->ids))->delete();
         
         return response()->json([
             'status' => 1, 
-            'message' => "Success.! Messages has been deleted successfully.",
+            'message' => "Success.! Help Request has been deleted successfully.",
         ], 200);
     }
 
     public function loadTable()
     {
-        return view('admin.messages.table', [
-            'messages' => Messages::orderBy('id', 'DESC')->get()
+        return view('admin.help-request.table', [
+            'messages' => Helpcenter::orderBy('id', 'DESC')->get()
         ]);
     }
 }

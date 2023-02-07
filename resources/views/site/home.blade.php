@@ -1377,4 +1377,19 @@
         </ul>
     </div>
 </section>
+
+{{-- <form id="logout-form" action="{{ url('logout') }}" method="POST" >
+    @csrf 
+    <div class="overlay hide logout_container">
+        <div class="ques_box">
+          <p class="ques_txt">Do you really want to leave us :( ?</p>
+          <div class="d-flex justify-content-between">
+            <button type="submit" class="ques_btn" id="logout">Yes, I'm sorry</button>
+            <button type="button" onclick="$('.logout_container').hide();" class="ques_btn cancel_btn" id="cancel_logout">
+              No, I'm here
+            </button>
+          </div>
+        </div>
+      </div>
+</form> --}}
 @endsection

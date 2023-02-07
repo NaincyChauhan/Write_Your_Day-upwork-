@@ -21,7 +21,7 @@
                 <td>
                     @can('update-user')
                         <label class="switch">
-                            <input type="checkbox" onchange="changeStatus($(this))" href="{{ route('change-staff-status', $user->id) }}" {{ $user->status == 1 ? 'checked' : '' }}>
+                            <input type="checkbox" onchange="changeStatus($(this))" href="{{ route('change-user-status', $user->id) }}" {{ $user->status == 1 ? 'checked' : '' }}>
                             <span class="slider round"></span>
                         </label>
                     @endcan

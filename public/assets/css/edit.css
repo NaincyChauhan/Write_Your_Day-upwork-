@@ -693,8 +693,7 @@ fieldset:last-child {
     }
 }
 
-#edit-phone-btn,
-#edit-email-btn {
+.edit-email-phone{
     box-shadow: 0 0 0 1px #d4d4d4;
     border: 0;
     font-family: "Poppins", sans-serif;
@@ -713,4 +712,22 @@ fieldset:last-child {
 }
 .error{
     color: darkred;
+    font-size: 0.8rem;
+    font-weight: 500;
+    /* display: ; */
+}
+.cancel-button{
+    border: navajowhite;
+    background: transparent;
+    display: none;
+    float: right;
+}
+
+.cancel-button-text{
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: red;
+}
+#success-message{
+    font-size: 15px;
 }

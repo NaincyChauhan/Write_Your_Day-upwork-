@@ -6,6 +6,10 @@ use Illuminate\Support\Facades\Route;
 // Site Controller
 use App\Http\Controllers\Site\HomeController as SiteHomeController;
 use App\Http\Controllers\Site\UserController as SiteUserController;
+use App\Http\Controllers\HelpcenterController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\AboutController;
+use App\Http\Controllers\SettingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,13 +49,16 @@ Route::group(['middleware' => ['auth:sanctum',  'verified']], function () {
     Route::get('/friends', [SiteHomeController::class, 'profileSearch'])->name('friends');
     
     // User Sections
+    Route::get('/profile', [SiteUserController::class, 'viewProfile'])->name('view-user-profile');
     Route::get('/edit/profile', [SiteUserController::class, 'editProfile'])->name('user-profile');
     Route::post('/update/profile', [SiteUserController::class, 'updateProfile'])->name('edit-profile');
+    Route::post('update-password', [UserController::class, 'updatePassword'])->name('update-password');
+    Route::post('help-center', [HelpcenterController::class, 'store'])->name('help-center');
+    Route::get('user/delete/request', [SiteUserController::class, 'deleteRequest'])->name('user-delete-request');
 
 });
 
 Route::group(['middleware' => ['auth:sanctum',  'verified', 'role']], function () {
-
     // Admin Panel
     Route::group(['prefix' => 'admin'], function(){
         // Dashboard
@@ -59,6 +66,12 @@ Route::group(['middleware' => ['auth:sanctum',  'verified', 'role']], function (
 
         // Messages
         Route::resource('message', MessageController::class);
+        Route::resource('helpcenter', HelpcenterController::class);
+
+        // Users
+        Route::resource('user', UserController::class);
+        Route::resource('user', UserController::class);
+        Route::resource('staff', StaffController::class);
         
         // Policies
         Route::group(["prefix" => "policy"], function(){
@@ -92,7 +105,14 @@ Route::group(['middleware' => ['auth:sanctum',  'verified', 'role']], function (
 
         //Ajax
         Route::group(["prefix" => "ajax"], function(){
-            
+            // Load Table
+            Route::get('load-help-request-table', [HelpcenterController::class, 'loadTable'])->name('load-help-request-table');
+
+            // Multi Delete
+            Route::get('delete-help-requests', [HelpcenterController::class, 'multiDelete'])->name('delete-help-requests'); 
+
+            // Change Staff
+            Route::put('change-user-status/{id}', [UserController::class, 'UserChangeStatus'])->name('change-user-status');
         });
         Route::get('change-password', [UserController::class, 'changePassword'])->name('change-password');
     });

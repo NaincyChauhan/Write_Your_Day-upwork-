@@ -3,7 +3,7 @@
   <head>
     <meta name="viewport" content="width=device-width" />
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Email Varification</title>
+    <title>Help Request</title>
     <style>
       /* -------------------------------------
           GLOBAL RESETS
@@ -242,7 +242,7 @@
         <td>&nbsp;</td>
         <td class="container">
           <div class="content">
-            <span class="preheader">One Time Password</span>
+            <span class="preheader">Help Request</span>
             <table class="main">
 
               <!-- START MAIN CONTENT AREA -->
@@ -251,14 +251,36 @@
                   <table border="0" cellpadding="0" cellspacing="0">
                     <tr>
                       <td>
-                        <h1>One Time Password</h1>
-                        <h2 style="margin-bottom: 0px;">Hi! {{$mailData['name']}},</h2>                        
-                        <h4 style="color: gray;">Your Email Verification OTP!</h4>
+                        <h1>New Help Request</h1>
+                        <h2>{{$mailData['subject']}}</h2>
+                        <table border="0" cellpadding="0" cellspacing="0">
+                          <tbody>
+                            <tr>
+                              <td align="left">
+                                <table border="0" cellpadding="0" cellspacing="0">
+                                  <tbody>
+                                    <tr>
+                                      <td><strong>Name:</strong></td>
+                                      <td>{{$mailData['name']}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Email:</strong></td>
+                                        <td>{{$mailData['email']}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Mobile:</strong></td>
+                                        <td>{{$mailData['phone']}}</td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
                         <p>
-                            {{$mailData['otp']}} is the One Time Password (OTP) for your Email Verification, valid for 10 minutes. Do not share your OTP with anyone, Write Your Day never calls to verify OTP.
+                            {{$mailData['user_message']}}
                         </p>
-                        <h4 style="margin-bottom: 0px;">With Regards,</h4>      
-                        <h5 style="margin-top: 2px;">Write Your Day.</h5>
+      
                       </td>
                     </tr>
                   </table>
@@ -273,7 +295,7 @@
               <table border="0" cellpadding="0" cellspacing="0">
                 <tr>
                   <td class="content-block">
-                    <span class="apple-link">writeyourday.in</span>
+                    <span class="apple-link">hhnsewak.in</span>
                   </td>
                 </tr>
                 <tr>

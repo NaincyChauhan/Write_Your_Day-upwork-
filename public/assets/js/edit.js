@@ -99,11 +99,33 @@ let closeBox = () => {
     }, 1000)
 }
 
+// Change User Email
+const userEmail = $('#user-email');
+let email_btn = $('#change-email-btn');
+let edit_email_btn = $('#edit-email-btn');
+let emailMessage = $('#email_message');
+const email_opt_box = $('#email-otp-box');
+const cancel_edit_email = $('#cancel-edit-email');
+
+function EditUserEmail() {
+    userEmail.attr('readonly', false)
+    edit_email_btn.css('display', 'none');
+    email_btn.css('display', 'block');
+    $('#cancel-edit-email').css('display', 'block');
+}
+
+function CancelEditEmail(obj) {
+    userEmail.attr('readonly', true);
+    userEmail.val(userEmail.attr('oldValue'));
+    edit_email_btn.css('display', 'block');
+    email_btn.css('display', 'none');
+    obj.css('display', 'none');
+    emailMessage.html("");
+    email_opt_box.css('display', 'none');
+    email_opt_box.val("");
+}
+
 function ChangeUserEmail() {
-    const userEmail = $('#user-email');
-    let emailMessage = $('#email_message'),
-        email_btn = $('#edit-email-btn');
-    const email_opt_box = $('#email-otp-box');
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -127,38 +149,345 @@ function ChangeUserEmail() {
         type: "POST",
         url: $('#edit-profile-form').attr('action'),
         data: {
-            "email":userEmail.val(),
-            "otp":email_opt_box.val(),
+            "email": userEmail.val(),
+            "otp": email_opt_box.val(),
             "type": 1,
         },
-        success: function(data) {
+        success: function (data) {
             if (parseInt(data.status) == 1) {    // Success
                 emailMessage.addClass("text-success");
                 emailMessage.html(data.message)
-                if (parseInt(data.type)==0) {
-                    email_opt_box.css("display","block");
+                if (parseInt(data.type) == 0) {
+                    email_opt_box.css("display", "block");
+                    email_btn.html('Verify');
+                }
+                if (parseInt(data.type) == 1) {
+                    email_opt_box.css("display", "none");
+                    userEmail.attr('readonly', true);
+                    email_opt_box.val("");
+                    email_btn.css("display", "none");
+                    edit_email_btn.css('display', 'block');
+                    cancel_edit_email.css('display', 'none');
+                    email_btn.html('Change');
                 }
             } else {  // Failed
                 emailMessage.addClass("error");
                 emailMessage.html(data.message)
+                email_btn.html('Verify');
             }
             email_btn.attr("disabled", false);
-            email_btn.html('Verify');
         },
-        error: function(data) { // Failed
-            $.each(data.responseJSON.errors, function(key, value) {
-                emailMessage.html(value);
-            });
+        error: function (data) { // Failed
+            emailMessage.addClass("error");
+            emailMessage.html(data.responseJSON.message);
             email_btn.attr("disabled", false);
-            email_btn.html('Edit');
+            email_btn.html('Change');
         }
     });
 }
 
-//Tabs Layout Code
-$("#tabs").tabs({
-    activate: function (event, ui) {
-        var active = $('#tabs').tabs('option', 'active');
-        $("#tabid").html('the tab id is ' + $("#tabs ul>li a").eq(active).attr("href"));
-    }
+// Change User Phone
+const userPhone = $('#user-phone');
+let phone_btn = $('#change-phone-btn');
+let edit_phone_btn = $('#edit-phone-btn');
+let phoneMessage = $('#phone_message');
+const phone_opt_box = $('#phone-otp-box');
+const cancel_edit_phone = $('#cancel-edit-phone');
+
+function EditUserPhone() {
+    userPhone.attr('readonly', false)
+    edit_phone_btn.css('display', 'none');
+    phone_btn.css('display', 'block');
+    $('#cancel-edit-phone').css('display', 'block');
+}
+
+function CancelEditPhone(obj) {
+    userPhone.attr('readonly', true);
+    userPhone.val(userPhone.attr('oldValue'));
+    edit_phone_btn.css('display', 'block');
+    phone_btn.css('display', 'none');
+    obj.css('display', 'none');
+    phoneMessage.html("");
+    phone_opt_box.css('display', 'none');
+    phone_opt_box.val("");
+}
+
+function ChangeUserPhone() {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+    // Sending Post Request.....
+    phone_btn.attr("disabled", true);
+    phone_btn.html('Requesting');
+    $.ajax({
+        type: "POST",
+        url: $('#edit-profile-form').attr('action'),
+        data: {
+            "phone": userPhone.val(),
+            "otp": phone_opt_box.val(),
+            "type": 2,
+        },
+        success: function (data) {
+            phoneMessage.css('display','block');
+            if (parseInt(data.status) == 1) {    // Success
+                phoneMessage.addClass("text-success");
+                phoneMessage.html(data.message)
+                if (parseInt(data.type) == 0) {
+                    phone_opt_box.css("display", "block");
+                    phone_btn.html('Verify');
+                }
+                if (parseInt(data.type) == 1) {
+                    phone_opt_box.css("display", "none");
+                    userPhone.attr('readonly', true);
+                    phone_opt_box.val("");
+                    phone_btn.css("display", "none");
+                    edit_phone_btn.css('display', 'block');
+                    phone_btn.html('Change');
+                    cancel_edit_phone.css('display', 'none');
+                }
+            } else {  // Failed
+                phoneMessage.addClass("error");
+                phoneMessage.html(data.message)
+                phone_btn.html('Verify');
+            }
+            phone_btn.attr("disabled", false);
+        },
+        error: function (data) { // Failed
+            phoneMessage.addClass("error");
+            phoneMessage.css('display','block');
+            phoneMessage.html(data.responseJSON.message);
+            phone_btn.attr("disabled", false);
+            phone_btn.html('Change');
+        }
+    });
+}
+
+
+// Update Profile
+let message = $('#success-message');
+const Error_Messages = ['username','name','gender','thought_of_the_day','bio'];
+$(function () {
+    $('#edit-profile-form').validate({
+        rules: {
+            name: "required",
+            username: "required",
+            thought_of_the_day: "required",
+            gender: "required",
+            bio: "required",
+        },
+        messages: {
+            name: "Oops.! The name field is required.",
+            username: "Oops.! The Username field is required.",
+            thought_of_the_day: "Oops.! The Thought Of The Day field is required.",
+            gender: "Oops.! The Gender field is required.",
+            bio: "Oops.! The Bio field is required.",
+        },
+        errorElement: 'p',
+        errorPlacement: function (error, element) {
+            error.addClass('invalid-feedback');
+            element.closest('.grid-65').append(error);
+        },
+        highlight: function (element, errorClass, validClass) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            $(element).removeClass('is-invalid');
+        },
+        submitHandler: function (f) {
+            clearErrors();
+            var btn = $('#update-profile-btn'),
+                form = $('#edit-profile-form');
+            btn.attr('disabled', true);
+            btn.val('Requesting');
+            $.ajax({
+                type: "POST",
+                processData: false,
+                contentType: false,
+                url: form.attr('action'),
+                data: new FormData(form[0]), // serializes the form's elements.
+                success: function (data) {
+                    // clearErrors();
+                    if (parseInt(data.status) == 1) {
+                        MessageShow('alert-success', data.message,$('#profile-setting'));
+                        $('#user-photo').html(data.img);
+                        $('.header-img').each(function(index,element) {
+                            $(element).attr('src',data.profileimage);
+                         });
+                    } else {
+                        MessageShow('alert-danger',data.message,$('#profile-setting'));
+                    }
+                    btn.attr("disabled", false);
+                    // form[0].reset();
+                    btn.val('Update Profile');
+                },
+                error: function (data) {
+                    // clearErrors();
+                    $.each(data.responseJSON.errors, function (key, value) {
+                        $(`#${key}` + "_error").css('display','block');
+                        $(`#${key}` + "_error").html(value);
+                    });
+                    btn.attr("disabled", false);
+                    btn.val('Update Profile');
+                }
+            });
+            return false;
+        }
+    });
 });
+
+
+//Change Password validation
+$(function (){
+    $('#change-pass-form').validate(
+    {
+        rules: {
+            old_password: "required",
+            new_password: "required",
+            confirm_password: "required",
+        },
+        messages: {
+            old_password: "Oops.! The old password field is required.",
+            new_password: "Oops.! The new password field is required.",
+            confirm_password: "Oops.! The confirm password field is required.",
+        },          
+        errorElement: 'p',
+        errorPlacement: function (error, element) {
+            error.addClass('invalid-feedback');
+            element.closest('.grid-65').append(error);
+        },
+        highlight: function (element, errorClass, validClass) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            $(element).removeClass('is-invalid');
+        },
+        submitHandler: function(f) {
+            var btn = $('#change-pass-btn'), form = $('#change-pass-form');
+            btn.attr('disabled', true) ;
+            btn.val('Updating...');
+            clearErrors(['old_password','new_password','confirm_password']);
+            $.ajax({
+                type: "POST",
+                url: form.attr('action'),
+                data: form.serialize(), // serializes the form's elements.
+                success: function(data) {
+                    if(parseInt(data.status) == 1)
+                    {
+                        MessageShow('alert-success',data.message,$('#password-settings'));
+                    }else{
+                        MessageShow('alert-danger',data.message,$('#password-settings'));
+                    }                     
+                    btn.attr("disabled", false);
+                    form[0].reset();                            
+                    btn.val('Update');
+                },
+                error: function(data) {                    
+                    if (data.responseJSON.message != "") {
+                        MessageShow('alert-danger', data.responseJSON.message,$('#password-settings'));
+                    }
+                    $.each(data.responseJSON.errors, function (key, value) {
+                        $(`#${key}`+"_error").css('display','block');
+                        $(`#${key}`+"_error").html(value);
+                    });
+                    btn.attr("disabled", false);
+                    btn.val('Update');
+                }
+            });
+            return false;
+        }
+    });
+});
+
+// Help Request
+$(function (){
+    $('#help-form').validate(
+    {
+        rules: {
+            name: "required",
+            email: "required",
+            message: "required",
+        },
+        messages: {
+            name: "Oops.! The old Name field is required.",
+            email: "Oops.! The new Email field is required.",
+            message: "Oops.! The  Message field is required.",
+        },          
+        errorElement: 'p',
+        errorPlacement: function (error, element) {
+            error.addClass('invalid-feedback');
+            element.closest('.grid-65').append(error);
+        },
+        highlight: function (element, errorClass, validClass) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            $(element).removeClass('is-invalid');
+        },
+        submitHandler: function(f) {
+            var btn = $('#help-btn'), form = $('#help-form');
+            btn.attr('disabled', true) ;
+            btn.val('Sending...');
+            clearErrors(['email_help','name_help','phone_help','message_help']);
+            $.ajax({
+                type: "POST",
+                url: form.attr('action'),
+                data: form.serialize(), // serializes the form's elements.
+                success: function(data) {
+                    if(parseInt(data.status) == 1)
+                    {
+                        MessageShow('alert-success',data.message,$('#help'));
+                    }else{
+                        MessageShow('alert-danger',data.message,$('#help'));
+                    }                     
+                    btn.attr("disabled", false);
+                    form[0].reset();                            
+                    btn.val('Send');
+                },
+                error: function(data) {                    
+                    if (data.responseJSON.message != "") {
+                        MessageShow('alert-danger', data.responseJSON.message,$('#help'));
+                    }
+                    $.each(data.responseJSON.errors, function (key, value) {
+                        $(`#${key}` + "_help_error").css('display','block');
+                        $(`#${key}` + "_help_error").html(value);
+                    });
+                    btn.attr("disabled", false);
+                    btn.val('Send');
+                }
+            });
+            return false;
+        }
+    });
+});
+
+
+function clearErrors(error_messages="") {
+    if (error_messages.length > 0) {
+        $.each(error_messages, function (key, value) {
+            $(`#${value}` + "_help_error").html("");
+        }); 
+    }else{
+        $.each(Error_Messages, function (key, value) {
+            $(`#${value}` + "_help_error").html("");
+        });
+    }
+}
+
+function MessageShow(addclass,msg,container) {
+    // $('#success-box').css('display', 'block')
+    $(container).prepend(`<div class="alert ${addclass} alert-dismissible fade show" role="alert">
+                                <span id="success-message">${msg}</span>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>`);
+    $(".active").scrollTop(0);
+}
+
+// //Tabs Layout Code
+// $("#tabs").tabs({
+//     activate: function (event, ui) {
+//         var active = $('#tabs').tabs('option', 'active');
+//         $("#tabid").html('the tab id is ' + $("#tabs ul>li a").eq(active).attr("href"));
+//     }
+// });

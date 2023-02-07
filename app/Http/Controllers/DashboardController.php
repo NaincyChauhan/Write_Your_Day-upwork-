@@ -3,8 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Models\Userapplication;
-use App\Models\Messages;
+use App\Models\Helpcenter;
 use Illuminate\Http\Request;
 use Carbon\Carbon, Auth;
 
@@ -17,19 +16,14 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        $user = Auth::user();
-        if($user->hasRole('superadmin'))
+        if(Auth::user()->hasRole('superadmin'))
         {
-            return "everything working fine";
             return view('admin.dashboard', [
                 'active' => 'dashboard',            
-                'users' => User::count(),            
-                'applications' => Userapplication::count(),            
-                'income' => Userapplication::sum('amount'),            
-                'messages' => Messages::latest()->take(20)->get(),            
+                'users' => User::count(),                  
+                'messages' => Helpcenter::latest()->take(20)->get(),            
             ]);
-        }
-        else
+        }else
         {
             return  redirect()->route('home');
         }

@@ -144,7 +144,7 @@
         <div class="privacy_box">
             <h3 class="title">Privacy Policy</h3>
             <div class="content">
-                Privacy Policy Descripation
+                {{App\Models\Policies::get()->first()->policy}}
             </div>
             <button class="cancel_btn">Close</button>
         </div>

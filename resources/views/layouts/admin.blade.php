@@ -61,10 +61,10 @@
             <div class="navbar-brand-wrapper d-flex justify-content-center">
                 <div class="navbar-brand-inner-wrapper d-flex justify-content-between align-items-center w-100">
                     <a class="navbar-brand brand-logo" href="{{ route('dashboard') }}">
-                        <img src="{{ asset('/'.$setting->light_logo) }}" alt="logo" style="height:70px;"/>
+                        <img src="{{ isset($setting->light_logo) ? asset('/'.$setting->light_logo) : asset('app-assets/images/haxways.png') }}" alt="logo" style="height:70px;"/>
                     </a>
                     <a class="navbar-brand brand-logo-mini" href="{{ route('dashboard') }}">
-                        <img src="{{ asset('/'.$setting->favicon) }}" alt="logo" />
+                        <img src="{{ isset($setting->favicon) ? asset('/'.$setting->favicon) : asset('app-assets/images/haxways.png') }}" alt="logo" />
                     </a>
                     <button class="navbar-toggler navbar-toggler align-self-center" type="button"
                         data-toggle="minimize">
@@ -117,20 +117,6 @@
         </nav>
         <!-- partial -->
         <nav class="navbar-breadcrumb col-xl-12 col-12 d-flex flex-row p-0">
-            {{-- <div class="navbar-links-wrapper d-flex align-items-stretch">
-                <div class="nav-link">
-                    <a href="javascript:;"><i class="typcn typcn-calendar-outline"></i></a>
-                </div>
-                <div class="nav-link">
-                    <a href="javascript:;"><i class="typcn typcn-mail"></i></a>
-                </div>
-                <div class="nav-link">
-                    <a href="javascript:;"><i class="typcn typcn-folder"></i></a>
-                </div>
-                <div class="nav-link">
-                    <a href="javascript:;"><i class="typcn typcn-document-text"></i></a>
-                </div>
-            </div> --}}
             <div class="navbar-menu-wrapper d-flex align-items-center justify-content-left">
                 <ul class="navbar-nav mr-lg-2">
                     <li class="nav-item ml-0">
@@ -157,329 +143,7 @@
                         </a>
                     </li>
                     
-                    @can('read-banner')
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('banner.index') }}">
-                                <i class="typcn typcn-image menu-icon"></i>
-                                <span class="menu-title">Banners</span>
-                            </a>
-                        </li>
-                    @endcan
-                    @can('read-category')
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('category.index') }}">
-                                <i class="mdi mdi-format-list-bulleted-type menu-icon"></i>
-                                <span class="menu-title">Categories</span>
-                            </a>
-                        </li>
-                    @endcan
-                    @can('read-subcategory')
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('subcategory.index') }}">
-                                <i class="mdi mdi-playlist-minus menu-icon"></i>
-                                <span class="menu-title">Sub-Categories</span>
-                            </a>
-                        </li>
-                    @endcan
-
-    
-                    @can('read-blog')                   
-                        <li class="nav-item">
-                            <a class="nav-link" data-toggle="collapse" href="#latest-update" aria-expanded="false"
-                                aria-controls="latest-update">
-                                <i class="mdi mdi-blogger menu-icon"></i>
-                                <span class="menu-title">Blogs</span>
-                                <i class="menu-arrow"></i>
-                            </a>
-                            <div class="collapse" id="latest-update">
-                                <ul class="nav flex-column sub-menu">
-                                    @can('create-blog')
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="{{route('blog.create')}}">Add Blog</a>
-                                        </li>
-                                    @endcan
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="{{route('blog.index')}}">Blogs</a>
-                                    </li>
-                                    
-                                    @can('read-blogcategory')
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="{{route('blogcategory.index')}}">Categories</a>
-                                        </li>
-                                    @endcan
-                                    @can('manage-blogtag')
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="{{route('blogtag.index')}}">Tags</a>
-                                        </li>
-                                    @endcan
-                                </ul>
-                            </div>
-                        </li>
-                    @endcan
-    
-                    @can('read-news')
-                        <li class="nav-item">
-                            <a class="nav-link" data-toggle="collapse" href="#news-elements" aria-expanded="false"
-                                aria-controls="news-elements">
-                                <i class="mdi mdi-newspaper menu-icon"></i>
-                                <span class="menu-title">News</span>
-                                <i class="menu-arrow"></i>
-                            </a>
-                            <div class="collapse" id="news-elements">
-                                <ul class="nav flex-column sub-menu">
-                                    @can('create-listing')
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="{{route('news.create')}}">Add News</a>
-                                        </li>
-                                    @endcan
-                    
-                                    @can('read-news')
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="{{route('news.index')}}">News</a>
-                                        </li>
-                                    @endcan
-                                </ul>
-                            </div>
-                        </li>
-                    @endcan
-
-                    @can('read-video')
-                        <li class="nav-item">
-                            <a class="nav-link" data-toggle="collapse" href="#video-gallery" aria-expanded="false"
-                                aria-controls="video-gallery">
-                                <i class="mdi mdi-file-video menu-icon"></i>
-                                <span class="menu-title">Video Gallery</span>
-                                <i class="menu-arrow"></i>
-                            </a>
-                            <div class="collapse" id="video-gallery">
-                                <ul class="nav flex-column sub-menu">
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="{{route('videogallery.index')}}">Videos</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                    @endcan
-    
-                    @can('read-image')
-                        <li class="nav-item">
-                            <a class="nav-link" data-toggle="collapse" href="#image-gallery" aria-expanded="false"
-                                aria-controls="image-gallery">
-                                <i class="mdi mdi-file-image menu-icon"></i>
-                                <span class="menu-title">Image Gallery</span>
-                                <i class="menu-arrow"></i>
-                            </a>
-                            <div class="collapse" id="image-gallery">
-                                <ul class="nav flex-column sub-menu">
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="{{route('imagegallery.index')}}">Images</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                    @endcan
-
-                    @can('read-testimonial')
-                        <li class="nav-item">
-                            <a class="nav-link" data-toggle="collapse" href="#testimonial-managment" aria-expanded="false"
-                                aria-controls="testimonial-managment">
-                                <i class="mdi mdi-file-document-box menu-icon"></i>
-                                <span class="menu-title">Testimonials</span>
-                                <i class="menu-arrow"></i>
-                            </a>
-                            <div class="collapse" id="testimonial-managment">
-                                <ul class="nav flex-column sub-menu">
-                                    @can('create-testimonial')
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="{{ route('testimonial.create') }}">Add Testimonial</a>
-                                        </li>
-                                    @endcan
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="{{ route('testimonial.index') }}">Testimonials</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                    @endcan
-
-                    @can('read-notice')
-                        <li class="nav-item">
-                            <a class="nav-link" data-toggle="collapse" href="#notice-managment" aria-expanded="false"
-                                aria-controls="notice-managment">
-                                <i class="mdi mdi-file-send menu-icon"></i>
-                                <span class="menu-title">Notices</span>
-                                <i class="menu-arrow"></i>
-                            </a>
-                            <div class="collapse" id="notice-managment">
-                                <ul class="nav flex-column sub-menu">
-                                    @can('create-notice')
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="{{ route('notice.create') }}">Add Notice</a>
-                                        </li>
-                                    @endcan
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="{{ route('notice.index') }}">Notices</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                    @endcan
-
-                    @can('read-event')
-                        <li class="nav-item">
-                            <a class="nav-link" data-toggle="collapse" href="#event-managment" aria-expanded="false"
-                                aria-controls="event-managment">
-                                <i class="mdi mdi-dns menu-icon"></i>
-                                <span class="menu-title">Events</span>
-                                <i class="menu-arrow"></i>
-                            </a>
-                            <div class="collapse" id="event-managment">
-                                <ul class="nav flex-column sub-menu">                                    
-                                    @can('create-event')
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="{{ route('event.create') }}">Add Event</a>
-                                        </li>
-                                    @endcan
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="{{ route('event.index') }}">Events</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                    @endcan
-
-                    @can('read-achievement')
-                        <li class="nav-item">
-                            <a class="nav-link" data-toggle="collapse" href="#achievement-managment" aria-expanded="false"
-                                aria-controls="achievement-managment">
-                                <i class="mdi mdi-arrow-up-bold-hexagon-outline menu-icon"></i>
-                                <span class="menu-title">Achievements</span>
-                                <i class="menu-arrow"></i>
-                            </a>
-                            <div class="collapse" id="achievement-managment">
-                                <ul class="nav flex-column sub-menu">
-                                    @can('create-achievement')
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="{{ route('achievement.create') }}">Add Achievement</a>
-                                        </li>
-                                    @endcan
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="{{ route('achievement.index') }}">Achievements</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                    @endcan
-
-                    @can('read-service')
-                        <li class="nav-item">
-                            <a class="nav-link" data-toggle="collapse" href="#service-managment" aria-expanded="false"
-                                aria-controls="service-managment">
-                                <i class="mdi mdi-barley menu-icon"></i>
-                                <span class="menu-title">Services</span>
-                                <i class="menu-arrow"></i>
-                            </a>
-                            <div class="collapse" id="service-managment">
-                                <ul class="nav flex-column sub-menu">
-                                    @can('create-service')
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="{{ route('service.create') }}">Add Service</a>
-                                        </li>
-                                    @endcan
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="{{ route('service.index') }}">Services</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                    @endcan
-
-                    @can('read-college')
-                        <li class="nav-item">
-                            <a class="nav-link" data-toggle="collapse" href="#college-managment" aria-expanded="false"
-                                aria-controls="college-managment">
-                                <i class="mdi mdi-school menu-icon"></i>
-                                <span class="menu-title">Colleges</span>
-                                <i class="menu-arrow"></i>
-                            </a>
-                            <div class="collapse" id="college-managment">
-                                <ul class="nav flex-column sub-menu">                                    
-                                    @can('create-college')
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="{{ route('college.create') }}">Add College</a>
-                                        </li>
-                                    @endcan
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="{{ route('college.index') }}">Colleges</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                    @endcan
-
-                    @can('read-product')
-                        <li class="nav-item">
-                            <a class="nav-link" data-toggle="collapse" href="#product-managment" aria-expanded="false"
-                                aria-controls="product-managment">
-                                <i class="mdi mdi-seat-flat menu-icon"></i>
-                                <span class="menu-title">Products</span>
-                                <i class="menu-arrow"></i>
-                            </a>
-                            <div class="collapse" id="product-managment">
-                                <ul class="nav flex-column sub-menu">
-                                    @can('create-product')
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="{{ route('product.create') }}">Add Product</a>
-                                        </li>
-                                    @endcan
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="{{ route('product.index') }}">Products</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                    @endcan
-    
-                    @can('read-role')
-                        <li class="nav-item">
-                            <a class="nav-link" data-toggle="collapse" href="#roles-managment" aria-expanded="false"
-                                aria-controls="roles-managment">
-                                <i class="mdi mdi-security menu-icon"></i>
-                                <span class="menu-title">Roles</span>
-                                <i class="menu-arrow"></i>
-                            </a>
-                            <div class="collapse" id="roles-managment">
-                                <ul class="nav flex-column sub-menu">
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="{{ route('role.create') }}">Add Role</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="{{ route('role.index') }}">Roles</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                    @endcan
-    
-                    @can('read-staff')
-                        <li class="nav-item">
-                            <a class="nav-link" data-toggle="collapse" href="#staff-management" aria-expanded="false"
-                                aria-controls="staff-management">
-                                <i class="mdi mdi-account-location menu-icon"></i>
-                                <span class="menu-title">Staffs</span>
-                                <i class="menu-arrow"></i>
-                            </a>
-                            <div class="collapse" id="staff-management">
-                                <ul class="nav flex-column sub-menu">
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="{{ route('staff.index') }}">Staffs</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                    @endcan
-    
-                    @can('read-user')
+                    {{-- @can('read-user')
                         <li class="nav-item">
                             <a class="nav-link" data-toggle="collapse" href="#user-management" aria-expanded="false"
                                 aria-controls="user-management">
@@ -495,7 +159,7 @@
                                 </ul>
                             </div>
                         </li>
-                    @endcan
+                    @endcan --}}
     
                     @can('update-setting')
                         <li class="nav-item">
@@ -518,12 +182,6 @@
                                 <ul class="nav flex-column sub-menu">
                                     <li class="nav-item">
                                         <a class="nav-link" href="{{ route('policy.update.policy') }}">Privacy Policy</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="{{ route('refund.update.policy') }}">Refund Policy</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="{{ route('policy.update.term') }}">Terms & Conditions</a>
                                     </li>
                                 </ul>
                             </div>
@@ -557,7 +215,7 @@
     
                     @can('read-Enquiry')
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('message.index') }}">
+                            <a class="nav-link" href="{{ route('helpcenter.index') }}">
                                 <i class="mdi mdi-message-alert menu-icon"></i>
                                 <span class="menu-title">Enquiry Management</span>
                             </a>
@@ -570,12 +228,6 @@
                             <span class="menu-title">Change Password</span>
                         </a>
                     </li>
-                    {{-- <li class="nav-item">
-                        <a class="nav-link" href="{{ route('dashboard') }}">
-                            <i class="mdi mdi-chart-bar menu-icon"></i>
-                            <span class="menu-title">Activities</span>
-                        </a>
-                    </li> --}}
                 </ul>
             </nav>
             <!-- partial -->
@@ -590,7 +242,7 @@
                         <div class="card-body">
                             <div class="d-sm-flex justify-content-center justify-content-sm-between">
                                 <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright ©
-                                    2022 <a href="" class="text-muted" target="_blank">{{ config('app.name') }}</a>. All rights
+                                    2023 <a href="" class="text-muted" target="_blank">{{ config('app.name') }}</a>. All rights
                                     reserved.</span>
                                 <span
                                     class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center text-muted">Design
@@ -618,7 +270,6 @@
     <script src="{{ asset('app-assets/js/hoverable-collapse.js') }}"></script>
     <script src="{{ asset('app-assets/js/template.js') }}"></script>
     <script src="{{ asset('app-assets/js/settings.js') }}"></script>
-
     <script src="{{ asset('app-assets/js/todolist.js') }}"></script>
     <script src="{{ asset('app-assets/vendors/typeahead.js/typeahead.bundle.min.js') }}"></script>
     <script src="{{ asset('app-assets/vendors/select2/select2.min.js') }}"></script>
@@ -627,6 +278,8 @@
     <script src="{{ asset('app-assets/js/file-upload.js') }}"></script>
     <script src="{{ asset('app-assets/js/typeahead.js') }}"></script>
     <script src="{{ asset('app-assets/js/select2.js') }}"></script>
+    <script src="{{ asset('app-assets/js/swal.min.js') }}"></script>
+    <script src="{{ asset('assets/js/messages.js') }}"></script>
     {{-- Error Script --}}
     <script>
         $(function () {
@@ -653,9 +306,7 @@
                     text: "@foreach($errors->all() as $error) * {{ $error }} \n @endforeach",
                 });
             @endif
-        });
-
-        
+        });        
     </script>
 
     @yield('js')

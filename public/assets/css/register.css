@@ -1,6 +1,7 @@
-body{
+body {
     background-color: var(--main_color);
 }
+
 .container-fluid {
     width: 100%;
     padding: 0;
@@ -27,6 +28,7 @@ nav .navbar-brand {
 nav .navbar-brand span {
     color: #000;
 }
+
 aside h3 {
     margin-bottom: .7em;
 }
@@ -46,6 +48,7 @@ aside p {
 .login_img img {
     width: 100%;
 }
+
 main {
     order: 2;
     display: flex;
@@ -75,17 +78,22 @@ main {
     width: 100%;
     float: unset;
     font-size: .9em;
+    position: relative;
     margin-bottom: 1.5em;
 }
-.form fieldset.hide{
+
+.form fieldset.hide {
     display: none;
 }
+
 .form legend .input-group {
     margin: .8em 0;
 }
-.form legend label{
+
+.form legend label {
     font-size: 1em;
 }
+
 .form legend .icon {
     border: 0;
     font-size: 1.2em;
@@ -102,7 +110,7 @@ main {
     border: 0;
     padding: 0.4em 2.5em;
     font-size: 1.2em;
-    box-shadow: 1px 1px 3px rgb(121, 121, 121) ;
+    box-shadow: 1px 1px 3px rgb(121, 121, 121);
     background: #fff;
     border-radius: 100vmax !important;
     color: rgb(20, 20, 20);
@@ -112,7 +120,7 @@ main {
 }
 
 
-.form legend .input-group .password-toogle{
+.form legend .input-group .password-toogle {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
@@ -127,25 +135,26 @@ main {
     margin-bottom: 2.5em;
 }
 
-.form .forgot a{
+.form .forgot a {
     color: #fff;
     text-decoration: underline;
 }
 
-.form .forgot a:hover{
+.form .forgot a:hover {
     text-decoration: none;
-    color: rgba(255,255,255, .7);
-}
+    color: rgba(255, 255, 255, .7);
+}   
 
-.error{
+.error {
     color: darkred;
     font-weight: 500;
 }
 
-.form legend .submit, #resend_code_btn {
+.form legend .submit,
+#resend_code_btn {
     width: 8em;
     font-weight: 500;
-    font-size: 1.2em;
+    font-size: 1em;
     border-radius: 100vmax;
     display: block;
     background: #fff;
@@ -156,22 +165,40 @@ main {
     transition: all .3s ease;
     position: relative;
 }
-
+.verify .code_btn{
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    border: 0;
+    border-radius: 0 100vmax 100vmax 0;
+    font-size: 1em;
+    font-weight: 500;
+}
+.verify .code_btn .countdown{
+    position: unset;
+    padding-left: .3em;
+}
+/* .form .verify legend  .submit,
 #resend_code_btn{
+    marin
+} */
+#resend_code_btn {
     color: #fff;
     border: 1px solid #fff;
     background: transparent;
 }
 
-.form legend .submit:hover, #resend_code_btn:hover{
+.form legend .submit:hover,
+#resend_code_btn:hover {
     transform: scale(1.1);
 }
 
-.form legend .submit.loading{
+.form legend .submit.loading {
     background-color: #efefef;
 }
 
-.form legend .submit.loading::after{
+.form legend .submit.loading::after {
     content: "";
     padding: .5em;
     border: 1px solid var(--main_color);
@@ -204,11 +231,11 @@ main {
     font-weight: 400;
 }
 
-.external-link a:hover{
-    color: rgba(255,255,255, .7);
+.external-link a:hover {
+    color: rgba(255, 255, 255, .7);
 }
 
-.alert{
+.alert {
     position: fixed;
     top: 50%;
     left: 50%;
@@ -220,14 +247,15 @@ main {
     font-weight: 600;
     max-width: 15em;
     text-align: center;
-    
+
 }
-.alert.hide{
+
+.alert.hide {
     visibility: hidden;
     transition: all .5s ease;
 }
 
-.countdown{
+.countdown {
     position: absolute;
     top: 50%;
     right: 0;
@@ -240,16 +268,32 @@ main {
     font-weight: 500;
 }
 
+.iti-mobile .iti--container {
+    width: 75vw;
+    max-width: 20em;
+}
+
+.iti.iti--allow-dropdown {
+    width: 100%;
+    color: rgba(20, 20, 20, 1);
+}
+.iti__country-list{
+    border-radius: 0.5rem;
+    margin-top: 0.3rem;
+    width: 650%;
+}
 @media screen and (min-width: 500px) {
 
     .main {
         padding: 0 2.5em;
     }
+
     aside {
         padding-left: 2.5em;
         padding-right: 2.5em;
     }
-    aside p{
+
+    aside p {
         font-size: .8em;
     }
 }
@@ -271,6 +315,110 @@ main {
     }
 }
 
+
+/* privacy alert */
+.privacy_link{
+    text-decoration: underline;
+    transition: color .2s ease;
+}
+.privacy_link:hover{
+    text-decoration: unset;
+    color: rgba(255, 255, 255, .7);
+}
+.privacy_box {
+    width: 75vw;
+    max-width: 40em;
+    background: #fff;
+    height: 85vh;
+    padding: 1em 0;
+    border-radius: 1em;
+    font-size: 1.1em;
+    position: relative;
+}
+.privacy_box .title {
+    text-align: center;
+    padding-bottom: 0.5em;
+    font-weight: 600;
+}
+.privacy_box .content {
+    overflow-y: scroll;
+    height: 85%;
+    text-align: justify;
+    padding: 0 1.5em;
+}
+.privacy_box .cancel_btn {
+    border: 0;
+    padding: 0.5em 0.8em;
+    border-radius: 100vmax;
+    background-color: var(--main_color);
+    color: #fff;
+    font-weight: 500;
+    position: absolute;
+    right: 1em;
+    bottom: 1.5%;
+}
+
+
+/* phone code */
+.form legend .icon.country_icon{
+    border-radius: 0px;
+    width: 18px;
+    background-size: 100% 100%;
+    display: inline-block;
+    height: 12px;
+    background-repeat: no-repeat;
+    cursor: pointer;
+}
+.country_icon:after {
+    content: "";
+    width: 5px;
+    height: 5px;
+    border-bottom: 2px solid #000;
+    border-left: 2px solid #000;
+    position: relative;
+    left: 21px;
+    display: block;
+    top: 30%;
+    transform: rotate(-45deg);
+}
+.country_list {
+    background-color: #fff;
+    color: #000;
+    width: 85vw;
+    max-width: 20em;
+    border-radius: 0.5em;
+    padding: 0.5em 0;
+    max-height: 20em;
+    height: 60vh;
+    overflow-y: scroll;
+    position: absolute;
+    top: 110%;
+    left: 0;
+    z-index: 1;
+}
+.country_list.hide{
+    visibility: hidden;
+}
+.country_list .country {
+    padding: 0.25em 0.5em 0.25em;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #efefef;
+    cursor: pointer;
+}
+.country_list .country:hover {
+    background-color: #efefef;
+}
+.country > span {
+    margin-left: 0.5em;
+}
+.country_flag{
+    width: 25px;
+    height: 15px;
+    display: inline-block;
+}
+
+
 @media screen and (min-width: 768px) {
     aside {
         width: 50%;
@@ -279,33 +427,37 @@ main {
         padding-left: 3em;
         padding-right: 3em;
     }
-    
+
     main {
         width: 50%;
         order: 1;
     }
+
     aside p {
         font-size: 1.1em;
         text-align: center;
     }
+
     .main {
         padding: 0 3em;
     }
 
-.form .forgot {
-    font-size: 1em;
-}
+    .form .forgot {
+        font-size: 1em;
+    }
 }
 
 @media screen and (min-width: 1200px) {
-    aside{
+    aside {
         padding-left: 7em;
         padding-right: 7em;
     }
-    .main{
+
+    .main {
         padding: 1.5em 7em;
     }
-    .main .form legend label{
+
+    .main .form legend label {
         font-size: 1.2em;
     }
 }
@@ -313,16 +465,21 @@ main {
 
 
 @keyframes rotate {
-    to{transform: rotateZ(360deg);}
+    to {
+        transform: rotateZ(360deg);
+    }
 }
 
-input::-webkit-outer-spin-button, input::-webkit-inner-spin-button{
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
     -webkit-appearance: none;
     appearance: none;
     margin: 0;
 }
-input[type=number]{
+
+input[type=number] {
     -moz-appearance: textfield;
+    appearance: none;
 }
 .iti__country-name{
     color: black !important;

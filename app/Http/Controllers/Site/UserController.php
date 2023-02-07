@@ -8,6 +8,7 @@ use App\Models\Role;
 use App\Http\Controllers\Controller;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Rules\Password;
+use App\Models\Policies;
 use Session, Auth,Hash,Mail;
 use App\Mail\UserMail;
 
@@ -30,13 +31,16 @@ class UserController extends Controller
 
         $user = User::where($field, $request->email)->first();
         if (isset($user)) {
-            if(Hash::check($request->password, $user->password))
-            {                
-                Auth::loginUsingId($user->id,$request->remember);
-                return response()->json(['status' => 1, 'message' => 'True'], 200); 
+            if($user->status == 1){
+                if(Hash::check($request->password, $user->password))
+                {                
+                    Auth::loginUsingId($user->id,$request->remember);
+                    return response()->json(['status' => 1, 'message' => 'True'], 200); 
+                }
+            }else{
+                return response()->json(['status' => 0, 'message' => "Your Account is Blocked in this site.If you don't know about this please contact the Support Center"], 200);
             }
         }
-
         return response()->json(['status' => 0, 'message' => "Credentials Does't not match"], 200);
     }
 
@@ -45,7 +49,7 @@ class UserController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:20'],
-            'email' => ['required', 'string', 'email:rfc,dns', 'max:50', 'unique:users'],
+            'email' => ['required', 'string', 'max:50', 'unique:users'],
             'password' => ['required', 'string', 'confirmed',Password::min(8)
             ->letters()->numbers()->symbols()],
             'username' => ['required','unique:users','max:20'],
@@ -75,6 +79,8 @@ class UserController extends Controller
                         $user->permissions()->attach($role->permissions);
         
                         Auth::loginUsingId($user->id);
+                        Session::forget('user_register_otp');
+                        Session::forget('user_register_email');
                         return response()->json(['status' => 1, 'message' => 'User registered successfully.', 'type' => 1]);
                     }else
                     {
@@ -101,23 +107,33 @@ class UserController extends Controller
         return response()->json(['status' => 1, 'message' => 'OTP has been sent In your email('.substr($request->email, 0, 10).'****). if  you missed  please check your spam folder.', 'type' => 0]);        
     }
 
+    // User Change Password View
     public function changePassword(Request $request){
         return view('site.user.change-password',[
             'active' => $request->active,
         ]);
     }
 
-    public function editProfile(Request $request){
-        return view('site.user.profile-edit',[
+    // User Profile View
+    public function viewProfile(){
+        return view('site.user.view-profile',[
             'user' => User::where('id',Auth::user()->id)->
                       select('name','email','username','image','phone','thought_of_the_day','website','gender','bio')->first(),
         ]);
     }
 
+    // User  Edit Profile View
+    public function editProfile(Request $request){
+        return view('site.user.profile-edit',[
+            'user' => User::where('id',Auth::user()->id)->
+                      select('name','email','username','image','phone','thought_of_the_day','website','gender','bio')->first(),
+            'privacy' => Policies::get()->first()->policy,
+        ]);
+    }
+
+    // User  Update Profile 
     public function updateProfile(Request $request){
         $user = User::where('id',Auth::user()->id)->first();
-
-        // dd($request->json()->all(),"first is ",$request->type, "second is here" ,$request);
 
         // Type 1 describe the change and Verify the Email Id
         if(isset($request->type) && $request->type == 1){
@@ -130,9 +146,12 @@ class UserController extends Controller
                     if($request->email == Session::get('change_email_id')){
                         $user->email = $request->email;
                         $user->save();
+                        Session::forget('change_email_otp');
+                        Session::forget('change_email_id');
                         return response()->json([
                             'status' => 1, 
                             'message' => 'Email Id has been Changed', 
+                            'type' => 1,
                         ]);  
                     }else{
                         return response()->json([
@@ -160,12 +179,62 @@ class UserController extends Controller
             ]);        
             
         }
+
+        // Type 2 describe the change and Verify the User Phone Number
+        if(isset($request->type) && $request->type == 2){
+            $request->validate([
+                'phone' => 'required|max:10|min:10|unique:users,phone,'.$user->id,
+            ]);
+
+            if(isset($request->otp) && Session::has('change_phone_otp')){
+                if($request->otp == Session::get('change_phone_otp')){
+                    if($request->phone == Session::get('change_phone_number')){
+                        $user->phone = $request->phone;
+                        $user->phone_verified = 1;
+                        $user->save();
+                        Session::forget('change_phone_otp');
+                        Session::forget('change_phone_number');
+                        return response()->json([
+                            'status' => 1, 
+                            'message' => 'Phone Number has been Changed', 
+                            'type' => 1,
+                        ]);  
+                    }else{
+                        return response()->json([
+                            'status' => 0, 
+                            'message' => 'Phone Number must be same where you send OTP request', 
+                        ]);  
+                    }
+                }else{
+                    return response()->json([
+                        'status' => 0, 
+                        'message' => 'Invalid OTP', 
+                    ]);  
+                }
+            }
+
+            // $otp = rand(100000, 999999);
+            // Send Phone OTP
+            // $mailData = [ 'name' => $user->name,'otp' => $otp,'template' => 'mail.otp','subject' => 'One Time Password'];
+            // Mail::to($request->email)->send(new UserMail($mailData));
+            $otp = 123456;
+            Session::put('change_phone_otp', $otp);
+            Session::put('change_phone_number', $request->phone);
+            return response()->json([
+                'status' => 1, 
+                'message' => 'OTP has been sent In your Phone('.$request->phone.').', 
+                'type' => 0
+            ]);        
+            
+        }
         
         $request->validate([
             'name' => 'required',
-            'email' => 'required|unique:users,email,'.$user->id,
-            'mobile' => 'required',
-            'address' => 'required',
+            'username' => 'required|max:20|unique:users,username,'.$user->id,            
+            'image' => [isset($user->image) ? '' : 'required' ,'mimetypes:image/jpg,image/png,image/jpeg,image/webp','max:1024','min:2'],
+            'thought_of_the_day' => 'required',
+            'gender' => 'required',
+            'bio' => 'required',
         ]);
 
         //Uploading Image
@@ -182,16 +251,18 @@ class UserController extends Controller
             $user->image = $file_name;
         }
         $user->name = $request->name;
-        $user->email = $request->email;
-        $user->mobile = $request->mobile;
-        $user->address = $request->address;
+        $user->username = $request->username;
+        $user->thought_of_the_day = $request->thought_of_the_day;
+        $user->gender = $request->gender;
+        $user->bio = $request->bio;
+        $user->website = $request->website;
         $user->save();
 
         return response()->json([
             'status' => 1, 
             'message' => "Success.! Profile has been updated successfully.",  
-            'img' => $user->image != null ? '<img src="'.asset('storage/users/'.$user->image) .'" class="img-thumbnail rounded-circle user-profile-image"  alt="User Profile">' : '',  
-            'profileimage' => $user->image != null ? '<img class="rounded-circle" src="'.asset('storage/users/'.$user->image).'" alt="user" width="50px">' : '',        
+            'img' => $user->image != null ? '<img src="'.asset('storage/users/'.$user->image) .'" class="photo img-fluid"  alt="User Profile">' : '',  
+            'profileimage' => asset('storage/users/'.$user->image),        
         ], 200);
     }
 
@@ -249,6 +320,50 @@ class UserController extends Controller
                     return response()->json(['status' => 0, 'message' => 'Invalid OTP.', 'type' => 0]);
                 }
             }
+        }
+    }
+
+    // Handle User Delete Request
+    public function deleteRequest(Request $request)
+    {
+        $user = User::where('id',Auth::user()->id)->first();
+        if(isset($user)){            
+            $user->delete_at = Carbon::now()->addDays(14);
+            $user->save();
+            
+            // Add a success message and redirect the user
+            // return redirect()->back()->with('success', 'Your account has been scheduled for deletion. You can still recover your account within the next 14 days.');
+            return response()->json([
+                'status' => 1,
+                'message' => 'Your account has been scheduled for deletion. You can still recover your account within the next 14 days',
+            ], 200);
+        }else{
+            return response()->json([
+                'status' => 0,
+                'message' => 'Something Went Wrong',
+            ], 200);
+        }
+    }
+
+    // Handle User Recover Account Request
+    public function recoverRequest(Request $request)
+    {
+        $user = User::where('id',Auth::user()->id)->first();
+        if(isset($user)){
+            $user->delete_at = null;
+            $user->save();
+            
+            // Add a success message and redirect the user
+            // return redirect()->back()->with('success', 'Your account has been successfully recovered.');
+            return response()->json([
+                'status' => 1,
+                'message' => 'Your account has been successfully recovered.',
+            ], 200);
+        }else{
+            return response()->json([
+                'status' => 0,
+                'message' => 'Something Went Wrong',
+            ], 200);
         }
     }
 }

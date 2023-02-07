@@ -47,6 +47,9 @@ button.btn:focus,
   outline: unset;
   box-shadow: none;
 }
+input:disabled{
+  filter: brightness(0.85);
+}
 
 :root {
   --heading_color: #1d4354;
@@ -65,6 +68,9 @@ button.btn:focus,
   background-color: rgba(0,0,0,.6);
   backdrop-filter: blur(0.8px);
   transition: .3s ease;
+}
+.overlay_container > div, .overlay > div{
+  animation: zoomin .3s ease;
 }
 .overlay_container.hide,.followers_container.hide,.following_container.hide  {
   visibility: hidden;
@@ -646,11 +652,11 @@ li .header-search .dropdown .dropdown-menu li:hover {
 .report_msg_box .report_btns .report_msg_btn:hover {
   transform: scale(1.1);
 }
-.logout_container .logout_box {
+.ques_box {
   width: 80vw;
   max-width: 20em;
 }
-.logout_box .logout_ques {
+.ques_box .ques_txt {
   margin-bottom: 1em;
   color: #fff;
   font-weight: 600;
@@ -658,17 +664,17 @@ li .header-search .dropdown .dropdown-menu li:hover {
   text-align: center;
   text-shadow: 0 0 10px black;
 }
-.logout_box .logout_btn {
+.ques_box .ques_btn {
   border: 0;
   padding: 7px 12px;
   border-radius: 100vmax;
   font-weight: 500;
-  transition: transform .2s ease;
+  background: rgb(255,255,255);
 }
-.logout_box .logout_btn:hover{
+.ques_box .ques_btn:hover, .d_btn:hover{
   transform: scale(1.05);
 }
-.logout_box .logout_btn#cancel_logout {
+.ques_box .ques_btn#cancel_logout {
   background-color: var(--main_color);
   color: #fff;
 }
@@ -984,16 +990,11 @@ ul.date_time li a img {
   padding: 50px 0;
 }
 
-.profile-detail {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-}
 
 .profile-detail-img img {
   border: 6px solid var(--main_color);
   border-radius: 50%;
-  margin-right: 60px;
+  /* margin-right: 60px; */
   max-width: 150px;
 }
 
@@ -1001,7 +1002,6 @@ ul.date_time li a img {
   font-size: 24px;
   font-weight: 600;
   color: #232323;
-  margin-right: 20px;
 }
 
 .profile-detail-content .profile-detail-list {
@@ -1011,14 +1011,18 @@ ul.date_time li a img {
 }
 
 .profile-detail-content .profile-detail-list li {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 400;
   color: #626262;
-  margin-right: 50px;
+  margin-right: 25px;
   line-height: 1.3;
   cursor: pointer;
+  padding-right: 25px;
 }
+.profile-detail-content .profile-detail-list li:not(:last-child){
+  border-right: 1.5px solid rgb(107, 103, 103, .3);
 
+}
 .profile-detail-content .profile-detail-list li span {
   font-weight: 500;
   color: #2a2a2a;
@@ -1378,7 +1382,6 @@ ul.date_time li a img {
   font-size: 16px;
   color: #333;
   display: block;
-  vertical-align: middle;
   margin-top: 10px;
 }
 
@@ -1729,7 +1732,6 @@ textarea {
   display: inline-block;
   height: 34px;
   width: 150px;
-  float: left;
   border: 0;
   font-size: 16px;
   z-index: 2;
@@ -2853,10 +2855,7 @@ section.sort-posts {
     margin: 15px 0px;
   }
 
-  .profile-detail-content .profile-detail-list li {
-    font-size: 14px;
-    margin-right: 25px;
-  }
+ 
 
   .profile-detail-content .profile-detail-a {
     font-size: 14px;
@@ -3408,4 +3407,9 @@ section.sort-posts {
   color: #989898;
   font-size: 16px;
   font-weight: 500;
+}
+
+@keyframes zoomin {
+  from{transform: scale(.8);}
+  to{transform: scale(1);}
 }
