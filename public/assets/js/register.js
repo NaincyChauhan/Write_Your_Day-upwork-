@@ -24,10 +24,12 @@ $(function() {
         rules: {
             email: "required",
             password: "required",
+            otp: "required",
         },
         messages: {
             email: "Oops.! The email field is required.",
             password: "Oops.! The Password field is required.",
+            otp: "Oops.! The OTP field is required.",
         },
         errorElement: 'span',
         errorPlacement: function(error, element) {
@@ -41,44 +43,7 @@ $(function() {
             $(element).removeClass('is-invalid');
         },
         submitHandler: function(f) {
-            var btn = $('#login'),
-                form = $('#LogInForm');
-            btn.attr('disabled', true);
-            btn.html('Requesting <i class="mdi mdi-cloud-circle"></i>');
-            $.ajax({
-                type: "POST",
-                processData: false,
-                contentType: false,
-                url: form.attr('action'),
-                data: new FormData(form[0]), // serializes the form's elements.
-                success: function(data) {
-                    if (parseInt(data.status) == 1) {    
-                        MessageShow('#fff',data.message);
-                        if(data.type == 1){
-                            $('#verify-login-otp').css('display','block')
-                            $('#proceed-login').css('display','none');
-                            btn.css('display','block');
-                            $('#login-type').val(0);
-                        }else {
-                            location.reload();                    
-                        }
-                    }else{
-                        MessageShow('#dc3545',data.message);
-                        if (data.type == 0) {
-                            $('#proceed-login').css('display','block');
-                            btn.css('display','none')
-                        }
-                    }
-                    btn.attr("disabled", false);
-                    btn.html('Sign In');
-                },
-                error: function(data) {
-                    MessageShow('#dc3545',data.message);
-                    btn.attr("disabled", false);
-                    btn.html('Sign In');
-                }
-            });
-
+            LoginAjaxRequest();
             return false;
         }
     });
@@ -90,6 +55,60 @@ function proseedToLogin() {
     $('#LogInForm').submit();
     $('#proceed-login').css('display','none');
     $('#login').css('display','block')
+}
+
+// Resend Login OTP
+function resendLoginOTP() {
+    $('#login-type').val(1);
+    $('#user-otp').val("");
+    $('#send_otp').html("Requesting...");
+    $('#send_otp').attr("disabled", true);
+    // $('#LogInForm').submit();
+    LoginAjaxRequest();
+}
+
+//  User Login Ajax Function
+function LoginAjaxRequest() {
+    var btn = $('#login'),
+    form = $('#LogInForm');
+    btn.attr('disabled', true);
+    btn.html('Requesting <i class="mdi mdi-cloud-circle"></i>');
+    $.ajax({
+        type: "POST",
+        processData: false,
+        contentType: false,
+        url: form.attr('action'),
+        data: new FormData(form[0]), // serializes the form's elements.
+        success: function(data) {
+            if (parseInt(data.status) == 1) {    
+                MessageShow('#fff',data.message);
+                if(data.type == 1){
+                    $('#verify-login-otp').css('display','block')
+                    $('#proceed-login').css('display','none');
+                    btn.css('display','block');
+                    $('#login-type').val(0);
+                }else {
+                    location.reload();                    
+                }
+            }else{
+                MessageShow('#dc3545',data.message);
+                if (data.type == 0) {
+                    $('#proceed-login').css('display','block');
+                    btn.css('display','none')
+                }
+            }
+            btn.attr("disabled", false);
+            btn.html('Sign In');
+            // Resend Login
+            $('#send_otp').html("Resend OTP");
+            $('#send_otp').attr("disabled", false);
+        },
+        error: function(data) {
+            MessageShow('#dc3545',data.message);
+            btn.attr("disabled", false);
+            btn.html('Sign In');
+        }
+    });
 }
 // Register Script
 $(function() {

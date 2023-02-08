@@ -68,6 +68,7 @@
                                     placeholder="Enter OTP" />
                                 <button class="code_btn" type="button" id="send_otp" onclick="event.preventDefault(); resendLoginOTP()"><span id="code_btn_txt">Resend OTP</span> <span id="countdown"></span></button>
                             </div>
+                            <p id="login_otp_error" class="error"></p>
                         </legend>
                         <p class="forgot"><a href="{{route('forget-password-view')}}">Forgot Password</a></p>
 
