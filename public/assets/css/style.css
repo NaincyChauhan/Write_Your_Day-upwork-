@@ -996,6 +996,8 @@ ul.date_time li a img {
   border-radius: 50%;
   /* margin-right: 60px; */
   max-width: 150px;
+  height: 150px;
+  max-height: 150px;
 }
 
 .profile-detail-content h4 {
@@ -1957,7 +1959,8 @@ section.sort-posts {
   }
 
   .profile-detail-img img {
-    width: 200px;
+    height: 150px;
+    width: 150px;
     border: 3px solid var(--main_color);
   }
 
@@ -2275,6 +2278,8 @@ section.sort-posts {
   }
 
   .profile-detail-img img {
+    /* width: 150px; */
+    height: 150px;
     width: 150px;
   }
 

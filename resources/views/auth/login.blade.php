@@ -20,6 +20,14 @@
     <link rel="stylesheet" href="{{ asset('assets/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/register.css') }}">
+    <style>
+        p{
+            text-align: start !important;
+        }
+        .forgot{
+            float: right;
+        }
+    </style>
 </head>
 
 <body>
@@ -32,6 +40,7 @@
                     <h1 class="title"><i class="fa fa-link"></i> Sign In</h1>
                     <form id="LogInForm" class="form" method="POST" action="{{route('login')}}">
                         @csrf
+                        <input type="hidden" name="type" id="login-type">
                         <legend class="legend">
                             <label for="user-email">Email/Username/Phone</label>
                             <div class="input-group d-flex align-items-center">
@@ -51,12 +60,22 @@
                             </div>
                             <p id="password_error" class="error"></p>
                         </legend>
+                        <legend class="legend verify" id="verify-login-otp" style="display:none;">
+                            <label for="user-otp">OTP:</label>
+                            <div class="input-group d-flex justify-content-end">
+                                <i class="fa fa-envelope icon"></i>
+                                <input type="text" name="otp" maxlength="6" id="user-otp"
+                                    placeholder="Enter OTP" />
+                                <button class="code_btn" type="button" id="send_otp" onclick="event.preventDefault(); resendLoginOTP()"><span id="code_btn_txt">Resend OTP</span> <span id="countdown"></span></button>
+                            </div>
+                        </legend>
                         <p class="forgot"><a href="{{route('forget-password-view')}}">Forgot Password</a></p>
 
                         <legend class="d-flex flex-column flex-sm-row justify-content-sm-between confirm">
                             <label for="rememberpass"><input type="checkbox" name="remember" id="remeberpass">
                                 Remember me</label>
                             <button id="login" type="submit" class="submit">Sign In</button>
+                            <button id="proceed-login" style="display:none;" onclick="event.preventDefault(); proseedToLogin()" type="button" class="submit">Proceed</button>                            
                         </legend>
                         <p class="external-link">Don't have an account? <a href="{{route('register')}}">Create one <i
                                     class="fa fa-external-link-alt"></i></a></p>

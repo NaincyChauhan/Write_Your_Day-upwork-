@@ -216,9 +216,9 @@
                         <img src="{{ isset(Auth::user()->image) ? asset('storage/users/'.Auth::user()->image) : asset('assets/images/images.png') }}" />
                     </div>
                     <div class="thoughtoday col-sm-7 px-4">
-                        <h3 class="mb-3 position-relative">{{$user->thought_of_the_day}}</h3>
+                        <h3 class="mb-3 position-relative">Thought Of The Day</h3>
                         <p class="thought text-start">
-                            {{$user->bio}}
+                            {{$user->thought_of_the_day}}
                         </p>
                     </div>
                 </div>
@@ -255,7 +255,7 @@
                   >
                 </div>
                 <div class="col-sm-7 px-4 mb-3 px-sm-2">
-                  <p class="username mb-2"><b>{{$user->username}}</b></p>
+                  <p class="username"><b>{{$user->username}}</b></p>
                   {{-- <p>CEO - of ABC Company</p> --}}
                   <p class="text-start">
                     {{$user->bio}}

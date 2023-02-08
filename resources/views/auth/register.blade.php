@@ -22,6 +22,11 @@
     <link rel="stylesheet" href="{{ asset('assets/css/register.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+    <style>
+        p{
+            text-align: start !important;
+        }
+    </style>
 </head>
 
 <body>

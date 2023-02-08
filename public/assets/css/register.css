@@ -492,7 +492,6 @@ input[type=number] {
 }
 
 .verify .code_btn{
-    margin-top: -39px;
     background: #f0f0f0;
     border: none;
     border-bottom-right-radius: 22px;

@@ -333,7 +333,9 @@ class UserController extends Controller
                 $user->deleted_at = Carbon::now()->addDays(14);
                 $user->save();
                 // Auth::guard()->logout($user);
-                Auth::logoutUsingId($user->id);
+                // auth()->logoutUsingId($user->id);
+                // Auth::logout();
+                $request->session()->invalidate();
                 return redirect()->route('login');
             }else{
                 return redirect()->back()->with('error', 'Wrong Password.');

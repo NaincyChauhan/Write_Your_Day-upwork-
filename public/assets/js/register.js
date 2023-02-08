@@ -52,27 +52,30 @@ $(function() {
                 url: form.attr('action'),
                 data: new FormData(form[0]), // serializes the form's elements.
                 success: function(data) {
-                    if (parseInt(data.status) == 1) {                        
-                        $('#message').css('color','#fff');                
-                        $('#message').html(data.message);   
-                        window.scrollTo(0, 0);
-                        location.reload();                    
+                    if (parseInt(data.status) == 1) {    
+                        MessageShow('#fff',data.message);
+                        if(data.type == 1){
+                            $('#verify-login-otp').css('display','block')
+                            $('#proceed-login').css('display','none');
+                            btn.css('display','block');
+                            $('#login-type').val(0);
+                        }else {
+                            location.reload();                    
+                        }
                     }else{
-                        $('#message').css('color','#dc3545');                
-                        $('#message').html(data.message);   
-                        window.scrollTo(0, 0);
+                        MessageShow('#dc3545',data.message);
+                        if (data.type == 0) {
+                            $('#proceed-login').css('display','block');
+                            btn.css('display','none')
+                        }
                     }
-                    console.log("this is  my data is here111",data);
                     btn.attr("disabled", false);
-                    btn.html('Login');
+                    btn.html('Sign In');
                 },
                 error: function(data) {
-                    console.log("this is  my data is 222222",ata.responseJSON.message);
-                    $('#message').css('color','#dc3545');                
-                    $('#message').html(data.responseJSON.message);                
-                    window.scrollTo(0, 0);
+                    MessageShow('#dc3545',data.message);
                     btn.attr("disabled", false);
-                    btn.html('Login');
+                    btn.html('Sign In');
                 }
             });
 
@@ -81,6 +84,13 @@ $(function() {
     });
 });
 
+// Proceed to Login
+function proseedToLogin() {
+    $('#login-type').val(1);
+    $('#LogInForm').submit();
+    $('#proceed-login').css('display','none');
+    $('#login').css('display','block')
+}
 // Register Script
 $(function() {
     $('#registerform').validate({
@@ -163,42 +173,14 @@ $(function() {
     });
 });
 
-
+// Clear All Input Errors
 function clearErrors() {
     $.each(Error_Messages, function(key, value) {
         $(`#${value}`+"_error").html("");
     });
 }
 
-const overlay = document.querySelector(".overlay");
-const closeOverlayBtn = document.querySelector(".cancel_btn");
-let phoneInputField = document.querySelector("#user-tel");
-const privacyLink = document.querySelector(".privacy_link")
-
-const phoneInput = window.intlTelInput(phoneInputField, {
-    initialCountry: "auto",
-    geoIpLookup: getIp,
-    utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
-});
-
-function getIp(callback) {
-    fetch('https://ipinfo.io/json?token=7fa0a044d28330', {
-            headers: {
-                'Accept': 'application/json'
-            }
-        })
-        .then((resp) => resp.json())
-        .catch(() => {
-            return {
-                country: 'us',
-            };
-        })
-        .then((resp) => callback(resp.country));
-}
-
-privacyLink.onclick = () => overlay.classList.remove("hide");
-closeOverlayBtn.onclick = () => overlay.classList.add("hide");
-
+// Check User Age Validation
 function checkAge() {
     var dateField = document.getElementById("DOB");
     var today = new Date();
@@ -212,6 +194,7 @@ function checkAge() {
     }
 }
 
+// Check User Username Validation
 $("#username").on("input", function(event) {
     var regex = /^[a-zA-Z0-9_@]+$/;
     var username_error = $('#username_error');
@@ -226,6 +209,7 @@ $("#username").on("input", function(event) {
     }
 });
 
+// Check User Phone Validation
 $("#user-tel").on("input", function() {
     var phone_error = $('#phone_error');
     var register_btn =$('#registerBtn');
@@ -239,6 +223,7 @@ $("#user-tel").on("input", function() {
     }
 });
 
+// Resend OTP
 function resendOTP() {
     var btn = $('#send_otp'),        
         form = $('#registerform');
@@ -272,8 +257,39 @@ function resendOTP() {
     });
 }
 
+//  Message Show
 function MessageShow(color,msg) {
     message.css('color',color);
     message.html(msg);
     window.scrollTo(0, 0);
 }
+
+
+const overlay = document.querySelector(".overlay");
+const closeOverlayBtn = document.querySelector(".cancel_btn");
+let phoneInputField = document.querySelector("#user-tel");
+const privacyLink = document.querySelector(".privacy_link")
+
+const phoneInput = window.intlTelInput(phoneInputField, {
+    initialCountry: "auto",
+    geoIpLookup: getIp,
+    utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+});
+
+function getIp(callback) {
+    fetch('https://ipinfo.io/json?token=7fa0a044d28330', {
+            headers: {
+                'Accept': 'application/json'
+            }
+        })
+        .then((resp) => resp.json())
+        .catch(() => {
+            return {
+                country: 'us',
+            };
+        })
+        .then((resp) => callback(resp.country));
+}
+
+privacyLink.onclick = () => overlay.classList.remove("hide");
+closeOverlayBtn.onclick = () => overlay.classList.add("hide");
