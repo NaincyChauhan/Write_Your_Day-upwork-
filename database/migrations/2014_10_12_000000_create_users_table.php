@@ -33,7 +33,8 @@ return new class extends Migration
             $table->tinyInteger('gender')->default(1)->comment("0 => other, 1 => Male, 2 => Female")->nullable();
             $table->tinyInteger('phone_verified')->default(0)->comment("0 => Not Verify, 1 => Verify");
             $table->longText('bio')->nullable();
-            $table->timestamp('delete_at')->nullable();
+            $table->timestamp('deleted_at')->nullable();
+            $table->integer('login_attempts')->default(0);
         });
     }
 

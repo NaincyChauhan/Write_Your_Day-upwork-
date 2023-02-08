@@ -52,9 +52,22 @@ $(function() {
                 url: form.attr('action'),
                 data: new FormData(form[0]), // serializes the form's elements.
                 success: function(data) {
-                    location.reload();                    
+                    if (parseInt(data.status) == 1) {                        
+                        $('#message').css('color','#fff');                
+                        $('#message').html(data.message);   
+                        window.scrollTo(0, 0);
+                        location.reload();                    
+                    }else{
+                        $('#message').css('color','#dc3545');                
+                        $('#message').html(data.message);   
+                        window.scrollTo(0, 0);
+                    }
+                    console.log("this is  my data is here111",data);
+                    btn.attr("disabled", false);
+                    btn.html('Login');
                 },
                 error: function(data) {
+                    console.log("this is  my data is 222222",ata.responseJSON.message);
                     $('#message').css('color','#dc3545');                
                     $('#message').html(data.responseJSON.message);                
                     window.scrollTo(0, 0);

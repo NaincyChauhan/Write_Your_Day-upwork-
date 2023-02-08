@@ -54,7 +54,7 @@ Route::group(['middleware' => ['auth:sanctum',  'verified']], function () {
     Route::post('/update/profile', [SiteUserController::class, 'updateProfile'])->name('edit-profile');
     Route::post('update-password', [UserController::class, 'updatePassword'])->name('update-password');
     Route::post('help-center', [HelpcenterController::class, 'store'])->name('help-center');
-    Route::get('user/delete/request', [SiteUserController::class, 'deleteRequest'])->name('user-delete-request');
+    Route::post('user/delete/request', [SiteUserController::class, 'deleteRequest'])->name('user-delete-request');
 
 });
 

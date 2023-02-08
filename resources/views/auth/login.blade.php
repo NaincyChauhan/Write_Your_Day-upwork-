@@ -36,7 +36,7 @@
                             <label for="user-email">Email/Username/Phone</label>
                             <div class="input-group d-flex align-items-center">
                                 <i class="fa fa-envelope icon"></i>
-                                <input type="text" name="email" id="user-email"
+                                <input type="text" value="{{old('email')}}" name="email" id="user-email"
                                     placeholder="Email/Username/Phone">
                             </div>
                             <p id="email_error" class="error"></p>
@@ -45,7 +45,7 @@
                             <label for="user-password">Password:</label>
                             <div class="input-group d-flex align-items-center">
                                 <i class="fa fa-key icon"></i>
-                                <input type="password" class="password" name="password" id="user-password"
+                                <input  value="{{old('value')}}" type="password" class="password" name="password" id="user-password"
                                     placeholder="Password">
                                 <i class="fa fa-eye-slash password-toogle"></i>
                             </div>
@@ -88,6 +88,27 @@
     <script src="{{ asset('app-assets/plugins/jquery-validation/jquery.validate.min.js') }}"></script>
     <script src="{{ asset('assets/js/register.js') }}"></script>
     <script src="{{ asset('assets/js/messages.js') }}"></script>
+    <script>
+        $(function () {
+            @if (!empty(Session:: get('success')))                
+                $('#message').css('color','#fff');                
+                $('#message').html("{{Session:: get('success')}}");                
+                window.scrollTo(0, 0);
+            @endif
+
+            @if (!empty(Session:: get('error')))
+                $('#message').css('color','#dc3545');                
+                $('#message').html("{{Session:: get('error')}}");     
+                window.scrollTo(0, 0);
+            @endif
+
+            @if ($errors -> any())               
+                $('#message').css('color','#dc3545');                
+                $('#message').html("@foreach($errors->all() as $error) * {{ $error }} \n @endforeach");     
+                window.scrollTo(0, 0);
+            @endif
+        });   
+    </script>
 </body>
 
 </html>

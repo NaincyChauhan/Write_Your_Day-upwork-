@@ -47,8 +47,8 @@ let proceedDeletion = () => {
       </div>
       <p class="error" id="pwd_error"></p>
       <div class="d-flex justify-content-between mx-4">
-        <button class="d_btn suggested_btn" onclick="checkPassword()">Confirm Password</button>
-        <button class="d_btn" onclick="closeBox()">Cancel</button>
+        <button  type="submit" class="d_btn suggested_btn" onclick="checkPassword()">Confirm Password</button>
+        <button type="button" class="d_btn" onclick="closeBox()">Cancel</button>
       </div>
     </div>
   `;
@@ -65,22 +65,23 @@ let proceedDeletion = () => {
 };
 
 let checkPassword = () => {
-    let user = JSON.parse(sessionStorage.getItem("user-details"));
-    let userPwd = user.password;
     let pwdField = document.querySelector("#password_check").value;
-    let pwdError = document.querySelector("#pwd_error");
+    $('#delete-confirm-password').val(pwdField);
+//     let user = JSON.parse(sessionStorage.getItem("user-details"));
+//     let userPwd = user.password;
+//     let pwdError = document.querySelector("#pwd_error");
 
-    if (userPwd !== pwdField) {
-        pwdError.textContent = "Wrong Password";
-        return;
-    }
+//     if (userPwd !== pwdField) {
+//         pwdError.textContent = "Wrong Password";
+//         return;
+//     }
 
-    deleteQuesContainer.innerHTML = `
-    <div class="feedback_box ">
-      <p class="feedback_txt">Your account has been deleted temporarily. You can recover it within 14 days else it will be permanetly deleted</p>
-      <button class="d_btn" onclick="closeBox()">Close</button>
-    </div>
-  `;
+//     deleteQuesContainer.innerHTML = `
+//     <div class="feedback_box ">
+//       <p class="feedback_txt">Your account has been deleted temporarily. You can recover it within 14 days else it will be permanetly deleted</p>
+//       <button type="button" class="d_btn" onclick="closeBox()">Close</button>
+//     </div>
+//   `;
 
 }
 
@@ -89,10 +90,10 @@ let closeBox = () => {
     setTimeout(() => {
         deleteQuesContainer.innerHTML = `
     <div class="ques_box ">
-      <p class="ques_txt ">Are you sure you want to delete this account?</p>
+      <p class="ques_txt ">Are you sure you want to delete this account? <br> You can still recover your account within the next 14 days</p>
       <div class="d-flex justify-content-between mx-4">
-        <button class="ques_btn" id="delete_btn" onclick="proceedDeletion()">Yes</button>
-        <button class="ques_btn suggested_btn" onclick="closeBox()" >No</button>
+        <button type="submit" class="ques_btn" id="delete_btn" onclick="proceedDeletion()">Yes</button>
+        <button type="button" class="ques_btn suggested_btn text-primary" onclick="closeBox()" >No</button>
       </div>
     </div>
   `

@@ -341,19 +341,23 @@
         </main>
     </div>
 </div>
-<div class="overlay hide" id="delete_container">
-    <div class="ques_box">
-        <p class="ques_txt">Are you sure you want to delete this account?</p>
-        <div class="d-flex justify-content-between mx-4">
-            <button class="ques_btn" id="delete_btn" onclick="proceedDeletion()">
-                Yes
-            </button>
-            <button class="ques_btn suggested_btn" onclick="closeBox()">
-                No
-            </button>
+<form id="logout-form" action="{{ route('user-delete-request') }}" method="POST" >
+    @csrf 
+    <div class="overlay hide" id="delete_container">
+        <div class="ques_box">
+            <p class="ques_txt">Are you sure you want to delete this account? <br> You can still recover your account within the next 14 days</p>
+            <div class="d-flex justify-content-between mx-4">
+                <input type="hidden" name="password" id="delete-confirm-password">
+                <button type="submit" class="ques_btn" id="delete_btn" onclick="proceedDeletion()">
+                    Yes
+                </button>
+                <button type="button" class="ques_btn suggested_btn text-primary" onclick="closeBox()">
+                    No
+                </button>
+            </div>
         </div>
     </div>
-</div>
+</form>
 
 
 @endsection

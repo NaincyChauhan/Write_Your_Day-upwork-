@@ -18,6 +18,15 @@
     <link rel="stylesheet" href="{{ asset('assets/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
     @yield('css')
+    <style>
+        #session_message_area{
+            width: calc(100% - 25%) !important;            
+        }
+        #session_message_box_area{
+            display: flex;
+            justify-content: center;           
+        }
+    </style>
 </head>
 
 <body>
@@ -150,6 +159,11 @@
         </div>
     </header>
 
+    <div id="session_message_box_area">
+        <div class="pt-2 pb-0" id="session_message_area">
+            
+        </div>
+    </div>
     @yield('content')
 
     {{-- Logout Modal --}}
@@ -181,6 +195,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     {{-- <script src="{{ asset('assets/js/msg_extras.js') }}"></script> --}}
     @yield('js')
+    <script type="text/javascript" src="{{ asset('assets/js/custom.js') }}"></script>
     <script>
         $('.simple-heart').click(function (e) {
             $(this).hide();
@@ -319,7 +334,39 @@
         });
         // });
     </script>
-    <script type="text/javascript" src="{{ asset('assets/js/custom.js') }}"></script>
+    <script>
+        $(function () {
+            @if (!empty(Session:: get('success')))                
+                $('#session_message_area').html(
+                    `<div class="alert alert-success alert-dismissible fade show mb-0" role="alert">
+                                <span id="success-message">${"{{Session::get('success')}}"}</span>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>`
+                );
+                window.scrollTo(0, 0);
+            @endif
+
+            @if (!empty(Session:: get('error')))
+                $('#session_message_area').html(
+                        `<div class="alert alert-danger alert-dismissible fade show mb-0"  role="alert">
+                                    <span id="success-message">${"{{Session::get('error')}}"}</span>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>`
+                    );
+                window.scrollTo(0, 0);
+            @endif
+
+            @if ($errors -> any())                
+                $('#session_message_area').html(
+                    `<div class="alert alert-warning alert-dismissible fade show mb-0" role="alert">
+                                <span id="success-message">${"@foreach($errors->all() as $error) * {{ $error }} \n @endforeach"}</span>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>`
+                );
+                window.scrollTo(0, 0);
+            @endif
+        });   
+    </script>
 </body>
 
 </html>

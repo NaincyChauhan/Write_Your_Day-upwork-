@@ -11,6 +11,7 @@ use Illuminate\Validation\Rules\Password;
 use App\Models\Policies;
 use Session, Auth,Hash,Mail;
 use App\Mail\UserMail;
+use Carbon\Carbon;
 
 class UserController extends Controller
 {
@@ -328,20 +329,17 @@ class UserController extends Controller
     {
         $user = User::where('id',Auth::user()->id)->first();
         if(isset($user)){            
-            $user->delete_at = Carbon::now()->addDays(14);
-            $user->save();
-            
-            // Add a success message and redirect the user
-            // return redirect()->back()->with('success', 'Your account has been scheduled for deletion. You can still recover your account within the next 14 days.');
-            return response()->json([
-                'status' => 1,
-                'message' => 'Your account has been scheduled for deletion. You can still recover your account within the next 14 days',
-            ], 200);
+            if(Hash::check($request->password, $user->password)){                
+                $user->deleted_at = Carbon::now()->addDays(14);
+                $user->save();
+                // Auth::guard()->logout($user);
+                Auth::logoutUsingId($user->id);
+                return redirect()->route('login');
+            }else{
+                return redirect()->back()->with('error', 'Wrong Password.');
+            }
         }else{
-            return response()->json([
-                'status' => 0,
-                'message' => 'Something Went Wrong',
-            ], 200);
+            return redirect()->back()->with('error', 'Something Went Wrong.');
         }
     }
 
@@ -350,11 +348,10 @@ class UserController extends Controller
     {
         $user = User::where('id',Auth::user()->id)->first();
         if(isset($user)){
-            $user->delete_at = null;
+            $user->deleted_at = null;
             $user->save();
             
             // Add a success message and redirect the user
-            // return redirect()->back()->with('success', 'Your account has been successfully recovered.');
             return response()->json([
                 'status' => 1,
                 'message' => 'Your account has been successfully recovered.',
