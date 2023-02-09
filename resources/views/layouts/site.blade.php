@@ -100,8 +100,8 @@
                         <li class="nav-item profile">
                             <a href="{{route('user-profile')}}">
                                 <div class="nav-link">
-                                    <img class="header-img" src="{{ isset(Auth::user()->image) ? asset('storage/users/'.Auth::user()->image) : asset('assets/images/images.png') }}">
-                                    <h4>{{Auth::user()->name}}</h4>
+                                    <img class="header-img rounded-circle" src="{{ isset(Auth::user()->image) ? asset('storage/users/'.Auth::user()->image) : asset('assets/images/images.png') }}">
+                                    <h4>{!! Str::limit(Auth::user()->name, 10, ' ...') !!}</h4>
 
                                 </div>
                             </a>
@@ -117,14 +117,14 @@
                         </li>
                         <li class="nav-item user-icon">
                             <div class="nav-link">
-                                <img class="header-img" src="{{ isset(Auth::user()->image) ? asset('storage/users/'.Auth::user()->image) : asset('assets/images/images.png') }}">
-                                <h4 class="d-lg-none">{{Auth::user()->name}}</h4>
+                                <img class="header-img rounded-circle" src="{{ isset(Auth::user()->image) ? asset('storage/users/'.Auth::user()->image) : asset('assets/images/images.png') }}">
+                                <h4 class="d-lg-none">{!! Str::limit(Auth::user()->name, 10, ' ...') !!}</h4>
                             </div>
                             <ul class="submenu">
                                 <li>
                                     <a href="{{route('view-user-profile')}}">
-                                        <img class="header-img" src="{{ isset(Auth::user()->image) ? asset('storage/users/'.Auth::user()->image) : asset('assets/images/images.png') }}">
-                                        <h4>{{Auth::user()->name}}</h4>
+                                        <img class="header-img rounded-circle" src="{{ isset(Auth::user()->image) ? asset('storage/users/'.Auth::user()->image) : asset('assets/images/images.png') }}">
+                                        <h4>{!! Str::limit(Auth::user()->name, 10, ' ...') !!}</h4>
                                     </a>
                                 </li>
                                 <li><a href="{{route('user-profile')}}">Settings</a></li>

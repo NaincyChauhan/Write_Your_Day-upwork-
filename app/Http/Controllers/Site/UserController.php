@@ -49,11 +49,11 @@ class UserController extends Controller
     public function registeruser(Request $request)
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:20'],
+            'name' => ['required', 'string', 'max:20','min:3'],
             'email' => ['required', 'string', 'max:50', 'unique:users'],
             'password' => ['required', 'string', 'confirmed',Password::min(8)
             ->letters()->numbers()->symbols()],
-            'username' => ['required','unique:users','max:20'],
+            'username' => ['required','unique:users','max:20','min:3'],
             'phone' => ['required','min:10','max:10'],
             'dob' => 'required',
             'privacypolicy' => 'required',
@@ -230,12 +230,12 @@ class UserController extends Controller
         }
         
         $request->validate([
-            'name' => 'required',
-            'username' => 'required|max:20|unique:users,username,'.$user->id,            
-            'image' => [isset($user->image) ? '' : 'required' ,'mimetypes:image/jpg,image/png,image/jpeg,image/webp','max:1024','min:2'],
-            'thought_of_the_day' => 'required',
+            'name' => ['required', 'string', 'max:20','min:3'],
+            'username' => 'required|max:20|min:3|unique:users,username,'.$user->id,            
+            'image' => ['mimetypes:image/jpg,image/png,image/jpeg,image/webp','max:1024','min:2'],
+            'thought_of_the_day' => ['required', 'max:120','min:10'],
             'gender' => 'required',
-            'bio' => 'required',
+            'bio' => ['required', 'max:120','min:10'],
         ]);
 
         //Uploading Image
@@ -263,7 +263,7 @@ class UserController extends Controller
             'status' => 1, 
             'message' => "Success.! Profile has been updated successfully.",  
             'img' => $user->image != null ? '<img src="'.asset('storage/users/'.$user->image) .'" class="photo img-fluid"  alt="User Profile">' : '',  
-            'profileimage' => asset('storage/users/'.$user->image),        
+            'profileimage' => $user->image != null ? asset('storage/users/'.$user->image) : null,        
         ], 200);
     }
 

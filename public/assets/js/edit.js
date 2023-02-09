@@ -90,7 +90,7 @@ let closeBox = () => {
     setTimeout(() => {
         deleteQuesContainer.innerHTML = `
     <div class="ques_box ">
-      <p class="ques_txt ">Are you sure you want to delete this account? <br> You can still recover your account within the next 14 days</p>
+      <p class="ques_txt ">Are you sure you want to delete this account? <br> You can recover it within 14 days else it will be permanetly deleted.</p>
       <div class="d-flex justify-content-between mx-4">
         <button type="submit" class="ques_btn" id="delete_btn" onclick="proceedDeletion()">Yes</button>
         <button type="button" class="ques_btn suggested_btn text-primary" onclick="closeBox()" >No</button>
@@ -311,13 +311,15 @@ $(function () {
                 success: function (data) {
                     // clearErrors();
                     if (parseInt(data.status) == 1) {
-                        MessageShow('alert-success', data.message,$('#profile-setting'));
-                        $('#user-photo').html(data.img);
-                        $('.header-img').each(function(index,element) {
-                            $(element).attr('src',data.profileimage);
-                         });
+                        MessageShow('alert-success', data.message,'profile-setting');
+                        if (data.img) {  $('#user-photo').html(data.img);}
+                        if (data.profileimage) {
+                            $('.header-img').each(function(index,element) {
+                                $(element).attr('src',data.profileimage);
+                            });
+                        }
                     } else {
-                        MessageShow('alert-danger',data.message,$('#profile-setting'));
+                        MessageShow('alert-danger',data.message,'profile-setting');
                     }
                     btn.attr("disabled", false);
                     // form[0].reset();
@@ -376,9 +378,9 @@ $(function (){
                 success: function(data) {
                     if(parseInt(data.status) == 1)
                     {
-                        MessageShow('alert-success',data.message,$('#password-settings'));
+                        MessageShow('alert-success',data.message,'password-settings');
                     }else{
-                        MessageShow('alert-danger',data.message,$('#password-settings'));
+                        MessageShow('alert-danger',data.message,'password-settings');
                     }                     
                     btn.attr("disabled", false);
                     form[0].reset();                            
@@ -386,7 +388,7 @@ $(function (){
                 },
                 error: function(data) {                    
                     if (data.responseJSON.message != "") {
-                        MessageShow('alert-danger', data.responseJSON.message,$('#password-settings'));
+                        MessageShow('alert-danger', data.responseJSON.message,'password-settings');
                     }
                     $.each(data.responseJSON.errors, function (key, value) {
                         $(`#${key}`+"_error").css('display','block');
@@ -438,9 +440,9 @@ $(function (){
                 success: function(data) {
                     if(parseInt(data.status) == 1)
                     {
-                        MessageShow('alert-success',data.message,$('#help'));
+                        MessageShow('alert-success',data.message,'help');
                     }else{
-                        MessageShow('alert-danger',data.message,$('#help'));
+                        MessageShow('alert-danger',data.message,'help');
                     }                     
                     btn.attr("disabled", false);
                     form[0].reset();                            
@@ -448,7 +450,7 @@ $(function (){
                 },
                 error: function(data) {                    
                     if (data.responseJSON.message != "") {
-                        MessageShow('alert-danger', data.responseJSON.message,$('#help'));
+                        MessageShow('alert-danger', data.responseJSON.message,'help');
                     }
                     $.each(data.responseJSON.errors, function (key, value) {
                         $(`#${key}` + "_help_error").css('display','block');
@@ -477,10 +479,10 @@ function clearErrors(error_messages="") {
 }
 
 function MessageShow(addclass,msg,container) {
-    // $('#success-box').css('display', 'block')
-    $(container).prepend(`<div class="alert ${addclass} alert-dismissible fade show" role="alert">
-                                <span id="success-message">${msg}</span>
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    $('#success-box').css('display', 'block');
+    $(`main.setting#${container} .success-box`).html(`<div class="alert ${addclass} alert-dismissible fade show" role="alert">
+                                 <span id="success-message">${msg}</span>
+                                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                             </div>`);
     $(".active").scrollTop(0);
 }

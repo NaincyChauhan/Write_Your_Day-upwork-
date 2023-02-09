@@ -58,7 +58,7 @@
 
         <!--- Update Profile Container --->
         <main class="setting active" id="profile-setting">
-            <div  id="success-box"></div>
+            <div  class="success-box"></div>
             <div class="setting-head align-items-center mb-4 px-2">
                 <button class="open-categories-btn fa fa-list-dots sm-btn"></button>
                 <h2 class="title">My Profile</h2>
@@ -80,7 +80,7 @@
                             <label for="fname">Name <span class="required">*</span></label>
                         </div>
                         <div class="grid-65">
-                            <input type="text" name="name" value="{{$user->name}}"  id="fname" tabindex="1" placeholder="Full Name" />
+                            <input  type="text" name="name" value="{{$user->name}}"  id="fname" tabindex="1" placeholder="Full Name" />
                             <p id="name_error" class="error invalid-feedback"></p>
                         </div>
                     </fieldset>
@@ -186,7 +186,7 @@
                             <label for="description">Bio <span class="required">*</span></label>
                         </div>
                         <div class="grid-65">
-                            <textarea name="bio"  id="description" cols="30" rows="auto" tabindex="3" placeholder="Bio"
+                            <textarea  name="bio"  id="description" cols="30" rows="auto" tabindex="3" placeholder="Bio"
                                 >{{$user->bio}}</textarea>
                                 <p id="bio_error" class="error invalid-feedback"></p>
                         </div>
@@ -206,6 +206,7 @@
 
         <!--- Change Password Container --->
         <main class="setting" id="password-settings">
+            <div  class="success-box"></div>
             <div class="setting-head align-items-center mb-4 px-2">
                 <button class="open-categories-btn fa fa-list-dots sm-btn"></button>
                 <h2 class="title">Password Settings</h2>
@@ -253,6 +254,7 @@
 
         <!--- Help Request Container --->
         <main class="setting" id="help">
+            <div  class="success-box"></div>
             <div class="setting-head align-items-center mb-4 px-2">
                 <button class="open-categories-btn fa fa-list-dots sm-btn"></button>
                 <h2 class="title">Help Center</h2>
@@ -265,7 +267,7 @@
                             <label for="name">Name <span class="required">*</span></label>
                         </div>
                         <div class="grid-65">
-                            <input type="text" name="name" value="{{$user->name}}" id="name" placeholder="Full Name" />
+                            <input  type="text" name="name" value="{{$user->name}}" id="name" placeholder="Full Name" />
                             <p id="name_help_error" class="error invalid-feedback"></p>
                         </div>
                     </fieldset>
@@ -345,7 +347,7 @@
     @csrf 
     <div class="overlay hide" id="delete_container">
         <div class="ques_box">
-            <p class="ques_txt">Are you sure you want to delete this account? <br> You can still recover your account within the next 14 days</p>
+            <p class="ques_txt">Are you sure you want to delete this account? <br> You can recover it within 14 days else it will be permanetly deleted.</p>
             <div class="d-flex justify-content-between mx-4">
                 <input type="hidden" name="password" id="delete-confirm-password">
                 <button type="submit" class="ques_btn" id="delete_btn" onclick="proceedDeletion()">
