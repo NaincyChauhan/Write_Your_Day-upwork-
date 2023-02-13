@@ -84,23 +84,17 @@ class LoginController extends Controller
             if($this->username()=="phone" && $user->phone_verified==0){
                 return response()->json([
                     'status' => 0,
-                    'message' => 'Your Phone Number is not Verified. Please Try with Username and Email Id!',
+                    'message' => 'Your Phone Number is not Verified. Try with Username and Email Id!',
                 ], 200);
             }
-            if (!$user->trashed()) {
-                if (Auth::attempt([$this->username() => $request->email, 'password' => $request->password])) {
+            if(Hash::check($request->password, $user->password)){   
+                if (!$user->trashed()) {
+                    Auth::loginUsingId($user->id,$request->remember);                    
                     return response()->json([
                         'status' => 1,
                         'message' => 'Authentication Successfully.',
                     ], 200);
-                } else {                        
-                    return response()->json([
-                        'status' => 0,
-                        'message' => 'Invalid login credentials.',
-                    ], 200);
-                }
-            } else {
-                if(Hash::check($request->password, $user->password)){                      
+                } else {
                     if(isset($request->otp) && Session::has('login_otp')){                        
                         if($request->otp == Session::get('login_otp')){                            
                             $user->deleted_at = null;
@@ -134,20 +128,15 @@ class LoginController extends Controller
                         'status' => 0,
                         'message' => 'Your account has been Deleted.If you want to login anywhere click proceed button.',
                         'type' => 0,
-                    ], 200);
-                }else{
-                    return response()->json([
-                        'status' => 0,
-                        'message' => 'Invalid login credentials.',
-                    ], 200);
+                    ], 200);                                    
                 }
             }
-        }else{
-            // return redirect()->back()->with('error', 'Invalid login credentials.');
-            return response()->json([
-                'status' => 0,
-                'message' => 'Invalid login credentials.',
-            ], 200);
         }
+        // return redirect()->back()->with('error', 'Invalid login credentials.');
+        return response()->json([
+            'status' => 0,
+            'message' => 'Invalid login credentials.',
+        ], 200);
     }
 }
+
