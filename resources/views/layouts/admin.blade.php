@@ -61,7 +61,7 @@
             <div class="navbar-brand-wrapper d-flex justify-content-center">
                 <div class="navbar-brand-inner-wrapper d-flex justify-content-between align-items-center w-100">
                     <a class="navbar-brand brand-logo" href="{{ route('dashboard') }}">
-                        <img src="{{ isset($setting->light_logo) ? asset('/'.$setting->light_logo) : asset('app-assets/images/haxways.png') }}" alt="logo" style="height:70px;"/>
+                        <img src="{{ isset($setting->light_logo) ? asset('/'.$setting->light_logo) : asset('app-assets/images/haxways.png') }}" alt="logo"/>
                     </a>
                     <a class="navbar-brand brand-logo-mini" href="{{ route('dashboard') }}">
                         <img src="{{ isset($setting->favicon) ? asset('/'.$setting->favicon) : asset('app-assets/images/haxways.png') }}" alt="logo" />

@@ -42,11 +42,11 @@
                         @csrf
                         <input type="hidden" name="type" id="login-type">
                         <legend class="legend">
-                            <label for="user-email">Email/Username/Phone</label>
+                            <label for="user-email">Email/Username</label>
                             <div class="input-group d-flex align-items-center">
                                 <i class="fa fa-envelope icon"></i>
                                 <input type="text" value="{{old('email')}}" name="email" id="user-email"
-                                    placeholder="Email/Username/Phone">
+                                    placeholder="Email/Username">
                             </div>
                             <p id="email_error" class="error"></p>
                         </legend>
@@ -117,13 +117,13 @@
             @endif
 
             @if (!empty(Session:: get('error')))
-                $('#message').css('color','#dc3545');                
+                $('#message').css('color','darkred');                
                 $('#message').html("{{Session:: get('error')}}");     
                 window.scrollTo(0, 0);
             @endif
 
             @if ($errors -> any())               
-                $('#message').css('color','#dc3545');                
+                $('#message').css('color','darkred');                
                 $('#message').html("@foreach($errors->all() as $error) * {{ $error }} \n @endforeach");     
                 window.scrollTo(0, 0);
             @endif

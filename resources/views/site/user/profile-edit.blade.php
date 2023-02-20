@@ -33,7 +33,7 @@
         <aside class="categories hide">
             <button class="fa fa-times close-categories-btn sm-btn"></button>
             <div class="user-info">
-                <div class="user-photo" id="user-photo">
+                <div class="user-photo" id="user-photo" onclick="ProfileEditModal();">
                     <img src="{{ isset($user->image) ? asset('storage/users/'.$user->image) : asset('assets/images/images.png') }}" class="photo img-fluid" />
                 </div>
                 <div class="user-details">
@@ -66,7 +66,7 @@
             <section class="content">
                 <form id="edit-profile-form" method="POST" action="{{route('edit-profile')}}" enctype="multipart/form-data">
                     @csrf
-                    <fieldset class="fieldset">
+                    {{-- <fieldset class="fieldset">
                         <div class="grid-35">
                             <label for="setting-pic">Profile Picture <span class="required">*</span></label>
                         </div>
@@ -74,13 +74,13 @@
                             <input type="file" name="image" id="setting-pic" />
                             <p id="image_error" class="error invalid-feedback"></p>
                         </div>
-                    </fieldset>
+                    </fieldset> --}}
                     <fieldset class="fieldset">
                         <div class="grid-35">
                             <label for="fname">Name <span class="required">*</span></label>
                         </div>
                         <div class="grid-65">
-                            <input  type="text" name="name" value="{{$user->name}}"  id="fname" tabindex="1" placeholder="Full Name" />
+                            <input  type="text" maxlength="20" name="name" value="{{$user->name}}"  id="fname" tabindex="1" placeholder="Full Name" />
                             <p id="name_error" class="error invalid-feedback"></p>
                         </div>
                     </fieldset>
@@ -90,20 +90,20 @@
                             <label for="uname">Username <span class="required">*</span></label>
                         </div>
                         <div class="grid-65">
-                            <input type="text" name="username" value="{{$user->username}}" id="uname" tabindex="2" placeholder="username" />
+                            <input type="text"  maxlength="20"  name="username" value="{{$user->username}}" id="uname" tabindex="2" placeholder="username" />
                             <p id="username_error" class="error invalid-feedback"></p>
                         </div>
                     </fieldset>
                     <fieldset class="fieldset">
                         <div class="grid-35">
-                            <label for="uname">Thought of the Day <span class="required">*</span></label>
+                            <label for="uname">Thought of the Day</label>
                         </div>
                         <div class="grid-65">
                             <input type="text" name="thought_of_the_day" value="{{$user->thought_of_the_day}}" id="tod" tabindex="3" placeholder="today is like..." />
                             <p id="thought_of_the_day_error" class="error invalid-feedback"></p>
                         </div>
                     </fieldset>
-                    <!-- Phone number -->
+                    {{-- <!-- Phone number -->
                     <fieldset>
                         <div class="grid-35">
                             <label for="phone">Phone Number <span class="required">*</span></label>
@@ -128,7 +128,7 @@
                                 <span class="cancel-button-text">Cancel</span>
                             </button>
                         </div>
-                    </fieldset>
+                    </fieldset> --}}
                     <!-- Website URL -->
                     <fieldset class="fieldset">
                         <div class="grid-35">
@@ -173,9 +173,10 @@
                         </div>
                         <div class="grid-65">
                             <select name="gender" id="gender">
-                                <option value="1" @selected($user->gender == 1)>Male</option>
-                                <option value="2" @selected($user->gender == 2)>Female</option>
-                                <option value="0" @selected($user->gender == 3)>Other</option>
+                                <option value="0" @selected($user->gender == 0)>Rather Not Say</option>
+                                <option value="2" @selected($user->gender == 2)>Male</option>
+                                <option value="3" @selected($user->gender == 3)>Female</option>
+                                <option value="1" @selected($user->gender == 1)>Other</option>
                             </select>
                             <p id="gender_error" class="error invalid-feedback"></p>
                         </div>
@@ -183,7 +184,7 @@
                     <!-- Description about User -->
                     <fieldset class="fieldset">
                         <div class="grid-35">
-                            <label for="description">Bio <span class="required">*</span></label>
+                            <label for="description">Bio</label>
                         </div>
                         <div class="grid-65">
                             <textarea  name="bio"  id="description" cols="30" rows="auto" tabindex="3" placeholder="Bio"
@@ -343,11 +344,12 @@
         </main>
     </div>
 </div>
-<form id="logout-form" action="{{ route('user-delete-request') }}" method="POST" >
+<form id="delete_account_form" action="{{ route('user-delete-request') }}" method="POST" >
     @csrf 
     <div class="overlay hide" id="delete_container">
-        <div class="ques_box">
-            <p class="ques_txt">Are you sure you want to delete this account? <br> You can recover it within 14 days else it will be permanetly deleted.</p>
+        <div class="ques_box ques_box_1">
+            <p class="ques_txt">Are you sure you want to delete this account? 
+            </p>
             <div class="d-flex justify-content-between mx-4">
                 <input type="hidden" name="password" id="delete-confirm-password">
                 <button type="submit" class="ques_btn" id="delete_btn" onclick="proceedDeletion()">
@@ -361,7 +363,30 @@
     </div>
 </form>
 
-
+{{-- Update Profile Image --}}
+<form id="change_profile_form" action="{{ route('update-profile-image') }}" enctype="multipart/form-data" method="POST" >
+    @csrf
+    <div class="overlay hide" id="upload_profile_container">
+        <div class="ques_box ques_box_1">
+            <p class="ques_txt font-17">Change Profile Image</p>
+            <div class="profile-image-box">
+                <div class="profile-image-inner">
+                    <input type="file" id="my-file-input" name="image">
+                    <label for="my-file-input" class="file-button">Upload Image</label>
+                </div>
+                <p class="confirm_password_error_1 text-center mt-2" id="profile_image_error"></p>
+            </div>
+            <div class="d-flex justify-content-between mx-4">
+                <button type="submit" class="ques_btn" id="change_profile_btn">
+                    Submit
+                </button>
+                <button type="button" class="ques_btn suggested_btn text-primary" onclick="ProfileEditModal();">
+                    No
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
 @endsection
 @section('js')
 <script src="{{ asset('app-assets/vendors/js/vendor.bundle.base.js') }}"></script>    <!-- endinject -->

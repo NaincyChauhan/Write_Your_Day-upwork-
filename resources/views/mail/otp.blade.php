@@ -240,54 +240,156 @@
     <table border="0" cellpadding="0" cellspacing="0" class="body">
       <tr>
         <td>&nbsp;</td>
-        <td class="container">
-          <div class="content">
-            <span class="preheader">One Time Password</span>
-            <table class="main">
+        @if ($mailData['subject']==="One Time Password")            
+          <td class="container">
+            <div class="content">
+              <span class="preheader">{{$mailData['subject']}}</span>
+              <table class="main">
 
-              <!-- START MAIN CONTENT AREA -->
-              <tr>
-                <td class="wrapper">
-                  <table border="0" cellpadding="0" cellspacing="0">
-                    <tr>
-                      <td>
-                        <h1>One Time Password</h1>
-                        <h2 style="margin-bottom: 0px;">Hi! {{$mailData['name']}},</h2>                        
-                        <h4 style="color: gray;">Your Email Verification OTP!</h4>
-                        <p>
-                            {{$mailData['otp']}} is the One Time Password (OTP) for your Email Verification, valid for 10 minutes. Do not share your OTP with anyone, Write Your Day never calls to verify OTP.
-                        </p>
-                        <h4 style="margin-bottom: 0px;">With Regards,</h4>      
-                        <h5 style="margin-top: 2px;">Write Your Day.</h5>
-                      </td>
-                    </tr>
-                  </table>
-                </td>
-              </tr>
-
-            <!-- END MAIN CONTENT AREA -->
-            </table>
-
-            <!-- START FOOTER -->
-            <div class="footer">
-              <table border="0" cellpadding="0" cellspacing="0">
+                <!-- START MAIN CONTENT AREA -->
                 <tr>
-                  <td class="content-block">
-                    <span class="apple-link">writeyourday.in</span>
+                  <td class="wrapper">
+                    <table border="0" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td>
+                          <h1>{{$mailData['subject']}}</h1>
+                          <h2 style="margin-bottom: 0px;">Hi! {{$mailData['name']}},</h2>                        
+                          <h4 style="color: gray;">Your Email Verification OTP!</h4>
+                          <p>
+                              {{$mailData['otp']}} is the One Time Password (OTP) for your Email Verification, valid for 10 minutes. Do not share your OTP with anyone, Write Your Day never calls to verify OTP.
+                          </p>
+                          <h4 style="margin-bottom: 0px;">With Regards,</h4>      
+                          <h5 style="margin-top: 2px;">Write Your Day.</h5>
+                        </td>
+                      </tr>
+                    </table>
                   </td>
                 </tr>
-                <tr>
-                  <td class="content-block powered-by">
-                    Powered by <a href="https://www.haxways.com">Haxways.com</a>.
-                  </td>
-                </tr>
+
+              <!-- END MAIN CONTENT AREA -->
               </table>
+
+              <!-- START FOOTER -->
+              <div class="footer">
+                <table border="0" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td class="content-block">
+                      <span class="apple-link">writeyourday.in</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="content-block powered-by">
+                      Powered by <a href="https://www.haxways.com">Haxways.com</a>.
+                    </td>
+                  </tr>
+                </table>
+              </div>
+              <!-- END FOOTER -->
+              
+            <!-- END CENTERED WHITE CONTAINER -->
             </div>
-            <!-- END FOOTER -->
-            
-          <!-- END CENTERED WHITE CONTAINER -->
-          </div>
-        </td>
+          </td>
+        @endif
+        @if ($mailData['subject']==="Password Reset OTP")            
+          <td class="container">
+            <div class="content">
+              <span class="preheader">{{$mailData['subject']}}</span>
+              <table class="main">
+
+                <!-- START MAIN CONTENT AREA -->
+                <tr>
+                  <td class="wrapper">
+                    <table border="0" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td>
+                          <h1>{{$mailData['subject']}}</h1>
+                          <h2 style="margin-bottom: 0px;">Hi! {{$mailData['name']}},</h2>                        
+                          <h4 style="color: gray;">Your Password Reset OTP!</h4>
+                          <p>
+                              {{$mailData['otp']}} is the One Time Password (OTP) for your Password Reset, valid for 10 minutes. Do not share your OTP with anyone, Write Your Day never calls to verify OTP.
+                          </p>
+                          <h4 style="margin-bottom: 0px;">With Regards,</h4>      
+                          <h5 style="margin-top: 2px;">Write Your Day.</h5>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+              <!-- END MAIN CONTENT AREA -->
+              </table>
+
+              <!-- START FOOTER -->
+              <div class="footer">
+                <table border="0" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td class="content-block">
+                      <span class="apple-link">writeyourday.in</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="content-block powered-by">
+                      Powered by <a href="https://www.haxways.com">Haxways.com</a>.
+                    </td>
+                  </tr>
+                </table>
+              </div>
+              <!-- END FOOTER -->
+              
+            <!-- END CENTERED WHITE CONTAINER -->
+            </div>
+          </td>
+        @endif
+        @if ($mailData['subject']==="Activate Account")            
+          <td class="container">
+            <div class="content">
+              <span class="preheader">{{$mailData['subject']}}</span>
+              <table class="main">
+
+                <!-- START MAIN CONTENT AREA -->
+                <tr>
+                  <td class="wrapper">
+                    <table border="0" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td>
+                          <h1>{{$mailData['subject']}}</h1>
+                          <h2 style="margin-bottom: 0px;">Hi! {{$mailData['name']}},</h2>                        
+                          <h4 style="color: gray;">Your Activate Account OTP!</h4>
+                          <p>
+                              {{$mailData['otp']}} is the One Time Password (OTP) for your Activate Account, valid for 10 minutes. Do not share your OTP with anyone, Write Your Day never calls to verify OTP.
+                          </p>
+                          <h4 style="margin-bottom: 0px;">With Regards,</h4>      
+                          <h5 style="margin-top: 2px;">Write Your Day.</h5>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+              <!-- END MAIN CONTENT AREA -->
+              </table>
+
+              <!-- START FOOTER -->
+              <div class="footer">
+                <table border="0" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td class="content-block">
+                      <span class="apple-link">writeyourday.in</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="content-block powered-by">
+                      Powered by <a href="https://www.haxways.com">Haxways.com</a>.
+                    </td>
+                  </tr>
+                </table>
+              </div>
+              <!-- END FOOTER -->
+              
+            <!-- END CENTERED WHITE CONTAINER -->
+            </div>
+          </td>
+        @endif
         <td>&nbsp;</td>
       </tr>
     </table>

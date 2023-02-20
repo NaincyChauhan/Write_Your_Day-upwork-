@@ -204,12 +204,21 @@ header.header {
     }
 }
 
-.user-photo {
-    height: 150px;
-    width: 150px;
-    border-radius: 50%;
-    margin: 0 auto 15px;
-    overflow: hidden;
-    background: #ddd url("https://www.adtechnology.co.uk/images/UGM-default-user.png");
-    border: 2px solid #ddd;
-  }
+.text-secondary-emphasis{
+}
+.c-m-t-5{
+}
+.like_post_ > form > button > span {
+    color: #626262 !important;
+    margin-top: 5px;
+}
+.editButton{
+    color: #1c62a8;
+}
+.editButton:hover{
+    color: white;
+}
+#user-photo>.photo {
+    max-width: 100%;
+    border: none;
+}

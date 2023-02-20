@@ -47,7 +47,8 @@ button.btn:focus,
   outline: unset;
   box-shadow: none;
 }
-input:disabled{
+
+input:disabled {
   filter: brightness(0.85);
 }
 
@@ -56,7 +57,9 @@ input:disabled{
   --main_color: #4285f4;
   --main_font: "Poppins", sans-serif;
 }
-.overlay_container, .overlay {
+
+.overlay_container,
+.overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -65,16 +68,22 @@ input:disabled{
   display: grid;
   place-content: center;
   z-index: 11;
-  background-color: rgba(0,0,0,.6);
+  background-color: rgb(0 0 0 / 86%);
   backdrop-filter: blur(0.8px);
   transition: .3s ease;
 }
-.overlay_container > div, .overlay > div{
+
+.overlay_container>div,
+.overlay>div {
   animation: zoomin .3s ease;
 }
-.overlay_container.hide,.followers_container.hide,.following_container.hide  {
+
+.overlay_container.hide,
+.followers_container.hide,
+.following_container.hide {
   visibility: hidden;
 }
+
 .navbar-expand-lg .navbar-nav .nav-link {
   padding-right: 0rem;
   padding-left: 0rem;
@@ -586,8 +595,8 @@ li .header-search .dropdown .dropdown-menu li:hover {
 }
 
 .search_bar .search_dropdown li.selected {
-      background: #1c62a8;
-    color: #fff;
+  background: #1c62a8;
+  color: #fff;
 }
 
 .search_bar.huge {
@@ -612,17 +621,20 @@ li .header-search .dropdown .dropdown-menu li:hover {
 
 /* report message */
 
-.overlay.hide{
+.overlay.hide {
   visibility: hidden;
 }
+
 .report_msg_box {
   max-width: 40em;
   width: 80vw;
 }
+
 .report_msg_container .report_msg_box .msg_error {
   color: red;
   font-weight: 600;
 }
+
 .report_msg_box #report_msg {
   border: 0;
   border-radius: 10px;
@@ -652,32 +664,47 @@ li .header-search .dropdown .dropdown-menu li:hover {
 .report_msg_box .report_btns .report_msg_btn:hover {
   transform: scale(1.1);
 }
-.ques_box {
+
+.ques_box_1,
+.password_box,
+.feedback_box {
   width: 80vw;
-  max-width: 20em;
+  max-width: 24em;
+  background: #fff;
+  padding: 26px 12px;
+  border-radius: 10px;
+  border: 1px solid black;
 }
+
 .ques_box .ques_txt {
   margin-bottom: 1em;
-  color: #fff;
+  color: #424040;
+  /* color: #000; */
   font-weight: 600;
   font-size: 1.4em;
   text-align: center;
-  text-shadow: 0 0 10px black;
+  /* text-shadow: 0 0 10px black; */
 }
+
 .ques_box .ques_btn {
   border: 0;
   padding: 7px 12px;
   border-radius: 100vmax;
   font-weight: 500;
-  background: rgb(255,255,255);
+  /* background: rgb(255,255,255); */
+  background: rgb(241 241 241);
 }
-.ques_box .ques_btn:hover, .d_btn:hover{
+
+.ques_box .ques_btn:hover,
+.d_btn:hover {
   transform: scale(1.05);
 }
+
 .ques_box .ques_btn#cancel_logout {
   background-color: var(--main_color);
   color: #fff;
 }
+
 .box_group ul.msg_box {
   border-radius: 10px;
   box-shadow: 0px 2px 15px 5px rgba(241, 241, 241, 0.7);
@@ -996,8 +1023,6 @@ ul.date_time li a img {
   border-radius: 50%;
   /* margin-right: 60px; */
   max-width: 150px;
-  height: 150px;
-  max-height: 150px;
 }
 
 .profile-detail-content h4 {
@@ -1021,10 +1046,12 @@ ul.date_time li a img {
   cursor: pointer;
   padding-right: 25px;
 }
-.profile-detail-content .profile-detail-list li:not(:last-child){
+
+.profile-detail-content .profile-detail-list li:not(:last-child) {
   border-right: 1.5px solid rgb(107, 103, 103, .3);
 
 }
+
 .profile-detail-content .profile-detail-list li span {
   font-weight: 500;
   color: #2a2a2a;
@@ -1065,9 +1092,11 @@ ul.date_time li a img {
   color: #555555;
   transition: all 0.4s;
 }
+
 .message_btn:disabled {
-  background: rgba(100,100,100,.3);
+  background: rgba(100, 100, 100, .3);
 }
+
 .message_btn:hover:not(.message_btn:disabled) {
   background-color: #555555;
   color: #fff;
@@ -1959,8 +1988,7 @@ section.sort-posts {
   }
 
   .profile-detail-img img {
-    height: 150px;
-    width: 150px;
+    width: 200px;
     border: 3px solid var(--main_color);
   }
 
@@ -2221,9 +2249,11 @@ section.sort-posts {
   header.header ul.navbar-nav li.settings {
     order: 6;
   }
-  header.header ul.navbar-nav li.saved{
+
+  header.header ul.navbar-nav li.saved {
     order: 7;
   }
+
   header.header ul.navbar-nav li.logout {
     order: 8;
     border: none;
@@ -2278,8 +2308,6 @@ section.sort-posts {
   }
 
   .profile-detail-img img {
-    /* width: 150px; */
-    height: 150px;
     width: 150px;
   }
 
@@ -2860,7 +2888,7 @@ section.sort-posts {
     margin: 15px 0px;
   }
 
- 
+
 
   .profile-detail-content .profile-detail-a {
     font-size: 14px;
@@ -3415,6 +3443,129 @@ section.sort-posts {
 }
 
 @keyframes zoomin {
-  from{transform: scale(.8);}
-  to{transform: scale(1);}
+  from {
+    transform: scale(.8);
+  }
+
+  to {
+    transform: scale(1);
+  }
+}
+
+.user-photo {
+  height: 150px;
+  width: 150px;
+  border-radius: 50%;
+  margin: 0 auto 15px;
+  overflow: hidden;
+  background: #ddd url("https://www.adtechnology.co.uk/images/UGM-default-user.png");
+  border: 2px solid #ddd;
+}
+
+.toogle-reply {
+  height: 100% !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  transition: all 0.3s ease-in !important;
+}
+
+.like_button {
+  border: none;
+  background: transparent;
+}
+
+.user-photo {
+  height: 110px;
+  width: 110px;
+  margin: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  /* border: 2px solid #ddd; */
+}
+
+.share_profile {
+  background: #f7f7f7;
+  padding: 4px 12px;
+  border: 1px solid #e4e4f4;
+  text-align: center;
+  display: flex;
+  font-size: 14px;
+  justify-content: center;
+}
+
+.user-photo-post{
+  height: 80px;
+  width: 80px;
+  margin-right: 25px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+.user-photo-post > img {
+  width: 100%;
+  height: auto;
+}
+.load-more{
+  cursor: pointer;
+}
+.loading_{
+  display: none;
+}
+.reply-load{
+  margin-left: 100px;
+}
+
+.d-block-c{
+  display: block;
+}
+.d-none-c{
+  display: none;
+}
+.main-margin{
+  margin-top: 60px;
+}
+.like_post_ > form > button > span {
+  color: #626262 !important;
+  margin-top: 5px;
+}
+.editButton{
+  color: #1c62a8;
+}
+.editButton:hover{
+  color: white;
+}
+#user-photo>.photo {
+  max-width: 100%;
+  border: none;
+}
+.follow-user-img{
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+.pr-4{
+  padding-right: 6px;
+}
+.custom-column-margin-1{
+  margin-top: 7px;
+}
+.-c-d-n{
+  display: none;
+}
+.mla{
+  margin-left: auto !important;
+}
+.ml-1{
+  margin-left: 1px !important;
+}
+.post-user-image{
+  width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.left_part .radious_img img {
+  height: auto;
+  border-radius: 0%;
 }

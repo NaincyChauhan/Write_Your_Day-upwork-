@@ -169,6 +169,12 @@ class DatabaseSeeder extends Seeder
 			['slug' => 'update-user', 'name' => 'Update User'],
 			['slug' => 'delete-user', 'name' => 'Delete User'],
 
+			//User
+			['slug' => 'read-post', 'name' => 'Read Post'],
+			['slug' => 'create-post', 'name' => 'Create Post'],
+			['slug' => 'update-post', 'name' => 'Update Post'],
+			['slug' => 'delete-post', 'name' => 'Delete Post'],
+
 			//Setting
 			['slug' => 'update-setting', 'name' => 'Update Setting'],
 

@@ -1,6 +1,6 @@
-$(document).ready(function() {
+$(document).ready(function () {
     var maxLength = 240;
-    $(".right_part p").each(function() {
+    $(".right_part p").each(function () {
         var myStr = $(this).text();
         if ($.trim(myStr).length > maxLength) {
             var newStr = myStr.substring(0, maxLength);
@@ -12,31 +12,55 @@ $(document).ready(function() {
     });
 });
 
-$(window).on("load", function() {
+$(window).on("load", function () {
     var viewPortWidth = $(window).width();
     if (viewPortWidth < 992) {
-        $(".mbl-search button").click(function(e) {
+        $(".mbl-search button").click(function (e) {
             $(".header-search.mbl-search").toggleClass("active");
         });
 
-        $(".navbar-toggler").click(function(e) {
+        $(".navbar-toggler").click(function (e) {
             $(".header-search.mbl-search, .header-search.mbl-search .dropdown").toggleClass("invisible");
         });
     };
 
-    $(".red-hearta").on("click", function() {
+    $(".red-hearta").on("click", function () {
         $(this).parent().parent().parent().parent().siblings().children().removeClass("active");
         $(this).parent().parent().parent().toggleClass("active");
     });
 
     var viewPortWidth = $(window).width();
     if (viewPortWidth > 992) {
-        $(".user-icon .nav-link").on("click", function() {
+        $(".user-icon .nav-link").on("click", function () {
             $(this).parent().toggleClass("active");
         });
     };
 });
 
+//favicon
+function setFavicons(favImg) {
+    let headTitle = document.querySelector('head');
+    let setFavicon = document.createElement('link');
+    setFavicon.setAttribute('rel', 'shortcut icon');
+    setFavicon.setAttribute('href', favImg);
+    headTitle.appendChild(setFavicon);
+}
+setFavicons('assets/images/1.png');
+
+//verification
+function verifyUser() {
+    let init = document.body.innerHTML 
+    document.body.innerHTML = '<p>loading</p>';
+    if (!sessionStorage.getItem("user-details")) {
+        
+        let pathArr = window.location.pathname.split('/');
+        pathArr[pathArr.length - 1]= "login.html";
+        window.location.pathname = pathArr.join('/');
+    }else{
+        document.body.innerHTML = init;
+    }
+}
+// verifyUser();
 
 //working with overlay
 const cancelBtn = document.querySelector("#cancel");
@@ -67,8 +91,11 @@ for (let i = 0; i < closeOverlayBtns.length; i++) {
     closeOverlayBtns[i].onclick = () => {
         overlay[i].classList.add("hide");
     }
-
 }
+document.onclick = e => {
+    if (!logoutConfirmContainer.classList.contains("hide") && e.target.classList.contains("logout_container")) logoutConfirmContainer.classList.add("hide");
+}
+
 //category sorting
 const dropdownPlaceholder = document.querySelectorAll('.sort-categories .placeholder');
 const sortDropdownList = document.querySelectorAll('.sort-dropdown');

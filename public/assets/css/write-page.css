@@ -157,3 +157,46 @@
         max-width: 800px;
     }
 }
+
+/* ------- don't remove------ */
+#post-type-select{
+    padding: 12px 40px;
+    border-radius: 50px;
+    font-size: 16px;
+    line-height: 1;
+    font-weight: 400;
+    color: #fff;
+    background-color: var(--main_color);
+    transition: all 0.4s;
+    /* border: 1px solid var(--main_color); */
+
+    background-clip: padding-box;
+    border: 1px solid rgba(0,0,0,.15);
+    background-image: url("../images/next-white.png");
+}
+.form-control-sm::after {
+    content: "";
+    background:  url("../images/next-white.png") no-repeat center;
+    width: 15px; /* adjust to the width of your custom icon */
+    height: 15px; /* adjust to the height of your custom icon */
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+#post-type-select:focus{
+    box-shadow: none;
+}
+.post-select-option{
+    color: #000;
+    background: #fff;
+}
+
+.write-page-title{
+    margin-bottom: 0px;
+}
+.write-page-title-outer{
+    margin-bottom: 50px;
+}

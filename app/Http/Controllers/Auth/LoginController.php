@@ -115,7 +115,7 @@ class LoginController extends Controller
                     }
                     if(isset($request->type) && $request->type==1){
                         $otp = rand(100000, 999999);
-                        $mailData = [ 'name' => $user->name,'otp' => $otp,'template' => 'mail.otp','subject' => 'Login OTP(One Time Password)'];
+                        $mailData = [ 'name' => $user->name,'otp' => $otp,'template' => 'mail.otp','subject' => 'Activate Account'];
                         Mail::to($user->email)->send(new UserMail($mailData));
                         Session::put('login_otp', $otp);
                         return response()->json([

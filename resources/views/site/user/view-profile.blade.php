@@ -1,26 +1,25 @@
 @extends('layouts.site')
 @section('meta')
-<title>Edit Profile</title>
-
-<meta name="title" content="{{ config('app.name') }}" />
-<meta name="keywords" content="" />
-<meta name="description" content="" />
+<title>WYD | {{$user->username}}</title>
+<meta name="title" content="{{$user->username}}" />
+<meta name="keywords" content="{{$user->thought_of_the_day}}" />
+<meta name="description" content="{{$user->bio}}" />
 <meta name="robots" content="all" />
 
 <meta property="og:site_name" content="{{ config('app.name') }}" />
-<meta property="og:image" content="" />
+<meta property="og:image" content="{{asset('storage/users/'.$user->image)}}" />
 <meta property="og:image:width" content="180" />
 <meta property="og:image:height" content="50" />
 
 <meta property="og:type" content=website />
-<meta property="og:title" content="{{ config('app.name') }}" />
+<meta property="og:title" content="{{$user->username}}" />
 <meta property="og:description" content="" />
 
-<meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:site" content="wirteyourday.com" />
-<meta name="twitter:title" content="{{ config('app.name') }}" />
-<meta name="twitter:description" content="" />
-<meta name="twitter:image" content="" />
+<meta name="twitter:card" content="{{$user->bio}}" />
+<meta name="twitter:site" content="{{ config('app.url') }}" />
+<meta name="twitter:title" content="{{$user->username}}" />
+<meta name="twitter:description" content="{{$user->bio}}" />
+<meta name="twitter:image" content="{{asset('storage/users/'.$user->image)}}" />
 @endsection
 @section('css')
 <link rel="stylesheet" href="{{ asset('assets/css/profile.css') }}">
@@ -33,86 +32,38 @@
             <span class="close_followers cancel_btn">X</span>
         </div>
         <ul class="follower_list">
-            <li class="follower d-flex align-items-center">
-                <img src="{{ asset('assets/images/profile-img.png') }}" alt="profile_img"
-                    class="follower_img d-inline-block" width="48px" height="48px" />
-                <div class="follower_name">
-                    <p class="username">@king_dave</p>
-                    <p>David Mark</p>
+            @foreach ($user->followers as $follwer)                    
+                <div id="remove_follower_user_container_{{$follwer->id}}">
+                    @php
+                        $user_ = $follwer->follow_user;
+                    @endphp
+                    <li class="follower d-flex align-items-center">
+                        <div class="follow-user-img">
+                            <img class="w-100" src="{{ isset($user_->image) ? asset('storage/users/'.$user_->image) : asset('assets/images/images.png') }}" alt="profile_img" class="follower_img d-inline-block" />
+                        </div>
+                        <div class="follower_name">
+                            <p class="username">{{$user_->username}}</p>
+                            <p>{{$user_->name}}</p>
+                        </div>
+                        @php
+                            $is_following  = Auth::user()->following()->where('following_user_id', $user_->id)->exists();
+                        @endphp
+                        @if (Auth::user()->id !== $user_->id )   
+                            <button onclick="FollowUnFollowRequest({{$user_->id}},$(this));" class="follow_btn mla">
+                                {{$is_following == false ? 'Follow Back' : 'Following'}}
+                            </button>
+                        @endif
+                        <button class="main_btn ml-1" onclick="RemoverFromFollower({{$follwer->id}},$(this))">Remove</button>
+                    </li>
+                    <form action="{{route('follow-unfollow-user')}}" id="follow_unfollow_user_form_{{$user_->id}}" method="POST">
+                        @csrf
+                        <input type="hidden" name="username" value="{{$user_->username}}">
+                    </form>
+                    <form action="{{route('remove-follower-user',['id'=>$follwer->id])}}" id="remove_follower_user_form_{{$follwer->id}}" method="POST">
+                        @csrf
+                    </form>
                 </div>
-                <button class="follow_btn">Follow</button>
-                <button class="main_btn remove_btn">Remove</button>
-            </li>
-            <li class="follower d-flex align-items-center">
-                <img src="{{ asset('assets/images/profile-img.png') }}" alt="profile_img"
-                    class="follower_img d-inline-block" width="48px" height="48px" />
-                <div class="follower_name">
-                    <p class="username">@king_dave</p>
-                    <p>David Mark</p>
-                </div>
-                <button class="follow_btn">Follow</button>
-                <button class="main_btn remove_btn">Remove</button>
-            </li>
-            <li class="follower d-flex align-items-center">
-                <img src="{{ asset('assets/images/profile-img.png') }}" alt="profile_img"
-                    class="follower_img d-inline-block" width="48px" height="48px" />
-                <div class="follower_name">
-                    <p class="username">@king_dave</p>
-                    <p>David Mark</p>
-                </div>
-                <button class="follow_btn">Follow</button>
-                <button class="main_btn remove_btn">Remove</button>
-            </li>
-            <li class="follower d-flex align-items-center">
-                <img src="{{ asset('assets/images/profile-img.png') }}" alt="profile_img"
-                    class="follower_img d-inline-block" width="48px" height="48px" />
-                <div class="follower_name">
-                    <p class="username">@king_dave</p>
-                    <p>David Mark</p>
-                </div>
-                <button class="follow_btn">Follow</button>
-                <button class="main_btn remove_btn">Remove</button>
-            </li>
-            <li class="follower d-flex align-items-center">
-                <img src="{{ asset('assets/images/profile-img.png') }}" alt="profile_img"
-                    class="follower_img d-inline-block" width="48px" height="48px" />
-                <div class="follower_name">
-                    <p class="username">@king_dave</p>
-                    <p>David Mark</p>
-                </div>
-                <button class="follow_btn">Follow</button>
-                <button class="main_btn remove_btn">Remove</button>
-            </li>
-            <li class="follower d-flex align-items-center">
-                <img src="{{ asset('assets/images/profile-img.png') }}" alt="profile_img"
-                    class="follower_img d-inline-block" width="48px" height="48px" />
-                <div class="follower_name">
-                    <p class="username">@king_dave</p>
-                    <p>David Mark</p>
-                </div>
-                <button class="follow_btn">Follow</button>
-                <button class="main_btn remove_btn">Remove</button>
-            </li>
-            <li class="follower d-flex align-items-center">
-                <img src="{{ asset('assets/images/profile-img.png') }}" alt="profile_img"
-                    class="follower_img d-inline-block" width="48px" height="48px" />
-                <div class="follower_name">
-                    <p class="username">@king_dave</p>
-                    <p>David Mark</p>
-                </div>
-                <button class="follow_btn">Follow</button>
-                <button class="main_btn remove_btn">Remove</button>
-            </li>
-            <li class="follower d-flex align-items-center">
-                <img src="{{ asset('assets/images/profile-img.png') }}" alt="profile_img"
-                    class="follower_img d-inline-block" width="48px" height="48px" />
-                <div class="follower_name">
-                    <p class="username">@king_dave</p>
-                    <p>David Mark</p>
-                </div>
-                <button class="follow_btn">Follow</button>
-                <button class="main_btn remove_btn">Remove</button>
-            </li>
+            @endforeach
         </ul>
     </div>
 </div>
@@ -123,69 +74,25 @@
             <span class="close_following cancel_btn">X</span>
         </div>
         <ul class="following_list">
-            <li class="follower d-flex align-items-center">
-                <img src="{{ asset('assets/images/profile-img.png') }}" alt="profile_img"
-                    class="follower_img d-inline-block" width="48px" height="48px" />
-                <div class="follower_name">
-                    <p class="username">@king_dave</p>
-                    <p>David Mark</p>
-                </div>
-                <button class="main_btn follow_btn">Following</button>
-            </li>
-            <li class="follower d-flex align-items-center">
-                <img src="{{ asset('assets/images/profile-img.png') }}" alt="profile_img"
-                    class="follower_img d-inline-block" width="48px" height="48px" />
-                <div class="follower_name">
-                    <p class="username">@king_dave</p>
-                    <p>David Mark</p>
-                </div>
-                <button class="main_btn follow_btn">Following</button>
-            </li>
-            <li class="follower d-flex align-items-center">
-                <img src="{{ asset('assets/images/profile-img.png') }}" alt="profile_img"
-                    class="follower_img d-inline-block" width="48px" height="48px" />
-                <div class="follower_name">
-                    <p class="username">@king_dave</p>
-                    <p>David Mark</p>
-                </div>
-                <button class="main_btn follow_btn">Following</button>
-            </li>
-            <li class="follower d-flex align-items-center">
-                <img src="{{ asset('assets/images/profile-img.png') }}" alt="profile_img"
-                    class="follower_img d-inline-block" width="48px" height="48px" />
-                <div class="follower_name">
-                    <p class="username">@king_dave</p>
-                    <p>David Mark</p>
-                </div>
-                <button class="main_btn follow_btn">Following</button>
-            </li>
-            <li class="follower d-flex align-items-center">
-                <img src="{{ asset('assets/images/profile-img.png') }}" alt="profile_img"
-                    class="follower_img d-inline-block" width="48px" height="48px" />
-                <div class="follower_name">
-                    <p class="username">@king_dave</p>
-                    <p>David Mark</p>
-                </div>
-                <button class="main_btn follow_btn">Following</button>
-            </li>
-            <li class="follower d-flex align-items-center">
-                <img src="{{ asset('assets/images/profile-img.png') }}" alt="profile_img"
-                    class="follower_img d-inline-block" width="48px" height="48px" />
-                <div class="follower_name">
-                    <p class="username">@king_dave</p>
-                    <p>David Mark</p>
-                </div>
-                <button class="main_btn follow_btn">Following</button>
-            </li>
-            <li class="follower d-flex align-items-center">
-                <img src="{{ asset('assets/images/profile-img.png') }}" alt="profile_img"
-                    class="follower_img d-inline-block" width="48px" height="48px" />
-                <div class="follower_name">
-                    <p class="username">@king_dave</p>
-                    <p>David Mark</p>
-                </div>
-                <button class="main_btn follow_btn">Following</button>
-            </li>
+            @foreach ($user->following as $following_)                    
+                @php
+                    $user_ = $following_->following_user;
+                @endphp
+                <li class="follower d-flex align-items-center">
+                    <div class="follow-user-img">
+                        <img class="w-100" src="{{ isset($user_->image) ? asset('storage/users/'.$user_->image) : asset('assets/images/images.png') }}" alt="profile_img" class="follower_img d-inline-block" />
+                    </div>
+                    <div class="follower_name">
+                        <p class="username">{{$user_->username}}</p>
+                        <p>{{$user_->name}}</p>
+                    </div>
+                    <button onclick="FollowUnFollowRequest({{$user_->id}},$(this));"  class="main_btn follow_btn">Following</button>
+                </li>
+                <form action="{{route('follow-unfollow-user')}}" id="follow_unfollow_user_form_{{$user_->id}}" method="POST">
+                    @csrf
+                    <input type="hidden" name="username" value="{{$user_->username}}">
+                </form>        
+            @endforeach
         </ul>
     </div>
 </div>
@@ -211,9 +118,9 @@
             <div class="col-12">
                 <!-- <div class="suspender position-absolute left-0 w-100 bg-white"></div> -->
                 <div
-                    class="profile-thought position-relative text-white py-3 rounded-bottom mt-3 mb-2 d-flex flex-sm-row flex-column justify-content-center align-items-center">
-                    <div class="profile-detail-img w-auto pb-2">
-                        <img src="{{ isset(Auth::user()->image) ? asset('storage/users/'.Auth::user()->image) : asset('assets/images/images.png') }}" />
+                    class="profile-thought position-relative text-white py-3 rounded-bottom mt-3 mb-2 d-flex flex-sm-row flex-column justify-content-center align-items-center">                    
+                    <div class="user-photo" id="user-photo">
+                        <img src="{{ isset($user->image) ? asset('storage/users/'.$user->image) : asset('assets/images/images.png') }}" class="photo img-fluid" />
                     </div>
                     <div class="thoughtoday col-sm-7 px-4">
                         <h3 class="mb-3 position-relative">Thought Of The Day</h3>
@@ -239,9 +146,9 @@
                   /></span>
                 </h4>
                 <ul class="profile-detail-list col-sm-7 px-4">
-                  <li><span>145</span> Days</li>
-                  <li class="followers_link"><span>750</span> Followers</li>
-                  <li class="following_link"><span>350</span> Following</li>
+                  <li><span>{{count($publicposts)}}</span> Days</li>
+                  <li class="followers_link"><span>{{$user->followers()->count()}}</span> Followers</li>
+                  <li class="following_link"><span>{{$user->following()->count()}}</span> Following</li>
                 </ul>
               </div>
               <div
@@ -327,33 +234,44 @@
             <div class="tab-content" id="pills-tabContent">
                 <div class="tab-pane fade show active box_group" id="pills-days" role="tabpanel"
                     aria-labelledby="pills-days-tab">
-                    @for ($i=0;$i<6;$i++)                        
-                        <div class="box_group">
+                    @foreach ($publicposts as $post)                        
+                        <div class="box_group" id="main_post_container_{{$post->id}}">
                             <ul class="msg_box mb-3 mb-sm-5">
                                 <li class="days-ago">
-                                    <p>5<sup>th</sup><br />day</p>
+                                    <p>{{ $post->post_number }}<sup>th</sup><br />day</p>
                                 </li>
                                 <li class="row align-items-center">
                                     <div class="col-lg-12">
-                                        <div class="msg_extras_container d-flex">
+                                        <div class="msg_extras_container d-flex">                                            
                                             <a class="heart">
-                                                <img class="simple-heart" src="{{ asset('assets/images/bookmark.png') }}" />
-                                                <img class="red-heart"
-                                                    src="{{ asset('assets/images/bookmark-blue.png') }}" />
+                                                <form action="{{route('save-post')}}" method="POST" id="save_post_form_{{$post->id}}">
+                                                    @csrf
+                                                    <input type="hidden" name="post_id" value="{{$post->id}}">
+                                                    <button class="like_button p-0" type="button" onclick="SavePostRequest({{$post->id}});" id="save_post_btn_{{$post->id}}">
+                                                        @if ($post->saves()->where('user_id', Auth::user()->id)->exists())                                                
+                                                            <img class="red-heart d-block" style="margin-bottom: -8px;" src="{{ asset('assets/images/bookmark-blue.png') }}">
+                                                        @else
+                                                            <img class="simple-heart" src="{{ asset('assets/images/bookmark.png') }}">
+                                                        @endif
+                                                    </button>
+                                                </form>
                                             </a>
                                             <button class="msg_extras_btn d-flex flex-column">
                                                 <span class="caret"></span>
                                                 <span class="caret"></span>
                                                 <span class="caret"></span>
                                             </button>
-                                            <ul class="msg_extras_list d-flex flex-column hide">
-                                                <li class="msg_extra p-1 px-3 pt-2">
-                                                    <i class="fa fa-eye-slash side_icon"></i> Hide
-                                                </li>
-                                                <li class="msg_extra p-1 px-3 report">
-                                                    <i class="fa fa-user-alt-slash side_icon"></i>
-                                                    Report
-                                                </li>
+                                            <ul class="msg_extras_list d-flex flex-column hide">   
+                                                <li class="msg_extra p-1 px-3 editButtonInner">
+                                                    <a class="editButton" href="{{route('edit-post-view',['type'=>$post->type,'slug'=>$post->slug_url])}}">
+                                                        <i class="fa fa-edit side_icon"></i>
+                                                        Edit
+                                                    </a>
+                                                </li>                                                
+                                                <li class="msg_extra p-1 px-3" onclick="ShowDeleteModal({{$post->id}})" id="delete_post_btn_{{$post->id}}">
+                                                    <i class="fa fa-trash-alt side_icon"></i>
+                                                    Delete
+                                                </li>                                                
                                                 <li class="msg_extra p-1 px-3 pb-2">
                                                     <i class="fa fa-times-circle side_icon"></i>
                                                     Cancel
@@ -364,47 +282,63 @@
                                             <ul class="date_time d-flex">
                                                 <li>
                                                     <p>
-                                                        <i class="far fa-clock"></i>10:00 AM - 20 feb,
-                                                        2020 - Las Vegas, USA
+                                                        <i class="far fa-clock"></i>{{ date("h:i A - M d, Y", strtotime($post->created_at)) }}
                                                     </p>
                                                 </li>
                                             </ul>
                                             <h3>
-                                                <a href="./preview.html">Loretm Ipsum is simply dummy text of the
-                                                    printing</a>
+                                                <a href="{{route('detail-post-view',['type'=>$post->type,'slug'=>$post->slug_url])}}">{{$post->title}}</a>
                                             </h3>
                                             <p>
-                                                Lorem Ipsum is simply dummy text of the printing
-                                                and typesetting industry. Lorem Ipsum has been the
-                                                industry's standard dummy text ever since the
-                                                1500s, when an unknown printer took a galley of
-                                                type and scrambled it to make a type specimen
-                                                book. It has survived not centuries,Lorem Ipsum is
-                                                simply dummy Lorem Ipsum is simply dummy text of
-                                                the printing and typesetting industry. Lorem Ipsum
-                                                has been the industry's
+                                                {!! Str::limit($post->desc, 200, ' ...') !!}
                                             </p>
 
                                             <ul class="like_comment d-flex justify-content-between align-items-center">
-                                                <li>
-                                                    <small><img
-                                                            src="{{ asset('assets/images/eye.png') }}" /><span><span>1000</span>
-                                                            Views</span></small>
-                                                    <a class="heart">
-                                                        <img class="simple-heart"
-                                                            src="{{ asset('assets/images/heart.png') }}" />
-                                                        <img class="red-heart"
-                                                            src="{{ asset('assets/images/red-heart.png') }}" />
-                                                        <span><span>1000</span> Likes</span>
+                                                <li class="d-flex align-items-center">
+                                                    <!-- Post Views -->
+                                                    <small><img src="{{ asset('assets/images/eye.png') }}" /><span><span>{{$post->views()->count()}}</span>
+                                                            Views</span></small>                                                    
+                                                    <!-- Post Likes -->
+                                                    <a class="heart like_post_">
+                                                        <form action="{{route('add-remove-like')}}" method="POST" id="like_post_form_{{$post->id}}">
+                                                            @csrf
+                                                            <input type="hidden" name="post_id" value="{{$post->id}}">
+                                                            <input type="hidden" name="post_type" value="{{$post->type}}">
+                                                            <button class="like_button d-flex justify-content-center align-items-center" type="button" onclick="LikePostRequest({{$post->id}},$(this));" id="like_post_btn_{{$post->id}}">
+                                                                @php $liked = $post->likes()->where('user_id', Auth::user()->id)->exists(); @endphp
+                                                                    <img class="red-heart {{$liked == true ? 'd-block-c' : 'd-none-c' }}" src="{{ asset('assets/images/red-heart.png') }}">
+                                                                    <img class="simple-heart {{$liked == true ? 'd-none-c' : 'd-block-c' }}" src="{{ asset('assets/images/heart.png') }}">
+                                                                <span><span class="post_like_count">{{$post->likes()->count()}}</span> Likes</span>
+                                                            </button>
+                                                        </form>
                                                     </a>
-                                                    <a href="#"><img
-                                                            src="{{ asset('assets/images/messsage.png') }}" /><span><span>1000</span>
+                                                    <!-- Post Comments -->
+                                                    <a><img src="{{ asset('assets/images/messsage.png') }}" /><span><span>{{$post->comments()->count()}}</span>
                                                             Comments</span>
                                                     </a>
-                                                    <a href="#"><img
-                                                            src="{{ asset('assets/images/share.png') }}" /><span><span>1000</span>
-                                                            Shares</span>
-                                                    </a>
+                                                    <!-- Post Shares -->
+                                                    <form action="{{route('share-post')}}" method="POST"  id="share_post_form_{{$post->id}}">
+                                                        @csrf
+                                                        <input type="hidden" name="post_id" value="{{$post->id}}">
+                                                        <input type="hidden" name="post_type" value="{{$post->type}}">
+                                                        <a type="button" onclick="sharePostRequest({{$post->id}});" id="share_post_btn_{{$post->id}}">
+                                                            <img src="{{ asset('assets/images/share.png') }}"><span><span class="share_count">{{$post->shares()->count()}}</span> Shares</span> 
+                                                        </a>
+                                                    </form>
+                                                    <!-- Share Post Modal -->
+                                                    <div class="overlay hide" id="share_post_container_{{$post->id}}">
+                                                        <div class="ques_box ques_box_1">
+                                                            <p class="ques_txt font-17">Copy Post Link</p>        
+                                                            <div class="share_profile">
+                                                                <p>{{route('detail-post-view',['type'=>$post->type,'slug'=>$post->slug_url])}}</p> 
+                                                            </div>     
+                                                            <div class="d-flex justify-content-center mt-4">           
+                                                                <button type="button" class="ques_btn suggested_btn text-primary" onclick="SharePostModal({{$post->id}});">
+                                                                    Cancel
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </li>
                                             </ul>
                                         </div>
@@ -412,124 +346,153 @@
                                 </li>
                             </ul>
                         </div>
-                    @endfor
+                        <form action="{{route('delete-public-post')}}" method="POST" id="delete_post_form_{{$post->id}}">
+                            @csrf
+                            <input type="hidden" name="post_type" value="{{$post->type}}">
+                            <input type="hidden" name="post_id" value="{{$post->id}}">
+                            <!-- Share Post Modal -->
+                            <div class="overlay hide" id="delete_post_container_{{$post->id}}">
+                                <div class="ques_box ques_box_1">
+                                    <p class="ques_txt font-17">Are You Sure You Want To Delete This Post</p>        
+                                    <div class="d-flex justify-content-center mt-4">           
+                                        <button type="button" class="btn btn-danger" id="delete_post_btn_{{$post->id}}" onclick="DeletePostRequest({{$post->id}})">
+                                            Delete
+                                        </button>
+                                    </div>    
+                                    <div class="d-flex justify-content-center mt-4">           
+                                        <button type="button" class="ques_btn suggested_btn text-primary" onclick="ShowDeleteModal({{$post->id}});">
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>                            
+                    @endforeach
                 </div>
                 <div class="tab-pane fade" id="pills-privte" role="tabpanel" aria-labelledby="pills-privte-tab">
-                    @for ($i=0;$i<6;$i++)                        
-                        <div class="box_group">
-                            <ul class="msg_box mb-3 mb-sm-5">
-                                <li class="days-ago">
-                                    <p>5<sup>th</sup><br />day</p>
-                                </li>
-                                <li class="row align-items-center">
-                                    <div class="col-lg-12">
-                                        <div class="msg_extras_container d-flex">
-                                            <a class="heart">
-                                                <img class="simple-heart" src="{{ asset('assets/images/bookmark.png') }}" />
-                                                <img class="red-heart"
-                                                    src="{{ asset('assets/images/bookmark-blue.png') }}" />
-                                            </a>
-                                            <button class="msg_extras_btn d-flex flex-column">
-                                                <span class="caret"></span>
-                                                <span class="caret"></span>
-                                                <span class="caret"></span>
-                                            </button>
-                                            <ul class="msg_extras_list d-flex flex-column hide">
-                                                <li class="msg_extra p-1 px-3 pt-2">
-                                                    <i class="fa fa-eye-slash side_icon"></i> Hide
-                                                </li>
-                                                <li class="msg_extra p-1 px-3 report">
-                                                    <i class="fa fa-user-alt-slash side_icon"></i>
-                                                    Report
-                                                </li>
-                                                <li class="msg_extra p-1 px-3 pb-2">
-                                                    <i class="fa fa-times-circle side_icon"></i>
-                                                    Cancel
-                                                </li>
-                                            </ul>
-                                        </div>
-                                        <div class="right_part">
-                                            <ul class="date_time d-flex">
-                                                <li>
-                                                    <p>
-                                                        <i class="far fa-clock"></i>10:00 AM - 20 feb,
-                                                        2020 - Las Vegas, USA
-                                                    </p>
-                                                </li>
-                                            </ul>
-                                            <h3>
-                                                <a href="./preview.html">Loretm Ipsum is simply dummy text of the
-                                                    printing</a>
-                                            </h3>
-                                            <p>
-                                                Lorem Ipsum is simply dummy text of the printing
-                                                and typesetting industry. Lorem Ipsum has been the
-                                                industry's standard dummy text ever since the
-                                                1500s, when an unknown printer took a galley of
-                                                type and scrambled it to make a type specimen
-                                                book. It has survived not centuries,Lorem Ipsum is
-                                                simply dummy Lorem Ipsum is simply dummy text of
-                                                the printing and typesetting industry. Lorem Ipsum
-                                                has been the industry's
-                                            </p>
-
-                                            <ul class="like_comment d-flex justify-content-between align-items-center">
-                                                <li>
-                                                    <small><img
-                                                            src="{{ asset('assets/images/eye.png') }}" /><span><span>1000</span>
-                                                            Views</span></small>
-                                                    <a class="heart">
-                                                        <img class="simple-heart"
-                                                            src="{{ asset('assets/images/heart.png') }}" />
-                                                        <img class="red-heart"
-                                                            src="{{ asset('assets/images/red-heart.png') }}" />
-                                                        <span><span>1000</span> Likes</span>
-                                                    </a>
-                                                    <a href="#"><img
-                                                            src="{{ asset('assets/images/messsage.png') }}" /><span><span>1000</span>
-                                                            Comments</span>
-                                                    </a>
-                                                    <a href="#"><img
-                                                            src="{{ asset('assets/images/share.png') }}" /><span><span>1000</span>
-                                                            Shares</span>
-                                                    </a>
-                                                </li>
-                                            </ul>
-                                        </div>
+                    @foreach ($privateposts as $post)                        
+                    <div class="box_group" id="main_post_container_{{$post->id}}">
+                        <ul class="msg_box mb-3 mb-sm-5">
+                            <li class="row align-items-center">
+                                <div class="col-lg-12">
+                                    <div class="msg_extras_container d-flex">   
+                                        <button class="msg_extras_btn d-flex flex-column">
+                                            <span class="caret"></span>
+                                            <span class="caret"></span>
+                                            <span class="caret"></span>
+                                        </button>
+                                        <ul class="msg_extras_list d-flex flex-column hide">                                                
+                                            <li class="msg_extra p-1 px-3 editButtonInner">
+                                                <a class="editButton" href="{{route('edit-post-view',['type'=>$post->type,'slug'=>$post->slug_url])}}">
+                                                    <i class="fa fa-edit side_icon"></i>
+                                                    Edit
+                                                </a>
+                                            </li>                                               
+                                            <li class="msg_extra p-1 px-3" onclick="ShowDeleteModal({{$post->id}})" id="delete_post_btn_{{$post->id}}">
+                                                <i class="fa fa-trash-alt side_icon"></i>
+                                                Delete
+                                            </li>                                                
+                                            <li class="msg_extra p-1 px-3 pb-2">
+                                                <i class="fa fa-times-circle side_icon"></i>
+                                                Cancel
+                                            </li>
+                                        </ul>
                                     </div>
-                                </li>
-                            </ul>
+                                    <div class="right_part">
+                                        <ul class="date_time d-flex">
+                                            <li>
+                                                <p>
+                                                    <i class="far fa-clock"></i>{{ date("h:i A - M d, Y", strtotime($post->created_at)) }}
+                                                </p>
+                                            </li>
+                                        </ul>
+                                        <h3>
+                                            <a href="{{route('detail-post-view-private',['type'=>$post->type,'slug'=>$post->slug_url])}}">{{$post->title}}</a>
+                                        </h3>
+                                        <p>
+                                            {!! Str::limit($post->desc, 200, ' ...') !!}
+                                        </p>
+
+                                        <ul class="like_comment d-flex justify-content-between align-items-center">
+                                            <li class="d-flex align-items-center">
+                                                <!-- Post Views -->
+                                                <small><img src="{{ asset('assets/images/eye.png') }}" /><span><span>{{$post->countViews()}}</span>
+                                                        Views</span></small>                                                    
+                                                <!-- Post Likes -->
+                                                <a class="heart like_post_">
+                                                    <form action="{{route('add-remove-like-private')}}" method="POST" id="like_post_form_{{$post->id}}">
+                                                        @csrf
+                                                        <input type="hidden" name="post_id" value="{{$post->id}}">
+                                                        <input type="hidden" name="post_type" value="{{$post->type}}">
+                                                        <button class="like_button d-flex justify-content-center align-items-center" type="button" onclick="LikePostRequest({{$post->id}},$(this));" id="like_post_btn_{{$post->id}}">
+                                                            @php $liked = $post->checkUserLike(Auth::user()->id); @endphp
+                                                                    <img class="red-heart {{$liked == true ? 'd-block-c' : 'd-none-c' }}" src="{{ asset('assets/images/red-heart.png') }}">
+                                                                    <img class="simple-heart {{$liked == true ? 'd-none-c' : 'd-block-c' }}" src="{{ asset('assets/images/heart.png') }}">
+                                                                <span><span class="post_like_count">{{$post->countLikes()}}</span> Likes</span>
+                                                        </button>
+                                                    </form>
+                                                </a>
+                                                <!-- Post Comments -->
+                                                <a><img src="{{ asset('assets/images/messsage.png') }}" /><span><span>{{$post->countComments()}}</span>
+                                                        Comments</span>
+                                                </a>
+                                                <!-- Post Shares -->
+                                                <a>
+                                                    <img src="{{ asset('assets/images/share.png') }}"><span><span class="share_count">{{$post->countShares()}}</span> Shares</span> 
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <form action="{{route('delete-private-post')}}" method="POST" id="delete_post_form_{{$post->id}}">
+                        @csrf
+                        <input type="hidden" name="post_type" value="{{$post->type}}">
+                        <input type="hidden" name="post_id" value="{{$post->id}}">
+                        <!-- Share Post Modal -->
+                        <div class="overlay hide" id="delete_post_container_{{$post->id}}">
+                            <div class="ques_box ques_box_1">
+                                <p class="ques_txt font-17">Are You Sure You Want To Delete This Post</p>        
+                                <div class="d-flex justify-content-center mt-4">           
+                                    <button type="button" class="btn btn-danger" id="delete_post_btn_{{$post->id}}" onclick="DeletePostRequest({{$post->id}})">
+                                        Delete
+                                    </button>
+                                </div>    
+                                <div class="d-flex justify-content-center mt-4">           
+                                    <button type="button" class="ques_btn suggested_btn text-primary" onclick="ShowDeleteModal({{$post->id}});">
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                    @endfor
+                    </form>
+                    @endforeach
                 </div>
                 <div class="tab-pane fade" id="pills-draft" role="tabpanel" aria-labelledby="pills-draft-tab">
-                    @for ($i=0;$i<9;$i++)                        
-                        <div class="box_group">
-                            <ul class="msg_box mb-3 mb-sm-5">
-                                <li class="days-ago">
-                                    <p>5<sup>th</sup><br />day</p>
-                                </li>
+                    @foreach ($draftposts as $post)                        
+                        <div class="box_group" id="main_post_container_{{$post->id}}">
+                            <ul class="msg_box mb-3 mb-sm-5">                                
                                 <li class="row align-items-center">
                                     <div class="col-lg-12">
-                                        <div class="msg_extras_container d-flex">
-                                            <a class="heart">
-                                                <img class="simple-heart" src="{{ asset('assets/images/bookmark.png') }}" />
-                                                <img class="red-heart"
-                                                    src="{{ asset('assets/images/bookmark-blue.png') }}" />
-                                            </a>
+                                        <div class="msg_extras_container d-flex">   
                                             <button class="msg_extras_btn d-flex flex-column">
                                                 <span class="caret"></span>
                                                 <span class="caret"></span>
                                                 <span class="caret"></span>
                                             </button>
-                                            <ul class="msg_extras_list d-flex flex-column hide">
-                                                <li class="msg_extra p-1 px-3 pt-2">
-                                                    <i class="fa fa-eye-slash side_icon"></i> Hide
-                                                </li>
-                                                <li class="msg_extra p-1 px-3 report">
-                                                    <i class="fa fa-user-alt-slash side_icon"></i>
-                                                    Report
-                                                </li>
+                                            <ul class="msg_extras_list d-flex flex-column hide">                                                
+                                                <li class="msg_extra p-1 px-3 editButtonInner">
+                                                    <a class="editButton" href="{{route('edit-post-view',['type'=>$post->type,'slug'=>$post->slug_url])}}">
+                                                        <i class="fa fa-edit side_icon"></i>
+                                                        Edit
+                                                    </a>
+                                                </li> 
+                                                <li class="msg_extra p-1 px-3" onclick="ShowDeleteModal({{$post->id}})" id="delete_post_btn_{{$post->id}}">
+                                                    <i class="fa fa-trash-alt side_icon"></i>
+                                                    Delete
+                                                </li>                                                
                                                 <li class="msg_extra p-1 px-3 pb-2">
                                                     <i class="fa fa-times-circle side_icon"></i>
                                                     Cancel
@@ -540,46 +503,43 @@
                                             <ul class="date_time d-flex">
                                                 <li>
                                                     <p>
-                                                        <i class="far fa-clock"></i>10:00 AM - 20 feb,
-                                                        2020 - Las Vegas, USA
+                                                        <i class="far fa-clock"></i>{{ date("h:i A - M d, Y", strtotime($post->created_at)) }}
                                                     </p>
                                                 </li>
                                             </ul>
                                             <h3>
-                                                <a href="./preview.html">Loretm Ipsum is simply dummy text of the
-                                                    printing</a>
+                                                <a href="{{route('detail-post-view-draft',['type'=>$post->type,'slug'=>$post->slug_url])}}">{{$post->title}}</a>
                                             </h3>
                                             <p>
-                                                Lorem Ipsum is simply dummy text of the printing
-                                                and typesetting industry. Lorem Ipsum has been the
-                                                industry's standard dummy text ever since the
-                                                1500s, when an unknown printer took a galley of
-                                                type and scrambled it to make a type specimen
-                                                book. It has survived not centuries,Lorem Ipsum is
-                                                simply dummy Lorem Ipsum is simply dummy text of
-                                                the printing and typesetting industry. Lorem Ipsum
-                                                has been the industry's
+                                                {!! Str::limit($post->desc, 200, ' ...') !!}
                                             </p>
 
                                             <ul class="like_comment d-flex justify-content-between align-items-center">
-                                                <li>
-                                                    <small><img
-                                                            src="{{ asset('assets/images/eye.png') }}" /><span><span>1000</span>
-                                                            Views</span></small>
-                                                    <a class="heart">
-                                                        <img class="simple-heart"
-                                                            src="{{ asset('assets/images/heart.png') }}" />
-                                                        <img class="red-heart"
-                                                            src="{{ asset('assets/images/red-heart.png') }}" />
-                                                        <span><span>1000</span> Likes</span>
+                                                <li class="d-flex align-items-center">
+                                                    <!-- Post Views -->
+                                                    <small><img src="{{ asset('assets/images/eye.png') }}" /><span><span>{{$post->countViews()}}</span>
+                                                            Views</span></small>                                                    
+                                                    <!-- Post Likes -->
+                                                    <a class="heart like_post_">
+                                                        <form action="{{route('add-remove-like-draft')}}" method="POST" id="like_post_form_{{$post->id}}">
+                                                            @csrf
+                                                            <input type="hidden" name="post_id" value="{{$post->id}}">
+                                                            <input type="hidden" name="post_type" value="{{$post->type}}">
+                                                            <button class="like_button d-flex justify-content-center align-items-center" type="button" onclick="LikePostRequest({{$post->id}},$(this));" id="like_post_btn_{{$post->id}}">
+                                                                @php $liked = $post->checkUserLike(Auth::user()->id); @endphp
+                                                                    <img class="red-heart {{$liked == true ? 'd-block-c' : 'd-none-c' }}" src="{{ asset('assets/images/red-heart.png') }}">
+                                                                    <img class="simple-heart {{$liked == true ? 'd-none-c' : 'd-block-c' }}" src="{{ asset('assets/images/heart.png') }}">
+                                                                <span><span class="post_like_count">{{$post->countLikes()}}</span> Likes</span>
+                                                            </button>
+                                                        </form>
                                                     </a>
-                                                    <a href="#"><img
-                                                            src="{{ asset('assets/images/messsage.png') }}" /><span><span>1000</span>
+                                                    <!-- Post Comments -->
+                                                    <a><img src="{{ asset('assets/images/messsage.png') }}" /><span><span>{{$post->countComments()}}</span>
                                                             Comments</span>
                                                     </a>
-                                                    <a href="#"><img
-                                                            src="{{ asset('assets/images/share.png') }}" /><span><span>1000</span>
-                                                            Shares</span>
+                                                    <!-- Post Shares -->
+                                                    <a>
+                                                        <img src="{{ asset('assets/images/share.png') }}"><span><span class="share_count">{{$post->countShares()}}</span> Shares</span> 
                                                     </a>
                                                 </li>
                                             </ul>
@@ -588,36 +548,71 @@
                                 </li>
                             </ul>
                         </div>
-                    @endfor
+                        <form action="{{route('delete-draft-post')}}" method="POST" id="delete_post_form_{{$post->id}}">
+                            @csrf
+                            <input type="hidden" name="post_type" value="{{$post->type}}">
+                            <input type="hidden" name="post_id" value="{{$post->id}}">
+                            <!-- Share Post Modal -->
+                            <div class="overlay hide" id="delete_post_container_{{$post->id}}">
+                                <div class="ques_box ques_box_1">
+                                    <p class="ques_txt font-17">Are You Sure You Want To Delete This Post</p>        
+                                    <div class="d-flex justify-content-center mt-4">           
+                                        <button type="button" class="btn btn-danger" id="delete_post_btn_{{$post->id}}" onclick="DeletePostRequest({{$post->id}})">
+                                            Delete
+                                        </button>
+                                    </div>    
+                                    <div class="d-flex justify-content-center mt-4">           
+                                        <button type="button" class="ques_btn suggested_btn text-primary" onclick="ShowDeleteModal({{$post->id}});">
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    @endforeach
                 </div>
                 <div class="tab-pane fade" id="pills-saved" role="tabpanel" aria-labelledby="pills-saved-tab">
-                    @for ($i=0;$i<10;$i++)                        
-                        <div class="box_group">
+                    @foreach ($saveposts as $save)                        
+                        @php
+                            $post = $save->post;
+                        @endphp
+                        <div class="box_group" id="main_post_container_{{$post->id}}">
                             <ul class="msg_box mb-3 mb-sm-5">
                                 <li class="days-ago">
-                                    <p>5<sup>th</sup><br />day</p>
+                                    <p>{{ $post->post_number }}<sup>th</sup><br />day</p>
                                 </li>
                                 <li class="row align-items-center">
                                     <div class="col-lg-12">
-                                        <div class="msg_extras_container d-flex">
+                                        <div class="msg_extras_container d-flex">                                            
                                             <a class="heart">
-                                                <img class="simple-heart" src="{{ asset('assets/images/bookmark.png') }}" />
-                                                <img class="red-heart"
-                                                    src="{{ asset('assets/images/bookmark-blue.png') }}" />
+                                                <form action="{{route('save-post')}}" method="POST" id="save_post_form_{{$post->id}}">
+                                                    @csrf
+                                                    <input type="hidden" name="post_id" value="{{$post->id}}">
+                                                    <button class="like_button p-0" type="button" onclick="SavePostRequest({{$post->id}});" id="save_post_btn_{{$post->id}}">
+                                                        @if ($post->saves()->where('user_id', Auth::user()->id)->exists())                                                
+                                                            <img class="red-heart d-block" style="margin-bottom: -8px;" src="{{ asset('assets/images/bookmark-blue.png') }}">
+                                                        @else
+                                                            <img class="simple-heart" src="{{ asset('assets/images/bookmark.png') }}">
+                                                        @endif
+                                                    </button>
+                                                </form>
                                             </a>
                                             <button class="msg_extras_btn d-flex flex-column">
                                                 <span class="caret"></span>
                                                 <span class="caret"></span>
                                                 <span class="caret"></span>
                                             </button>
-                                            <ul class="msg_extras_list d-flex flex-column hide">
-                                                <li class="msg_extra p-1 px-3 pt-2">
-                                                    <i class="fa fa-eye-slash side_icon"></i> Hide
-                                                </li>
-                                                <li class="msg_extra p-1 px-3 report">
-                                                    <i class="fa fa-user-alt-slash side_icon"></i>
-                                                    Report
-                                                </li>
+                                            <ul class="msg_extras_list d-flex flex-column hide">   
+                                                <li class="msg_extra p-1 px-3 editButtonInner">
+                                                    <a class="editButton" href="{{route('edit-post-view',['type'=>$post->type,'slug'=>$post->slug_url])}}">
+                                                        <i class="fa fa-edit side_icon"></i>
+                                                        Edit
+                                                    </a>
+                                                </li>                                                
+                                                <li class="msg_extra p-1 px-3" onclick="ShowDeleteModal({{$post->id}})" id="delete_post_btn_{{$post->id}}">
+                                                    <i class="fa fa-trash-alt side_icon"></i>
+                                                    Delete
+                                                </li>                                                
                                                 <li class="msg_extra p-1 px-3 pb-2">
                                                     <i class="fa fa-times-circle side_icon"></i>
                                                     Cancel
@@ -628,47 +623,63 @@
                                             <ul class="date_time d-flex">
                                                 <li>
                                                     <p>
-                                                        <i class="far fa-clock"></i>10:00 AM - 20 feb,
-                                                        2020 - Las Vegas, USA
+                                                        <i class="far fa-clock"></i>{{ date("h:i A - M d, Y", strtotime($post->created_at)) }}
                                                     </p>
                                                 </li>
                                             </ul>
                                             <h3>
-                                                <a href="./preview.html">Loretm Ipsum is simply dummy text of the
-                                                    printing</a>
+                                                <a href="{{route('detail-post-view',['type'=>$post->type,'slug'=>$post->slug_url])}}">{{$post->title}}</a>
                                             </h3>
                                             <p>
-                                                Lorem Ipsum is simply dummy text of the printing
-                                                and typesetting industry. Lorem Ipsum has been the
-                                                industry's standard dummy text ever since the
-                                                1500s, when an unknown printer took a galley of
-                                                type and scrambled it to make a type specimen
-                                                book. It has survived not centuries,Lorem Ipsum is
-                                                simply dummy Lorem Ipsum is simply dummy text of
-                                                the printing and typesetting industry. Lorem Ipsum
-                                                has been the industry's
+                                                {!! Str::limit($post->desc, 200, ' ...') !!}
                                             </p>
 
                                             <ul class="like_comment d-flex justify-content-between align-items-center">
-                                                <li>
-                                                    <small><img
-                                                            src="{{ asset('assets/images/eye.png') }}" /><span><span>1000</span>
-                                                            Views</span></small>
-                                                    <a class="heart">
-                                                        <img class="simple-heart"
-                                                            src="{{ asset('assets/images/heart.png') }}" />
-                                                        <img class="red-heart"
-                                                            src="{{ asset('assets/images/red-heart.png') }}" />
-                                                        <span><span>1000</span> Likes</span>
+                                                <li class="d-flex align-items-center">
+                                                    <!-- Post Views -->
+                                                    <small><img src="{{ asset('assets/images/eye.png') }}" /><span><span>{{$post->views()->count()}}</span>
+                                                            Views</span></small>                                                    
+                                                    <!-- Post Likes -->
+                                                    <a class="heart like_post_">
+                                                        <form action="{{route('add-remove-like')}}" method="POST" id="like_post_form_{{$post->id}}">
+                                                            @csrf
+                                                            <input type="hidden" name="post_id" value="{{$post->id}}">
+                                                            <input type="hidden" name="post_type" value="{{$post->type}}">
+                                                            <button class="like_button d-flex justify-content-center align-items-center" type="button" onclick="LikePostRequest({{$post->id}},$(this));" id="like_post_btn_{{$post->id}}">
+                                                                @php $liked = $post->likes()->where('user_id', Auth::user()->id)->exists(); @endphp
+                                                                    <img class="red-heart {{$liked == true ? 'd-block-c' : 'd-none-c' }}" src="{{ asset('assets/images/red-heart.png') }}">
+                                                                    <img class="simple-heart {{$liked == true ? 'd-none-c' : 'd-block-c' }}" src="{{ asset('assets/images/heart.png') }}">
+                                                                <span><span class="post_like_count">{{$post->likes()->count()}}</span> Likes</span>
+                                                            </button>
+                                                        </form>
                                                     </a>
-                                                    <a href="#"><img
-                                                            src="{{ asset('assets/images/messsage.png') }}" /><span><span>1000</span>
+                                                    <!-- Post Comments -->
+                                                    <a><img src="{{ asset('assets/images/messsage.png') }}" /><span><span>{{$post->comments()->count()}}</span>
                                                             Comments</span>
                                                     </a>
-                                                    <a href="#"><img
-                                                            src="{{ asset('assets/images/share.png') }}" /><span><span>1000</span>
-                                                            Shares</span>
-                                                    </a>
+                                                    <!-- Post Shares -->
+                                                    <form action="{{route('share-post')}}" method="POST"  id="share_post_form_{{$post->id}}">
+                                                        @csrf
+                                                        <input type="hidden" name="post_id" value="{{$post->id}}">
+                                                        <input type="hidden" name="post_type" value="{{$post->type}}">
+                                                        <a type="button" onclick="sharePostRequest({{$post->id}});" id="share_post_btn_{{$post->id}}">
+                                                            <img src="{{ asset('assets/images/share.png') }}"><span><span class="share_count">{{$post->shares()->count()}}</span> Shares</span> 
+                                                        </a>
+                                                    </form>
+                                                    <!-- Share Post Modal -->
+                                                    <div class="overlay hide" id="share_post_container_{{$post->id}}">
+                                                        <div class="ques_box ques_box_1">
+                                                            <p class="ques_txt font-17">Copy Post Link</p>        
+                                                            <div class="share_profile">
+                                                                <p>{{route('detail-post-view',['type'=>$post->type,'slug'=>$post->slug_url])}}</p> 
+                                                            </div>     
+                                                            <div class="d-flex justify-content-center mt-4">           
+                                                                <button type="button" class="ques_btn suggested_btn text-primary" onclick="SharePostModal({{$post->id}});">
+                                                                    Cancel
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </li>
                                             </ul>
                                         </div>
@@ -676,7 +687,28 @@
                                 </li>
                             </ul>
                         </div>
-                    @endfor
+                        <form action="{{route('delete-public-post')}}" method="POST" id="delete_post_form_{{$post->id}}">
+                            @csrf
+                            <input type="hidden" name="post_type" value="{{$post->type}}">
+                            <input type="hidden" name="post_id" value="{{$post->id}}">
+                            <!-- Share Post Modal -->
+                            <div class="overlay hide" id="delete_post_container_{{$post->id}}">
+                                <div class="ques_box ques_box_1">
+                                    <p class="ques_txt font-17">Are You Sure You Want To Delete This Post</p>        
+                                    <div class="d-flex justify-content-center mt-4">           
+                                        <button type="button" class="btn btn-danger" id="delete_post_btn_{{$post->id}}" onclick="DeletePostRequest({{$post->id}})">
+                                            Delete
+                                        </button>
+                                    </div>    
+                                    <div class="d-flex justify-content-center mt-4">           
+                                        <button type="button" class="ques_btn suggested_btn text-primary" onclick="ShowDeleteModal({{$post->id}});">
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>                            
+                    @endforeach
                 </div>
                 <div class="tab-pane fade" id="pills-tagged" role="tabpanel" aria-labelledby="pills-tagged-tab">
                     @for ($i=0;$i<10;$i++)                        
@@ -722,7 +754,7 @@
                                                 </li>
                                             </ul>
                                             <h3>
-                                                <a href="./preview.html">Loretm Ipsum is simply dummy text of the
+                                                <a href="">Loretm Ipsum is simply dummy text of the
                                                     printing</a>
                                             </h3>
                                             <p>
@@ -772,23 +804,13 @@
     </div>
     </div>
 </section>
-{{-- <form id="logout-form" action="{{ url('logout') }}" method="POST" >
-    @csrf 
-    <div class="overlay hide logout_container">
-        <div class="ques_box">
-          <p class="ques_txt">Do you really want to leave us :( ?</p>
-          <div class="d-flex justify-content-between">
-            <button type="submit" class="ques_btn" id="logout">Yes, I'm sorry</button>
-            <button type="button" onclick="$('.logout_container').hide();console.log('functionis running well');" class="ques_btn cancel_btn" id="cancel_logout">
-              No, I'm here
-            </button>
-          </div>
-        </div>
-      </div>
-</form> --}}
+<div id="like-popup" >
+</div>
 @endsection
 @section('js')
 <script src="{{ asset('app-assets/vendors/js/vendor.bundle.base.js') }}"></script> <!-- endinject -->
 <script src="{{ asset('app-assets/plugins/jquery-validation/jquery.validate.min.js') }}"></script>
-<script src="{{ asset('assets/js/edit.js') }}" type="text/javascript"></script>
+<script src="{{ asset('assets/js/msg_extras.js') }}"></script>
+<script src="{{ asset('assets/js/like_share_post.js') }}"></script>
+<script src="{{ asset('assets/js/delete_post.js') }}"></script>
 @endsection

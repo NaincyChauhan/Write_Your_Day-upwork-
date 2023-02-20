@@ -25611,12 +25611,13 @@ div.tagsinput span.tag a {
     -webkit-transition: background 0.25s ease;
     -moz-transition: background 0.25s ease;
     -ms-transition: background 0.25s ease;
-    border-bottom: 4px solid #844fc1;
+    /* border-bottom: 4px solid #dbd7df; */
+    border-bottom: 1px solid #bdb6b6;
     /* Navbar color variations */
 }
 
 .navbar .navbar-brand-wrapper {
-    background: #844fc1;
+    background: #fff;
     transition: width 0.25s ease, background 0.25s ease;
     -webkit-transition: width 0.25s ease, background 0.25s ease;
     -moz-transition: width 0.25s ease, background 0.25s ease;
@@ -25655,7 +25656,7 @@ div.tagsinput span.tag a {
 }
 
 .navbar .navbar-brand-wrapper .navbar-brand-inner-wrapper .navbar-brand img {
-    width: calc(236px - 110px);
+    width: calc(258px - 110px);
     max-width: 100%;
     height: 40px;
     margin: auto;
@@ -26299,8 +26300,9 @@ div.tagsinput span.tag a {
 }
 
 .navbar-breadcrumb {
-    background: #00c8bf;
+    background: #f7f7f7;
     margin-top: 4.625rem;
+    border-bottom: 1px solid #bdb6b6;
 }
 
 .navbar-breadcrumb .navbar-links-wrapper {
@@ -26377,7 +26379,7 @@ div.tagsinput span.tag a {
 .navbar-breadcrumb .navbar-menu-wrapper .navbar-nav .nav-item {
     margin-left: 0.593rem;
     margin-right: 0.593rem;
-    color: white;
+    color: #000;
 }
 
 .navbar-breadcrumb .navbar-menu-wrapper .navbar-nav .nav-item.nav-search {
@@ -27198,4 +27200,8 @@ div.tagsinput span.tag a {
     animation-duration: 3s;
     animation-iteration-count: infinite;
     animation-timing-function: linear;
+}
+
+.typcn-th-menu:before {
+    color: black !important;
 }

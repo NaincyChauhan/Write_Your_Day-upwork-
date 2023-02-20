@@ -1,26 +1,19 @@
 @extends('layouts.site')
+@section('meta')
+<title>404 page</title>
+@endsection
+@section('css')
+    <link rel="stylesheet" href="{{ asset('assets/css/404.css') }}">
+@endsection
 @section('content')
-    <div class="site-breadcrumb" style="background: url({{ asset('assets/img/bg/breadcrumb.jpg') }})">
-        <div class="container">
-            <h2 class="breadcrumb-title">404 Error</h2>
-            <ul class="breadcrumb-menu">
-                <li><a href="{{ route('home') }}">Home</a></li>
-                <li class="active">404 Error</li>
-            </ul>
-        </div>
+<section class="container d-flex notfound-container">
+    <div class="left-side">
+        <img src="{{ asset('assets/images/404.png') }}" alt="404 image"/>
     </div>
-
-
-    <div class="error-area py-120">
-        <div class="container">
-            <div class="col-md-6 mx-auto">
-                <div class="error-wrapper">
-                    <img src="{{ asset('assets/img/error/404.png') }}" alt="">
-                    <h2>Opos... Page Not Found!</h2>
-                    <p>The page you looking for not found may be it not exist or removed.</p>
-                    <a href="{{ route('home') }}" class="theme-btn"><i class="far fa-home"></i> Go Back Home</a>
-                </div>
-            </div>
-        </div>
-    </div> 
+    <div class="right-side">
+        <h2 class="title">Ooops!!!</h2>
+        <p class="description">It seems there was a break in transmission due to either the replacement or deleting of the page you're looking for.</p>
+        <p class="description">Try checking out our <a href=".{{route('home')}}">homepage</a> for more features</p>
+    </div>
+</section>
 @endsection

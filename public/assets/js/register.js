@@ -1,6 +1,7 @@
 const userPasswords = document.querySelectorAll(".password");
 const tooglePasswords = document.querySelectorAll(".password-toogle");
-const Error_Messages = ['email','username','name','dob','phone','password','privacypolicy'];
+// const Error_Messages = ['email','username','name','dob','phone','password','privacypolicy'];
+const Error_Messages = ['email','username','name','dob','password','privacypolicy'];
 let message = $('#message');
 
 for (let i = 0; i < tooglePasswords.length; i++) {
@@ -91,7 +92,7 @@ function LoginAjaxRequest() {
                     location.reload();                    
                 }
             }else{
-                MessageShow('#dc3545',data.message);
+                MessageShow('darkred',data.message);
                 if (data.type == 0) {
                     $('#proceed-login').css('display','block');
                     btn.css('display','none')
@@ -104,7 +105,7 @@ function LoginAjaxRequest() {
             $('#send_otp').attr("disabled", false);
         },
         error: function(data) {
-            MessageShow('#dc3545',data.message);
+            MessageShow('darkred',data.message);
             btn.attr("disabled", false);
             btn.html('Sign In');
         }
@@ -117,7 +118,7 @@ $(function() {
             name: "required",
             username: "required",
             email: "required",
-            phone: "required",
+            // phone: "required",
             dob: "required",
             password: "required",
             password_confirmation: "required",
@@ -127,7 +128,7 @@ $(function() {
             name: "Oops.! The name field is required.",
             username: "Oops.! The Username field is required.",
             email: "Oops.! The email field is required.",
-            phone: "Oops.! The Mobile field is required.",
+            // phone: "Oops.! The Mobile field is required.",
             dob: "Oops.! The Date of Birth field is required.",
             password: "Oops.! The Password field is required.",
             password_confirmation: "Oops.! The Confirm Password field is required.",
@@ -168,7 +169,7 @@ $(function() {
                                     window.location.pathname = "/friends";
                                 }
                             } else {
-                                MessageShow('#dc3545',data.message);
+                                MessageShow('darkred',data.message);
                             }
                             btn.attr("disabled", false);
                             // form[0].reset();
@@ -229,18 +230,19 @@ $("#username").on("input", function(event) {
 });
 
 // Check User Phone Validation
-$("#user-tel").on("input", function() {
-    var phone_error = $('#phone_error');
-    var register_btn =$('#registerBtn');
-    phone_error.css("text-align",'start');
-    if ($("#user-tel").val().length == 10) {
-        register_btn.attr("disabled", false);
-        phone_error.html("");
-    }else{
-        register_btn.attr("disabled", true);
-        phone_error.html("The phone must be at least 10 characters.");
-    }
-});
+// hold for some time
+// $("#user-tel").on("input", function() {
+//     var phone_error = $('#phone_error');
+//     var register_btn =$('#registerBtn');
+//     phone_error.css("text-align",'start');
+//     if ($("#user-tel").val().length == 10) {
+//         register_btn.attr("disabled", false);
+//         phone_error.html("");
+//     }else{
+//         register_btn.attr("disabled", true);
+//         phone_error.html("The phone must be at least 10 characters.");
+//     }
+// });
 
 // Resend OTP
 function resendOTP() {
@@ -260,7 +262,7 @@ function resendOTP() {
             if (parseInt(data.status) == 1) {
                 MessageShow('#fff',data.message);
             } else {
-                MessageShow('#dc3545',data.message);
+                MessageShow('darkred',data.message);
             }
             btn.attr("disabled", false);
             btn.html('Resend code');
@@ -286,14 +288,14 @@ function MessageShow(color,msg) {
 
 const overlay = document.querySelector(".overlay");
 const closeOverlayBtn = document.querySelector(".cancel_btn");
-let phoneInputField = document.querySelector("#user-tel");
+// let phoneInputField = document.querySelector("#user-tel");
 const privacyLink = document.querySelector(".privacy_link")
 
-const phoneInput = window.intlTelInput(phoneInputField, {
-    initialCountry: "auto",
-    geoIpLookup: getIp,
-    utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
-});
+// const phoneInput = window.intlTelInput(phoneInputField, {
+//     initialCountry: "auto",
+//     geoIpLookup: getIp,
+//     utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+// });
 
 function getIp(callback) {
     fetch('https://ipinfo.io/json?token=7fa0a044d28330', {

@@ -42,13 +42,13 @@ let proceedDeletion = () => {
     <div class="password_box">
       <label for="password">Enter your password</label>
       <div class="input-group">
-        <input type="password" name="password" id="password_check">
+        <input type="password" name="password" id="password_check" required>
         <i class="fa fa-eye-slash icon" ></i>
       </div>
-      <p class="error" id="pwd_error"></p>
-      <div class="d-flex justify-content-between mx-4">
-        <button  type="submit" class="d_btn suggested_btn" onclick="checkPassword()">Confirm Password</button>
-        <button type="button" class="d_btn" onclick="closeBox()">Cancel</button>
+      <p class="confirm_password_error_1" id="pwd_error"></p>
+      <div class="d-flex justify-content-between">
+        <button  type="submit" id="delete_account_submit" class="d_btn suggested_btn" onclick="checkPassword()">Confirm Password</button>
+        <button type="button" class="d_btn" onclick="closeBox()">Back to Profile</button>
       </div>
     </div>
   `;
@@ -65,36 +65,38 @@ let proceedDeletion = () => {
 };
 
 let checkPassword = () => {
-    let pwdField = document.querySelector("#password_check").value;
-    $('#delete-confirm-password').val(pwdField);
-//     let user = JSON.parse(sessionStorage.getItem("user-details"));
-//     let userPwd = user.password;
-//     let pwdError = document.querySelector("#pwd_error");
-
-//     if (userPwd !== pwdField) {
-//         pwdError.textContent = "Wrong Password";
-//         return;
-//     }
-
-//     deleteQuesContainer.innerHTML = `
-//     <div class="feedback_box ">
-//       <p class="feedback_txt">Your account has been deleted temporarily. You can recover it within 14 days else it will be permanetly deleted</p>
-//       <button type="button" class="d_btn" onclick="closeBox()">Close</button>
-//     </div>
-//   `;
-
+    
 }
 
+// $(document).on('click', '.file-button', function() {
+//     $('#my-file-input').click();
+// });
+
 let closeBox = () => {
+    DeleteAccountContainer();
+}
+
+let LogoutNow = () => {
+    DeleteAccountContainer();
+    location.reload();  
+}
+
+function DeleteAccountContainer() {
     deleteQuesContainer.classList.add("hide");
     setTimeout(() => {
         deleteQuesContainer.innerHTML = `
-    <div class="ques_box ">
-      <p class="ques_txt ">Are you sure you want to delete this account? <br> You can recover it within 14 days else it will be permanetly deleted.</p>
-      <div class="d-flex justify-content-between mx-4">
-        <button type="submit" class="ques_btn" id="delete_btn" onclick="proceedDeletion()">Yes</button>
-        <button type="button" class="ques_btn suggested_btn text-primary" onclick="closeBox()" >No</button>
-      </div>
+        <div class="ques_box ques_box_1">
+        <p class="ques_txt">Are you sure you want to delete this account? 
+        </p>
+        <div class="d-flex justify-content-between mx-4">
+            <input type="hidden" name="password" id="delete-confirm-password">
+            <button type="submit" class="ques_btn" id="delete_btn" onclick="proceedDeletion()">
+                Yes
+            </button>
+            <button type="button" class="ques_btn suggested_btn text-primary" onclick="closeBox()">
+                No
+            </button>
+        </div>
     </div>
   `
     }, 1000)
@@ -188,82 +190,85 @@ function ChangeUserEmail() {
 }
 
 // Change User Phone
-const userPhone = $('#user-phone');
-let phone_btn = $('#change-phone-btn');
-let edit_phone_btn = $('#edit-phone-btn');
-let phoneMessage = $('#phone_message');
-const phone_opt_box = $('#phone-otp-box');
-const cancel_edit_phone = $('#cancel-edit-phone');
+// HOLD..
+// $(function (){
+//     const userPhone = $('#user-phone');
+//     let phone_btn = $('#change-phone-btn');
+//     let edit_phone_btn = $('#edit-phone-btn');
+//     let phoneMessage = $('#phone_message');
+//     const phone_opt_box = $('#phone-otp-box');
+//     const cancel_edit_phone = $('#cancel-edit-phone');
 
-function EditUserPhone() {
-    userPhone.attr('readonly', false)
-    edit_phone_btn.css('display', 'none');
-    phone_btn.css('display', 'block');
-    $('#cancel-edit-phone').css('display', 'block');
-}
+//     function EditUserPhone() {
+//         userPhone.attr('readonly', false)
+//         edit_phone_btn.css('display', 'none');
+//         phone_btn.css('display', 'block');
+//         $('#cancel-edit-phone').css('display', 'block');
+//     }
 
-function CancelEditPhone(obj) {
-    userPhone.attr('readonly', true);
-    userPhone.val(userPhone.attr('oldValue'));
-    edit_phone_btn.css('display', 'block');
-    phone_btn.css('display', 'none');
-    obj.css('display', 'none');
-    phoneMessage.html("");
-    phone_opt_box.css('display', 'none');
-    phone_opt_box.val("");
-}
+//     function CancelEditPhone(obj) {
+//         userPhone.attr('readonly', true);
+//         userPhone.val(userPhone.attr('oldValue'));
+//         edit_phone_btn.css('display', 'block');
+//         phone_btn.css('display', 'none');
+//         obj.css('display', 'none');
+//         phoneMessage.html("");
+//         phone_opt_box.css('display', 'none');
+//         phone_opt_box.val("");
+//     }
 
-function ChangeUserPhone() {
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    });
-    // Sending Post Request.....
-    phone_btn.attr("disabled", true);
-    phone_btn.html('Requesting');
-    $.ajax({
-        type: "POST",
-        url: $('#edit-profile-form').attr('action'),
-        data: {
-            "phone": userPhone.val(),
-            "otp": phone_opt_box.val(),
-            "type": 2,
-        },
-        success: function (data) {
-            phoneMessage.css('display','block');
-            if (parseInt(data.status) == 1) {    // Success
-                phoneMessage.addClass("text-success");
-                phoneMessage.html(data.message)
-                if (parseInt(data.type) == 0) {
-                    phone_opt_box.css("display", "block");
-                    phone_btn.html('Verify');
-                }
-                if (parseInt(data.type) == 1) {
-                    phone_opt_box.css("display", "none");
-                    userPhone.attr('readonly', true);
-                    phone_opt_box.val("");
-                    phone_btn.css("display", "none");
-                    edit_phone_btn.css('display', 'block');
-                    phone_btn.html('Change');
-                    cancel_edit_phone.css('display', 'none');
-                }
-            } else {  // Failed
-                phoneMessage.addClass("error");
-                phoneMessage.html(data.message)
-                phone_btn.html('Verify');
-            }
-            phone_btn.attr("disabled", false);
-        },
-        error: function (data) { // Failed
-            phoneMessage.addClass("error");
-            phoneMessage.css('display','block');
-            phoneMessage.html(data.responseJSON.message);
-            phone_btn.attr("disabled", false);
-            phone_btn.html('Change');
-        }
-    });
-}
+//     function ChangeUserPhone() {
+//         $.ajaxSetup({
+//             headers: {
+//                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+//             }
+//         });
+//         // Sending Post Request.....
+//         phone_btn.attr("disabled", true);
+//         phone_btn.html('Requesting');
+//         $.ajax({
+//             type: "POST",
+//             url: $('#edit-profile-form').attr('action'),
+//             data: {
+//                 "phone": userPhone.val(),
+//                 "otp": phone_opt_box.val(),
+//                 "type": 2,
+//             },
+//             success: function (data) {
+//                 phoneMessage.css('display','block');
+//                 if (parseInt(data.status) == 1) {    // Success
+//                     phoneMessage.addClass("text-success");
+//                     phoneMessage.html(data.message)
+//                     if (parseInt(data.type) == 0) {
+//                         phone_opt_box.css("display", "block");
+//                         phone_btn.html('Verify');
+//                     }
+//                     if (parseInt(data.type) == 1) {
+//                         phone_opt_box.css("display", "none");
+//                         userPhone.attr('readonly', true);
+//                         phone_opt_box.val("");
+//                         phone_btn.css("display", "none");
+//                         edit_phone_btn.css('display', 'block');
+//                         phone_btn.html('Change');
+//                         cancel_edit_phone.css('display', 'none');
+//                     }
+//                 } else {  // Failed
+//                     phoneMessage.addClass("error");
+//                     phoneMessage.html(data.message)
+//                     phone_btn.html('Verify');
+//                 }
+//                 phone_btn.attr("disabled", false);
+//             },
+//             error: function (data) { // Failed
+//                 phoneMessage.addClass("error");
+//                 phoneMessage.css('display','block');
+//                 phoneMessage.html(data.responseJSON.message);
+//                 phone_btn.attr("disabled", false);
+//                 phone_btn.html('Change');
+//             }
+//         });
+//     }
+// });
 
 
 // Update Profile
@@ -274,14 +279,12 @@ $(function () {
         rules: {
             name: "required",
             username: "required",
-            thought_of_the_day: "required",
             gender: "required",
             bio: "required",
         },
         messages: {
             name: "Oops.! The name field is required.",
             username: "Oops.! The Username field is required.",
-            thought_of_the_day: "Oops.! The Thought Of The Day field is required.",
             gender: "Oops.! The Gender field is required.",
             bio: "Oops.! The Bio field is required.",
         },
@@ -311,13 +314,7 @@ $(function () {
                 success: function (data) {
                     // clearErrors();
                     if (parseInt(data.status) == 1) {
-                        MessageShow('alert-success', data.message,'profile-setting');
-                        if (data.img) {  $('#user-photo').html(data.img);}
-                        if (data.profileimage) {
-                            $('.header-img').each(function(index,element) {
-                                $(element).attr('src',data.profileimage);
-                            });
-                        }
+                        MessageShow('alert-success', data.message,'profile-setting');                        
                     } else {
                         MessageShow('alert-danger',data.message,'profile-setting');
                     }
@@ -480,12 +477,145 @@ function clearErrors(error_messages="") {
 
 function MessageShow(addclass,msg,container) {
     $('#success-box').css('display', 'block');
+    $(`main.setting#${container} .success-box`).css('display', 'block');
     $(`main.setting#${container} .success-box`).html(`<div class="alert ${addclass} alert-dismissible fade show" role="alert">
                                  <span id="success-message">${msg}</span>
                                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                             </div>`);
     $(".active").scrollTop(0);
+    setTimeout(function () {
+        $(`main.setting#${container} .success-box`).css('display', 'none');
+    }, 5000);
 }
+
+// Confirm Password (Delete Account)
+$(function () {
+    $('#delete_account_form').validate({
+        rules: {
+            password: "required",
+        },
+        messages: {
+            password: "Oops.! The password field is required.",
+        },
+        errorElement: 'p',
+        errorPlacement: function (error, element) {
+            error.addClass('invalid-feedback');
+            element.closest('.password_box').append(error);
+        },
+        highlight: function (element, errorClass, validClass) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            $(element).removeClass('is-invalid');
+        },
+        submitHandler: function (f) {
+            $('.confirm_password_error_1').html("");
+            var btn = $('#delete_account_submit'),
+                form = $('#delete_account_form');
+            btn.attr('disabled', true);
+            btn.html('Requesting');
+            $.ajax({
+                type: "POST",
+                processData: false,
+                contentType: false,
+                url: form.attr('action'),
+                data: new FormData(form[0]), // serializes the form's elements.
+                success: function (data) {
+                    if (parseInt(data.status) == 1) {
+                        deleteQuesContainer.innerHTML = `
+                            <div class="feedback_box ">
+                              <p class="delete-confirm-text">${data.message}</p>
+                              <button type="button" class="d_btn" onclick="LogoutNow()">Close</button>
+                            </div>
+                          `;
+                    } else {
+                        $('.confirm_password_error_1').html(data.message)
+                    }
+                    btn.attr("disabled", false);
+                    btn.html('Confirm Password');
+                },
+                error: function (data) {
+                    $.each(data.responseJSON.errors, function (key, value) {
+                        $('.confirm_password_error_1').html(value)
+                    });
+                    btn.attr("disabled", false);
+                    btn.html('Confirm Password');
+                }
+            });
+            return false;
+        }
+    });
+});
+
+// Update Profile Modal
+function ProfileEditModal() {
+    $('#profile_image_error').html("");
+    var form = $('#change_profile_form');
+    form[0].reset(); 
+    $('#upload_profile_container').toggleClass('hide');    
+}
+
+// Profile Image Form
+$(function () {
+    $('#change_profile_form').validate({
+        rules: {
+            image: "required",
+        },
+        messages: {
+            image: "Oops.! The image field is required.",
+        },
+        errorElement: 'p',
+        errorPlacement: function (error, element) {
+            error.addClass('invalid-feedback');
+            element.closest('.profile-image-box').append(error);
+        },
+        highlight: function (element, errorClass, validClass) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            $(element).removeClass('is-invalid');
+        },
+        submitHandler: function (f) {
+            $('#profile_image_error').html("");
+            var btn = $('#change_profile_btn'),
+                form = $('#change_profile_form');
+            btn.attr('disabled', true);
+            btn.val('Changing...');
+            $.ajax({
+                type: "POST",
+                processData: false,
+                contentType: false,
+                url: form.attr('action'),
+                data: new FormData(form[0]), // serializes the form's elements.
+                success: function (data) {
+                    if (parseInt(data.status) == 1) {
+                        if (data.img) {  $('#user-photo').html(data.img);}
+                        if (data.profileimage) {
+                            $('.header-img-1').each(function(index,element) {
+                                $(element).attr('src',data.profileimage);
+                            });
+                        }
+                        ProfileEditModal();
+                    } else {
+                        $('#profile_image_error').html(data.message);
+                    }
+                    btn.attr("disabled", false);
+                    form[0].reset();
+                    btn.val('Update Profile');
+                },
+                error: function (data) {
+                    // clearErrors();
+                    $.each(data.responseJSON.errors, function (key, value) {
+                        $('#profile_image_error').html(value);
+                    });
+                    btn.attr("disabled", false);
+                    btn.val('Update Profile');
+                }
+            });
+            return false;
+        }
+    });
+});
 
 // //Tabs Layout Code
 // $("#tabs").tabs({

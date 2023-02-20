@@ -5,6 +5,10 @@ namespace App\Http\Controllers\Site;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Role;
+use App\Models\Post;
+use App\Models\Privatepost;
+use App\Models\Draftpost;
+use App\Models\Savepost;
 use App\Http\Controllers\Controller;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Rules\Password;
@@ -54,7 +58,7 @@ class UserController extends Controller
             'password' => ['required', 'string', 'confirmed',Password::min(8)
             ->letters()->numbers()->symbols()],
             'username' => ['required','unique:users','max:20','min:3'],
-            'phone' => ['required','min:10','max:10'],
+            // 'phone' => ['required','min:10','max:10'],
             'dob' => 'required',
             'privacypolicy' => 'required',
         ]);
@@ -69,9 +73,11 @@ class UserController extends Controller
                         $user = new User();
                         $user->name = $request->name;
                         $user->username = $request->username;
-                        $user->phone = $request->phone;
+                        // $user->phone = $request->phone;
                         $user->email = $request->email;
                         $user->dob = $request->dob;
+                        $user->bio = "Lorem Ipsum has been the industry's standard dummy";
+                        $user->thought_of_the_day = "Lorem Ipsum has been the industry's standard dummy";
                         $user->password =Hash::make($request->password);
                         $user->save();
         
@@ -117,9 +123,14 @@ class UserController extends Controller
 
     // User Profile View
     public function viewProfile(){
+        $auth = Auth::user();
         return view('site.user.view-profile',[
-            'user' => User::where('id',Auth::user()->id)->
-                      select('name','email','username','image','phone','thought_of_the_day','website','gender','bio')->first(),
+            'user' => User::where('id',Auth::user()->id)->with('following','followers')->
+                      select('name','email','username','image','thought_of_the_day','website','gender','bio','id')->first(),
+            'publicposts' => Post::where('user_id',$auth->id)->latest()->get(),
+            'privateposts' => Privatepost::where('user_id',$auth->id)->latest()->get(),
+            'draftposts' => Draftpost::where('user_id',$auth->id)->latest()->get(),
+            'saveposts' => Savepost::where('user_id',$auth->id)->with(['post'=>function($query){$query->with('user');}])->latest()->get(),
         ]);
     }
 
@@ -127,7 +138,7 @@ class UserController extends Controller
     public function editProfile(Request $request){
         return view('site.user.profile-edit',[
             'user' => User::where('id',Auth::user()->id)->
-                      select('name','email','username','image','phone','thought_of_the_day','website','gender','bio')->first(),
+                      select('name','email','username','image','thought_of_the_day','website','gender','bio')->first(),
             'privacy' => Policies::get()->first()->policy,
         ]);
     }
@@ -231,9 +242,8 @@ class UserController extends Controller
         
         $request->validate([
             'name' => ['required', 'string', 'max:20','min:3'],
-            'username' => 'required|max:20|min:3|unique:users,username,'.$user->id,            
-            'image' => ['mimetypes:image/jpg,image/png,image/jpeg,image/webp','max:1024','min:2'],
-            'thought_of_the_day' => ['required', 'max:120','min:10'],
+            'username' => 'required|max:20|min:3|unique:users,username,'.$user->id,   
+            'thought_of_the_day' => ['max:120','min:10'],
             'gender' => 'required',
             'bio' => ['required', 'max:120','min:10'],
         ]);
@@ -327,21 +337,24 @@ class UserController extends Controller
     // Handle User Delete Request
     public function deleteRequest(Request $request)
     {
-        $user = User::where('id',Auth::user()->id)->first();
+        $user = User::where('id',Auth::user()->id)->select('id','password')->first();
         if(isset($user)){            
             if(Hash::check($request->password, $user->password)){                
                 $user->deleted_at = Carbon::now()->addDays(14);
                 $user->save();
-                // Auth::guard()->logout($user);
-                // auth()->logoutUsingId($user->id);
-                // Auth::logout();
                 $request->session()->invalidate();
-                return redirect()->route('login');
+                return response()->json([
+                    'status' => 1, 
+                    'message' => 'Your account has been deleted temporarily. You can recover it within 14 days else it will be permanetly deleted.',
+                ]);
             }else{
-                return redirect()->back()->with('error', 'Wrong Password.');
+                return response()->json([
+                    'status' => 0, 
+                    'message' => 'Oops.! The Password is wrong.',]
+                );
             }
         }else{
-            return redirect()->back()->with('error', 'Something Went Wrong.');
+            return response()->json(['status' => 0, 'message' => 'Something Went Wrong.Please reload page',]);
         }
     }
 
@@ -364,5 +377,45 @@ class UserController extends Controller
                 'message' => 'Something Went Wrong',
             ], 200);
         }
+    }
+
+    public function updateProfileImage(Request $request){
+        $request->validate([
+            'image' => ['required','mimetypes:image/jpg,image/png,image/jpeg,image/webp','max:5000','min:1'],
+        ]);
+        $user = User::where('id',Auth::user()->id)->first();
+        if($request->hasFIle('image'))
+        {
+            $file_name = '';
+            $file = $request->file('image');
+            $file_name = 'user_'.rand(00000, 99999).'.'. $file-> getClientOriginalExtension();
+            if($file->move(public_path("storage/users"), $file_name)){   
+                if(is_file(public_path('storage/users/'.$user->image))){
+                    unlink(public_path('storage/users/'.$user->image));
+                }             
+            }
+            $user->image = $file_name;
+            $user->save();
+        }
+        return response()->json([
+            'status' => 1, 
+            'message' => "Success.! Profile Image has been updated successfully.",  
+            'img' => $user->image != null ? '<img src="'.asset('storage/users/'.$user->image) .'" class="photo img-fluid"  alt="User Profile">' : '',  
+            'profileimage' => $user->image != null ? asset('storage/users/'.$user->image) : null,        
+        ], 200);
+    }
+
+    // Go To User Profile
+    public function SearchUserProfile($username){
+        $user = User::where('username',$username)->with(['posts','followers','following'])
+                ->select('name','username','image','bio','id')->first();
+        if (isset($user)) {
+            if ($user->id == Auth::user()->id) {
+                return redirect()->route('view-user-profile');
+            }
+        }
+        return view('site.user.search-profile',[
+            'user' => $user,
+        ]);
     }
 }

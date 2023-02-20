@@ -48,18 +48,6 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public $login_attempts = 0;
-
-    public function usersqualification()
-    {
-        return $this->hasMany(Usersqualification::class);
-    }
-    
-    public function usersexprience()
-    {
-        return $this->hasMany(Usersexprience::class);
-    }
-
     public function usersepermissions()
     {     
         return $this->hasMany(Users_permissions::class);
@@ -75,8 +63,33 @@ class User extends Authenticatable
         return $this->hasMany(Staff::class);
     }
 
-    public function userapplication()
+    public function saves()
     {
-        return $this->hasMany(Userapplication::class);
+        return $this->hasMany(Savepost::class);
+    }
+
+    /**
+     * Get the posts for this user.
+     */
+    public function posts(){
+        return $this->hasMany(Post::class);
+    }
+
+    // users that are followed by this user
+    public function following() {
+        return $this->hasMany(Followuser::class, 'follower_user_id');
+    }
+
+    // users that follow this user
+    public function followers() {
+        return $this->hasMany(Followuser::class, 'following_user_id');
+    }
+
+    /**
+     * Get the following user with their latest post.
+     */
+    public function followingUser()
+    {
+        return $this->belongsTo(User::class, 'following_user_id');
     }
 }

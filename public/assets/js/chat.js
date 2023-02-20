@@ -32,9 +32,11 @@ backBtn.onclick = showFriendsList;
 extraBtn.onclick = showExtrasList;
 closeBtn.onclick = hideFriendsList;
 
+
 for (let friendIndex = 0; friendIndex < userFriends.length; friendIndex++) {
   userFriends[friendIndex].onclick = () => {
-
+    userFriends.forEach(avatar => avatar.classList.remove("selected"));
+    userFriends[friendIndex].classList.add("selected");
     currentFriend.innerHTML = `Chat with ${userFriendsNames[friendIndex].innerHTML}`;
     currentFriendAvatar.src = userFriendsImages[friendIndex].src;
     friendsUsername.forEach(friend => friend.innerHTML = userFriendsNames[friendIndex].innerHTML.split(' ')[0]);

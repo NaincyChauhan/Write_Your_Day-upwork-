@@ -3,10 +3,10 @@ const msgExtrasList = document.querySelectorAll('.msg_extras_list');
 const reportContainer = document.querySelector(".report_msg_container");
 const reportMsg = document.querySelector("#report_msg");
 const sendReportBtn = document.querySelector("#send_report");
+const CancelReportBtn = document.querySelector("#close_report");
 const postOwners = document.querySelectorAll(".post_owner");
 const reportBtns = document.querySelectorAll(".report");
 const msgError = document.querySelector(".msg_error");
-const followBtns = document.querySelectorAll(".follow_btn");
 const friendName = document.querySelector("#friend_name");
 const followersLink = document.querySelectorAll(".followers_link");
 const followersContainer = document.querySelector(".followers_container");
@@ -24,14 +24,14 @@ for (let msgBtnIndex = 0; msgBtnIndex < msgExtrasBtn.length; msgBtnIndex++) {
         msgExtrasList[msgBtnIndex].classList.add("hide");
     }
 }
-document.body.onclick = (e) => {
-    if (!(e.target.classList.contains("msg_extras_btn") || e.target.classList.contains("caret"))) {
-        for (let msgBtnIndex = 0; msgBtnIndex < msgExtrasList.length; msgBtnIndex++) {
-            if (!msgExtrasList[msgBtnIndex].classList.contains("hide")) msgExtrasList[msgBtnIndex].classList.add("hide");
-        }
-    }
+// document.body.onclick = (e) => {
+//     if (!(e.target.classList.contains("msg_extras_btn") || e.target.classList.contains("caret"))) {
+//         for (let msgBtnIndex = 0; msgBtnIndex < msgExtrasList.length; msgBtnIndex++) {
+//             if (!msgExtrasList[msgBtnIndex].classList.contains("hide")) msgExtrasList[msgBtnIndex].classList.add("hide");
+//         }
+//     }
 
-}
+// }
 
 for (let reportBtnIndex = 0; reportBtnIndex < reportBtns.length; reportBtnIndex++) {
     reportBtns[reportBtnIndex].addEventListener('click', () => {
@@ -42,7 +42,7 @@ for (let reportBtnIndex = 0; reportBtnIndex < reportBtns.length; reportBtnIndex+
     });
 }
 
-sendReportBtn.onclick = () => {
+if (sendReportBtn) sendReportBtn.onclick = () => {
     if (reportMsg.value === "") {
         msgError.textContent = "Your report message is required";
         return;
@@ -59,13 +59,10 @@ sendReportBtn.onclick = () => {
     }, 1000);
 }
 
-
-followBtns.forEach(followBtn => {
-    followBtn.onclick = () => {
-        if (followBtn.textContent === "Follow") followBtn.textContent = "Following"; 
-        else followBtn.textContent = "Follow";
-    }
-});
+if (CancelReportBtn) CancelReportBtn.onclick = () => {
+    $('#report_msg').val("");
+    $('#report_msg_container').toggleClass('hide');
+}
 
 
 followersLink.forEach(link => link.onclick = () => followersContainer.classList.remove("hide"));
@@ -77,3 +74,17 @@ for (let i = 0; i < removeBtns.length; i++) {
    }; 
 }
 
+$('.editButtonInner').hover(
+    function() {
+      $('.editButton').css('color', '#fff');
+    },
+    function() {
+        $('.editButton').css('color', '#1c62a8');
+    }
+);
+
+function ShowMessageExtras(thisObj) {
+      var msgExtrasContainer = thisObj.closest('.msg_extras_container');
+    var msgExtrasList = msgExtrasContainer.find('.msg_extras_list');
+        msgExtrasList.toggleClass('hide');
+}

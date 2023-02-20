@@ -48,7 +48,7 @@
                             </div>
                             <p id="email_error" class="error"></p>
                         </legend>
-                        <legend class="legend">
+                        {{-- <legend class="legend">
                             <label for="user-tel">Phone Number:</label>
                             <div class="input-group d-flex align-items-center">
                                 <i class="fa fa-phone-alt icon"></i>
@@ -56,7 +56,7 @@
                                     placeholder="1234567890" />
                             </div>
                             <p id="phone_error" class="error"></p>
-                        </legend>
+                        </legend> --}}
                         <legend class="legend">
                             <label for="name">Full Name:</label>
                             <div class="input-group d-flex">
