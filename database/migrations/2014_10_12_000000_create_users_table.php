@@ -26,6 +26,7 @@ return new class extends Migration
             $table->rememberToken();
             $table->timestamps();
             $table->tinyInteger('status')->default(1);
+            $table->tinyInteger('suspend_mode')->default(0);
 
             $table->string('image',300)->nullable();
             $table->string('thought_of_the_day',200)->default("Lorem Ipsum has been the industry's standard dummy")->nullable();

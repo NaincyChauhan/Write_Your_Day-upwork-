@@ -1,6 +1,6 @@
 @extends('layouts.site')
 @section('meta')
-<title>About Us</title>
+<title>Edit Day</title>
 
 <meta name="title" content="{{ config('app.name') }}" />
 <meta name="keywords" content="" />
@@ -33,33 +33,25 @@
 <section class="write-page-outer">
     <div class="container">
         <div>
-            {{-- {{dd($post->type)}} --}}
         </div>
         <form id="create-post-form" action="{{route('update-post-view',['type'=>$post->type,'id'=>$post->id])}}" method="POST" enctype="multipart/form-data">
-            {{-- {{dd($post)}} --}}
             @csrf
             <div class="row">
                 <div class="col-12">
                     <div class="write-page-btn">
                         <button type="button" class="preview-btn">Preview</button>
-                        <!--- <div class="dropdown">
+                        <div class="dropdown">
                             <button  class="dropdown-toggle" type="button" id="dropdownMenuButton1" onclick="$('#type-dropdown-menu').toggleClass('show');">
-                                Public <img width="15" height="15" src="{{asset('assets/images/next-white.png') }}">
+                                Publish <img width="15" height="15" src="{{asset('assets/images/next-white.png') }}">
                             </button>
                             <ul class="dropdown-menu" id="type-dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                <li><a class="dropdown-item post-type" type-value="1" href="#">Private</a></li>
-                                <li><a class="dropdown-item post-type" type-value="2" href="#">Draft</a></li>
+                                <li><button class="dropdown-item post-type-button {{$post->type==0 ? 'selected' : ''}}"  type="submit" type-value="0" href="#">Public</button></li>
+                                <li><button class="dropdown-item post-type-button {{$post->type==1 ? 'selected' : ''}}"  type="submit" type-value="1" href="#">Private</button></li>
+                                <li><button class="dropdown-item post-type-button {{$post->type==2 ? 'selected' : ''}}" type="submit" type-value="2" href="#">Draft</button></li>
                             </ul>
-                        </div>                     --->
-                        <div>
-                            <select class="form-select" name="type" id="post-type-select" aria-label="Default select example">
-                                <option class="post-select-option" value="0" @selected($post->type==0)>Public</option>
-                                <option class="post-select-option" value="1" @selected($post->type==1)>Private</option>
-                                <option class="post-select-option" value="2" @selected($post->type==2)>Draft</option>
-                            </select>
-                        </div>
+                        </div>  
                     </div>
-                    <!--- <input type="hidden" name="type" id="inputType" value="0"> --->
+                    <input type="hidden" name="type" id="inputType" value="{{$post->type}}">
                     <h4>Type your day title <span class="required">*</span></h4>
                     <div class="write-page-title-outer">
                         <div class="write-page-title">
@@ -85,12 +77,11 @@
                     <div class="post-preview">
                         <h4>Post Preview</h4>
                         <div class="post-preview-box">
-                            <a href=""><h6 id="post-slug-url">{{ config('app.url') }}/{{$post->type}}/{{$post->slug_url}}</h6></a>
                             <ul class="date_time d-flex ">
                                 <li><p class="date-time-text-edit"><i class="far fa-clock"></i>{{ date("h:i A - M d, Y", strtotime($post->created_at)) }}</p></li>
                             </ul>
-                            <h4 id="post-title-preview">{{$post->title}}</h4>
-                            <p id="post-preview-desc-text">{{$post->desc}}</p>                        
+                            <h4 id="post-title-preview">{{$post->seo_title}}</h4>
+                            <p id="post-preview-desc-text">{{$post->meta_desc}}</p>                        
                         </div>
                     </div>
                     <div class="write-page-input-box">
@@ -102,7 +93,7 @@
                         </div>
                         <div class="write-page-input">
                             <label>SLUG URL</label>
-                            <input value="{{$post->slug_url}}" type="text" maxlength="100" id="slug_url" name="slug_url">
+                            <input value="{{$post->slug_url}}" readonly type="text" maxlength="100" id="slug_url" name="slug_url">
                             <div id="slug_url_error" class="text-danger d-block">
                             </div>
                         </div>
@@ -115,7 +106,7 @@
                             <div id="meta_desc_error" class="text-danger d-block">
                             </div>
                         </div>
-                        <button type="submit" id="create-post-btn">Save Changes</button>
+                        <button type="button" onclick="SaveSeoData($(this));">Save Changes</button>
                     </div>
                 </div>
             </div>
@@ -133,9 +124,11 @@
                 </div>
                 <div class="profile-info">
                     <h4>By: {{$user->name}}</h4>
-                    <button class="main_btn" id="edit_btn">Edit</button>
+                    <button type="button" class="main_btn" id="edit_btn">Edit</button>
                 </div>
-                <a href="#" class="active folder-img"><img src="{{asset('assets/images/folder.png') }}"></a>
+                <a @if($post->type==0)
+                 target="_blank"   href="{{route('print-post',['username'=>$post->user->username,'post_number'=>$post->post_number,'slug'=>$post->slug_url])}}"
+                @endif class="active folder-img"><img src="{{asset('assets/images/folder.png') }}"></a>
             </div>
             <div class="review-detail ">
                 <ul class="date_time d-flex ">
@@ -148,7 +141,7 @@
                 <ul class="like_comment d-flex justify-content-between align-items-center mt-0">
                     <li>
                         <small><img src="{{asset('assets/images/eye.png') }}"><span><span>
-                           {{-- {{ $user->viewCount()}} --}}
+                           {{ $post->views_count}}
                         </span> Views</span></small>
                     </li>
                     <li>
@@ -156,18 +149,18 @@
                             <img class="simple-heart" src="{{asset('assets/images/heart.png') }}">
                             <img class="red-heart" src="{{asset('assets/images/red-heart.png') }}">
                             <span><span>
-                                0
+                                {{ $post->likes_count}}
                             </span> Likes</span>
                         </a>
                     </li>
                     <li>
                         <a href="#"><img src="{{asset('assets/images/share.png') }}"><span><span>
-                            0
+                            {{ $post->shares_count}}
                         </span> Shares</span> </a>
                     </li>
                     <li>
                         <a href="#"><img src="{{asset('assets/images/messsage.png') }}"><span><span>
-                            0
+                            {{ $post->comments_count}}
                         </span> Comments</span>	</a>
 
                     </li>

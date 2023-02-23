@@ -42,4 +42,12 @@ class Post extends Model
     public function hidepost(){
         return $this->belongsTo(Hidepost::class);
     }
+
+    public function get_avg()
+    {
+        // return $this->views->count();
+        $_avg = $this->views->count() + $this->likes->count();
+        $_avg_2 = $_avg / 2;
+        return $_avg_2;
+    }
 }

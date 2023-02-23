@@ -40,39 +40,40 @@
                 <div class="col-12">
                     <div class="write-page-btn">
                         <button type="button" class="preview-btn">Preview</button>
-                        {{-- <div class="dropdown">
+                        <div class="dropdown">
                             <button  class="dropdown-toggle" type="button" id="dropdownMenuButton1" onclick="$('#type-dropdown-menu').toggleClass('show');">
-                                Public <img width="15" height="15" src="{{asset('assets/images/next-white.png') }}">
+                                Publish <img width="15" height="15" src="{{asset('assets/images/next-white.png') }}">
                             </button>
                             <ul class="dropdown-menu" id="type-dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                <li><a class="dropdown-item post-type" type-value="1" href="#">Private</a></li>
-                                <li><a class="dropdown-item post-type" type-value="2" href="#">Draft</a></li>
+                                <li><button class="dropdown-item post-type-button {{$new_post->type==0 ? 'selected' : ''}}"  type="submit" type-value="0" href="#">Public</button></li>
+                                <li><button class="dropdown-item post-type-button {{$new_post->type==1 ? 'selected' : ''}}"  type="submit" type-value="1" href="#">Private</button></li>
+                                <li><button class="dropdown-item post-type-button {{$new_post->type==2 ? 'selected' : ''}}" type="submit" type-value="2" href="#">Draft</button></li>
                             </ul>
-                        </div>                     --}}
-                        <div>
+                        </div>  
+                        {{-- <div>
                             <select class="form-select" name="type" id="post-type-select" aria-label="Default select example">
                                 <option class="post-select-option" value="2" selected>Draft</option>
                                 <option class="post-select-option" value="0">Public</option>
                                 <option class="post-select-option" value="1">Private</option>
                             </select>
-                        </div>
+                        </div> --}}
                     </div>
-                    {{-- <input type="hidden" name="type" id="inputType" value="0"> --}}
+                    <input type="hidden" name="type" id="inputType" value="{{$new_post->type}}">
                     <h4>Type your day title <span class="required">*</span></h4>
                     <div class="write-page-title-outer">
                         <div class="write-page-title">
                             <ul class="date_time d-flex ">
                                 <li><p id="preview-time" class="date-time-text"><i class="far fa-clock"></i>10:00 AM - 20 feb, 2023 </p></li>
                             </ul>
-                            <textarea name="title" maxlength="100" placeholder="Type your title" id="blog-title">{{$new_post->title}}</textarea>
-                            <span id="title_max_length">100 Charcter</span>
+                            <textarea name="title" maxlength="55" placeholder="Type your title" id="blog-title">{{$new_post->title}}</textarea>
+                            <span id="title_max_length">55 Charcter</span>
                         </div>
                         <div id="title_error" class="text-danger d-block">
                         </div>
                     </div>
                     <div class="write-page-title-editor">
                         <h4>Type your day description <span class="required">*</span></h4>
-                        <textarea class="w-100 ckeditor-placeholder" cols="0" id="toolbar-grouping" name="desc" rows="0">
+                        <textarea class="w-100 ckeditor-placeholder" maxlength="250" cols="0" id="toolbar-grouping" name="desc" rows="0">
                             
                         </textarea>
                         <div id="demo-word-count" class="word-count">
@@ -83,25 +84,23 @@
                     <div class="post-preview">
                         <h4>Post Preview</h4>
                         <div class="post-preview-box">
-                            <a href=""><h6 id="post-slug-url">{{ config('app.url') }}/{{$new_post->slug_url}}</h6></a>
                             <ul class="date_time d-flex ">
                                 <li><p class="date-time-text"><i class="far fa-clock"></i>10:00 AM - 20 feb, 2020 </p></li>
                             </ul>
-                            <h4 id="post-title-preview">Day Title</h4>
-                            <p id="post-preview-desc-text">Day Description</p>
-                        
+                            <h4 id="post-title-preview">{{$new_post->seo_title}}</h4>
+                            <p id="post-preview-desc-text">{{$new_post->meta_desc}}</p>                          
                         </div>
                     </div>
                     <div class="write-page-input-box">
                         <div class="write-page-input">
                             <label>SEO TITLE</label>
-                            <input type="text" maxlength="100" id="seo_title" name="seo_title">
+                            <input type="text" maxlength="55" id="seo_title" name="seo_title">
                             <div id="seo_title_error" class="text-danger d-block">
                             </div>
                         </div>
                         <div class="write-page-input">
                             <label>SLUG URL</label>
-                            <input type="text" maxlength="100" id="slug_url" value="{{$new_post->title}}" name="slug_url">
+                            <input type="text" readonly maxlength="100" id="slug_url" value="{{$new_post->title}}" name="slug_url">
                             <div id="slug_url_error" class="text-danger d-block">
                             </div>
                         </div>
@@ -114,7 +113,7 @@
                             <div id="meta_desc_error" class="text-danger d-block">
                             </div>
                         </div>
-                        <button type="submit" id="create-post-btn">Submit</button>
+                        <button type="button" onclick="SaveSeoData($(this));" id="create-post-btn">Save Changes</button>
                     </div>
                 </div>
             </div>
@@ -128,7 +127,7 @@
         <div class="preview-modal-content">
             <div class="preview-custmor-detail">
                 <div class="preview-custmor-detail-img">
-                    <img class="rounded-circle" src="{{asset('storage/users/'.$user->image) }}">
+                    <img class="rounded-circle" src="{{ isset($user->image) ? asset('storage/users/'.$user->image): asset('assets/images/images.png') }}">
                 </div>
                 <div class="profile-info">
                     <h4>By: {{$user->name}}</h4>

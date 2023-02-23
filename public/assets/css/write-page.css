@@ -200,3 +200,15 @@
 .write-page-title-outer{
     margin-bottom: 50px;
 }
+.dropdown .dropdown-menu .post-type-button{
+    background: transparent;
+    color: #212529;
+    border: none;
+    border-radius: 0px;
+    line-height: unset;
+    padding: 0.25rem 1rem;
+}
+.dropdown .dropdown-menu .selected{
+    background: #4285f4;
+    color: white;
+}

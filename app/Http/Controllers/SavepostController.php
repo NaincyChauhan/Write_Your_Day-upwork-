@@ -37,7 +37,8 @@ class SavepostController extends Controller
      */
     public function store(Request $request)
     {
-        $user_id = Auth::user()->id;        
+        $user= Auth::user();
+        $user_id = $user->id;
         $post = Post::where('id', $request->post_id)->exists();
         if (!$post) { return response()->json(['status' => 0,'message' => 'Something went wrong',], 404); }
         // Remove Post From Save

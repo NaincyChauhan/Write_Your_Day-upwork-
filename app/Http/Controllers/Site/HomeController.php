@@ -8,18 +8,34 @@ use Illuminate\Support\Carbon;
 use App\Models\User;
 use App\Models\Followuser;
 use App\Models\Post;
+use App\Models\Popularpost;
 use Mail,Auth,Session;
 
 class HomeController extends Controller
 {
     public function index()
     {
-        $user = Auth::user();
+        $auth_user = Auth::user();
+        $user = User::where('id',$auth_user->id)->
+                with(['hideposts'=> function($query){
+                    $query->with(['post'=>function($query){
+                        $query->select('id');
+                    }]);
+                }])->first();
+        // User Hide Posts
+        $hidesPosts = [];
+        foreach ($user->hideposts as $key => $hidepost) {
+            $hidesPosts[] = $hidepost->post->id;            
+        }
+        // User Followers
         $followedUsers = Followuser::where('follower_user_id', $user->id)->pluck('following_user_id');
+        // Get Posts
         $todayPosts = Post::select('posts.*')
             ->join('users', 'users.id', '=', 'posts.user_id')
             ->whereIn('users.id', $followedUsers)
+            ->whereNotIn('posts.id', $hidesPosts)
             ->whereDate('posts.created_at', today());
+        // Slip In to Random Order
         if (Session::has('viewed_posts')) {
             $viewedPosts = Session::get('viewed_posts');
             $todayPosts->inRandomOrder();
@@ -37,42 +53,75 @@ class HomeController extends Controller
         Session::put('viewed_posts', $viewedPosts);    
 
         // Get Popular Post if todayPosts
-        // if ($todayPosts->isEmpty() || count($todayPosts) < 10) {
-        //     // $popularPosts = Post::inRandomOrder()->limit(10)->get();
-        //     $popularPosts = Post::withCount(['views', 'likes', 'shares'])
-        //     ->orderByDesc('views_count')
-        //     ->orderByDesc('likes_count')
-        //     ->orderByDesc('shares_count')
-        //     ->limit(10)
-        //     ->get();
-        //     return view('site.home',[
-        //         'followers_posts' => [],
-        //         'posts' => $popularPosts,
-        //     ]);
-        // }
+        $popularPosts = Popularpost::with(['post'=>function($query){
+                                                $query->
+                                                withCount('comments','views','shares')->
+                                                with(['likes','user'=>function($query){
+                                                    $query->select('id','username','image','name')
+                                                        ->withCount(['followers']);
+                                                }]);
+                                            }])->take(2)->inRandomOrder()->get();
         
         return view('site.home',[
             'followers_posts' => $todayPosts,
-            'posts' => [],
+            'posts' => $popularPosts,
+            'logged_user' => $auth_user,
         ]);
     }
 
-    public function indexBackup()
+    public function suspend_user_home()
     {
-        $user_id = Auth::user()->id;
-        $following = auth()->user()->following()
-                    ->with(['following_user' => function ($query) {
-                        $query->select('id', 'name')
-                            ->with(['posts' => function ($query) {
-                                $query->whereDate('created_at', Carbon::today())
-                                        ->orderByDesc('created_at');
-                            }]);
-                    }])->get();
-        $posts =  Post::orderBy('created_at', 'desc')->get();
-        return view('site.home',[
-            'active' => 'home',
-            'follow_user_post' => $following,
-            'posts' =>  $posts,
+        $auth_user = Auth::user();
+        $user = User::where('id',$auth_user->id)->
+                with(['hideposts'=> function($query){
+                    $query->with(['post'=>function($query){
+                        $query->select('id');
+                    }]);
+                }])->first();
+        // User Hide Posts
+        $hidesPosts = [];
+        foreach ($user->hideposts as $key => $hidepost) {
+            $hidesPosts[] = $hidepost->post->id;            
+        }
+        // User Followers
+        $followedUsers = Followuser::where('follower_user_id', $user->id)->pluck('following_user_id');
+        // Get Posts
+        $todayPosts = Post::select('posts.*')
+            ->join('users', 'users.id', '=', 'posts.user_id')
+            ->whereIn('users.id', $followedUsers)
+            ->whereNotIn('posts.id', $hidesPosts)
+            ->whereDate('posts.created_at', today());
+        // Slip In to Random Order
+        if (Session::has('viewed_posts')) {
+            $viewedPosts = Session::get('viewed_posts');
+            $todayPosts->inRandomOrder();
+        } else {
+            $todayPosts->orderByDesc('created_at');
+        }
+
+        $todayPosts = $todayPosts->get();
+        
+        // Store the IDs of the viewed posts in the session
+        $viewedPosts = Session::get('viewed_posts', []);
+        foreach ($todayPosts as $post) {
+            $viewedPosts[] = $post->id;
+        }
+        Session::put('viewed_posts', $viewedPosts);    
+
+        // Get Popular Post if todayPosts
+        $popularPosts = Popularpost::with(['post'=>function($query){
+            $query->
+            withCount('comments','views','shares')->
+            with(['likes','user'=>function($query){
+                $query->select('id','username','image','name')
+                    ->withCount(['followers']);
+            }]);
+        }])->take(2)->inRandomOrder()->get();
+        
+        return view('site.suspend_home',[
+            'followers_posts' => $todayPosts,
+            'posts' => $popularPosts,
+            'logged_user' => $auth_user,
         ]);
     }
 
@@ -131,23 +180,6 @@ class HomeController extends Controller
             'content' => Policies::select('refund')->first()->refund
         ]);
     }
-
-    public function imageGallery()
-    {
-        return view('site.gallery.image',[
-            'active' => 'image-gallery',
-            'galleries' => Imagegallery::select('image', 'title')->paginate(15)
-        ]);
-    }
-
-    public function videoGallery()
-    {
-        return view('site.gallery.video',[
-            'active' => 'video-gallery',
-            'galleries' => Videogallery::select('video', 'title')->paginate(15)
-        ]);
-    }
-
    
 
     public function sednMessage(Request $request){
@@ -191,16 +223,68 @@ class HomeController extends Controller
     }
 
     public function LoadPostWithAjax(Request $request){
+        $user = User::where('id',Auth::user()->id)->
+                with(['hideposts'=> function($query){
+                    $query->with(['post'=>function($query){
+                        $query->select('id');
+                    }]);
+                }])->first();
+        // User Hide Posts
+        $hidesPosts = [];
+        foreach ($user->hideposts as $key => $hidepost) {
+            $hidesPosts[] = $hidepost->post->id;            
+        }
         // Get Popular Post if todayPosts
-        $popularPosts = Post::withCount(['views', 'likes', 'shares'])
-            // ->orderByDesc('views_count')
-            // ->orderByDesc('likes_count')
-            // ->orderByDesc('shares_count')
-            ->orderByDesc('created_at')
-            ->offset($request->input('offset'))
-            ->limit($request->input('limit'))
-            ->get();
+        $popularPosts = Post::withCount(['views', 'likes', 'shares','comments'])->
+                        with(['likes','user'=>function($query){
+                            $query->select('id','username','image','name')
+                                    ->withCount(['followers']);
+                        }])
+                        // ->orderByDesc('views_count')
+                        // ->orderByDesc('likes_count')
+                        // ->orderByDesc('shares_count')
+                        ->whereNotIn('posts.id', $hidesPosts)
+                        ->orderByDesc('created_at')
+                        ->offset($request->input('offset'))
+                        ->limit($request->input('limit'))
+                        ->get();
         // return response()->json(['status'=>1,'data'=>$popularPosts], 200);
         return view('partial.single_post',['posts'=>$popularPosts]);
+    }
+
+    public function LoadPostWithAjax_2(Request $request){
+        $user = User::where('id',Auth::user()->id)->
+                with(['hideposts'=> function($query){
+                    $query->with(['post'=>function($query){
+                        $query->select('id');
+                    }]);
+                }])->first();
+        // User Hide Posts
+        $hidesPosts = [];
+        foreach ($user->hideposts as $key => $hidepost) {
+            $hidesPosts[] = $hidepost->post->id;            
+        }
+        // Get Popular Post if todayPosts
+        $popularPosts = Post::withCount(['views', 'likes', 'shares','comments'])->
+                        with(['likes','user'=>function($query){
+                            $query->select('id','username','image','name')
+                                    ->withCount(['followers']);
+                        }])
+                        // ->orderByDesc('views_count')
+                        // ->orderByDesc('likes_count')
+                        // ->orderByDesc('shares_count')
+                        ->whereNotIn('posts.id', $hidesPosts)
+                        ->orderByDesc('created_at')
+                        ->offset($request->input('offset'))
+                        ->limit($request->input('limit'))
+                        ->get();
+        // return response()->json(['status'=>1,'data'=>$popularPosts], 200);
+        return view('partial.single_post_2',['posts'=>$popularPosts]);
+    }
+
+    public function AccountHelp(){
+        return view('site.user.account-help',[
+            'user'=>User::where('id',Auth::user()->id)->select('name','image','id','username','email')->first(),
+        ]);
     }
 }

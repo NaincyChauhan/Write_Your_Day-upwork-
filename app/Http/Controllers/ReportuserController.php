@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Reportuser;
+use App\Models\User;
+use Auth;
 use Illuminate\Http\Request;
 
 class ReportuserController extends Controller
@@ -35,7 +37,22 @@ class ReportuserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $user = User::where('id',$request->user_id)->select('id','suspend_mode')->first();
+        if (isset($user)) {
+            $report =  new Reportuser();
+            $report->reported_user_id = $user->id;
+            $report->report = $request->report;
+            $report->report_by_user_id = Auth::user()->id;
+            $report->save();
+
+            $user_reports = Reportuser::where('reported_user_id',$user->id)->get();
+            if (isset($user_reports) || $user_reports->count() >= 10) {
+                $user->suspend_mode == 1;
+                $user->save();
+            }
+            return response()->json(['status'=>1,'message'=>"Reported"], 200);
+        }
+        return response()->json(['status'=>0,'message'=>"Something Wrong"], 400);
     }
 
     /**

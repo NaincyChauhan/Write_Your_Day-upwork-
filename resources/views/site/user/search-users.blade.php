@@ -31,11 +31,16 @@
         <div class="serch-profile-box">
                     <a href="{{route('search-user-profile',['username'=>$user->username])}}">
                     <div class="serch-profile-box-img">
-                        <img src="{{ isset($user->image) ? asset('storage/users/'.$user->image) : asset('assets/images/images.png') }}">
+                        <div class="search-user-image">
+                            <img class="w-100 h-auto  rounded-0" src="{{ isset($user->image) ? asset('storage/users/'.$user->image) : asset('assets/images/images.png') }}">
+                        </div>
                     </div>
                 </a>
                     <div class="serch-profile-box-content">
-                        <h4>{{$user->name}}</h4>
+                        <a href="{{route('search-user-profile',['username'=>$user->username])}}">
+                            <h4>{{$user->name}}</h4>
+                            <h6 class="text-secondary mt-1">{{$user->username}}</h6>
+                        </a>
                         @php
                             $is_following  = Auth::user()->following()->where('following_user_id', $user->id)->exists();
                         @endphp
@@ -64,4 +69,7 @@
     <script src="{{ asset('app-assets/plugins/jquery-validation/jquery.validate.min.js') }}"></script>
     <script src="{{ asset('assets/js/msg_extras.js') }}"></script>
     <script src="{{ asset('assets/js/like_share_post.js') }}"></script>
+    <script>
+        $('#search_query').val("{{$search_query}}");
+    </script>
 @endsection

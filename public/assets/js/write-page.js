@@ -36,7 +36,13 @@ ClassicEditor
                 { model: 'heading6', view: 'h6', title: 'Heading 6', class: 'ck-heading_heading6' }
             ]
         },
-        // plugins: ['WordCount']
+        // plugins: ['WordCount'],
+        // extraPlugins: ['MaxLength'],
+        // extraPlugins: 'wordcount',
+        maxLength: {
+            maxCharCount: 200, // set the maximum character count here
+            message: 'You have reached the maximum character count.', // message to show when the limit is exceeded
+        }
     })
     .then(e => {
         userBlogContentInput = () => e.getData();
@@ -44,6 +50,7 @@ ClassicEditor
         // console.log(wordCountPlugin);
         // console.log(e.plugins.get("WordCount"));
         // window.editor = e;
+        // console.log("debugging11",window.editor);
         // document.getElementById("demo-word-count").appendChild(e.plugins.get("WordCount").wordCountContainer) 
     })
     .catch(error => {
@@ -93,17 +100,27 @@ window.onclick = e => {
 
 // Don't Remove
 
-$('.post-type').click(function () {
+$('.post-type-button').click(function () {
     $('#inputType').val($(this).attr('type-value'));
-    $('#type-dropdown-menu').toggleClass('show');
+    // ('#LogInForm').submit();
+    // $('#type-dropdown-menu').toggleClass('show');
 });
 
 // Title Length
 $("#blog-title").on("input", function () {
     const post_title = $("#blog-title").val();
-    $('#title_max_length').html(`Remaining Character ${100 - Number(post_title.length)}`)
-    $('#post-title-preview').html(post_title);
+    $('#title_max_length').html(`Remaining Character ${55 - Number(post_title.length)}`)
     $('#slug_url').val(post_title);
+});
+
+// Seo Title
+$("#seo_title").on("input", function () {
+    $('#post-title-preview').html($(this).val());
+});
+
+// Meta Descripation
+$("#meta_desc").on("input", function () {
+    $('#post-preview-desc-text').html($(this).val().substring(0, 200)+".");
 });
 
 // Create User Post
@@ -130,10 +147,11 @@ $(function () {
         },
         submitHandler: function (f) {
             clearErrors();
-            var btn = $('#create-post-btn'),
+            // console.log("this is function");
+            // return;
+            var btn = $('#type-dropdown-menu'),
                 form = $('#create-post-form');
             btn.attr('disabled', true);
-            btn.html('Submitting...');
             $.ajax({
                 type: "POST",
                 processData: false,
@@ -149,7 +167,6 @@ $(function () {
                         MessageShow('alert-danger', data.message, 'session_message_area');
                     }
                     btn.attr("disabled", false);
-                    btn.html('Submit');
                 },
                 error: function (data) {
                     // clearErrors();
@@ -163,7 +180,6 @@ $(function () {
                         }
                     }
                     btn.attr("disabled", false);
-                    btn.html('Submit');
                 }
             });
             return false;
@@ -187,16 +203,6 @@ function MessageShow(addclass, msg, container) {
                             </div>`);
     window.scrollTo(0, 0);
 }
-
-$(document).ready(function () {
-    $(window).scroll(function () {
-        var scrollPos = $(window).scrollTop();
-        let content = userBlogContentInput();
-        if (scrollPos >= 600) {
-            $('#post-preview-desc-text').html(content)
-        }
-    });
-});
 
 $(document).ready(function () {
     getDateTime();    
@@ -258,4 +264,19 @@ function showAutoDraftMessage(message_) {
     setTimeout(function () {
         $('#like-popup').html("");
     }, 2000);
+}
+
+$(document).ready(function(){
+    $('#blog-title').keypress(function(event){
+        if(event.keyCode == 13){
+            event.preventDefault();
+        }
+    });
+});
+
+function SaveSeoData(thisObj){
+    thisObj.html('Saved');
+    $('#seo_title').attr('readonly',true);
+    $('#slug_url').attr('readonly',true);
+    $('#meta_desc').attr('readonly',true);
 }

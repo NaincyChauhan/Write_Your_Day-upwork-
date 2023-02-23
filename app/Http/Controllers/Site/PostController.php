@@ -20,11 +20,10 @@ use Illuminate\Support\Str;
 
 class PostController extends Controller
 {
-    
+    // Crate Post View
     public function CreatePost(){
         $user = Auth::user();
         $postsToday = $user->posts()->whereDate('created_at', today())->count();
-
         $public_post =  Post::where('user_id',$user->id)->whereDate('created_at', today())->count();
         $public_private = Privatepost::where('user_id',$user->id)->whereDate('created_at', today())->count();
         $public_draft =  Draftpost::where('user_id',$user->id)->whereDate('created_at', today())->count();
@@ -57,33 +56,37 @@ class PostController extends Controller
         ]);
     }
 
+    // Stote Post
     public function StorePost(Request $request){
         if (isset($request->post_id)) {
             $draft_post = Draftpost::where('id',$request->post_id)->first();
-            if(isset($request->slug_url))
+            if(isset($request->title))
             {
-                $request['slug_url'] = (string) Str::of($request->slug_url)->slug('-');
+                $request['slug_url'] = (string) Str::of($request->title)->slug('-');
             }
             if ($request->type == 2) {
                 $request->validate([
                     'title' => 'required|max:100',
-                    'slug_url' => 'required|unique:posts|max:100',
+                    'slug_url' => 'required|max:100',
                 ]);
                 $post = $draft_post;
             }
             if ($request->type==0 || $request->type==1) {
                 $request->validate([
                     'title' => 'required|max:100',
-                    'slug_url' => 'required|unique:posts|max:100',
+                    'slug_url' => 'required|max:100',
                     'desc' => 'required',
-                    'seo_title' => 'required|max:100',
-                    'meta_desc' => 'required|max:2500',
+                    'seo_title' => 'max:100',
+                    'meta_desc' => 'max:2500',
                 ]);
             }
             if ($request->type == 0) {
                 $post = new Post();
                 $last_post = Post::where('user_id',Auth::user()->id)->where('type',$request->type)->select('post_number')->latest()->first();
                 if (isset($last_post)) {
+                    if ($last_post->post_number == 365 || $last_post->post_number > 365) {
+                        $post->post_number = 1;
+                    }
                     $post->post_number = $last_post->post_number+1;
                 }else{
                     $post->post_number = 1;
@@ -117,6 +120,7 @@ class PostController extends Controller
         ], 200);
     }
 
+    // Auto Draft Saved Post
     public function autoDraftPostRequest(Request $request){
         if (isset($request->title) && isset($request->slug_url)) {
             $draft_post = Draftpost::where('id',$request->post_id)->first();
@@ -131,11 +135,13 @@ class PostController extends Controller
         return response()->json(['status'=>0,'message'=>"Something Wrong"], 400);
     }
 
+    // Add View in Post
     public function addPostView(Request $request){
+        $user = Auth::user();
         View::firstOrCreate([
             'post_id' => $request->post_id,
             'post_type' => $request->post_type,
-            'user_id' => auth()->id()
+            'user_id' => $user->id,
         ]);
         return response()->json([
             'status' => 1, 
@@ -143,8 +149,10 @@ class PostController extends Controller
         ], 200);
     }
 
+    // Edit Post View
     public function editPostView($type,$slug){
-        $user_id = Auth::user()->id;
+        $user = Auth::user();
+        $user_id = $user->id;
         if ($type == 0) {
             $post = Post::where([['slug_url', '=' ,$slug],['type', '=' ,$type],['user_id','=',$user_id]]);
         }
@@ -154,7 +162,13 @@ class PostController extends Controller
         if ($type == 2) {
             $post = Draftpost::where([['slug_url', '=' ,$slug],['type', '=' ,$type],['user_id','=',$user_id]]);
         }
-        $post = $post->select('user_id','title','desc','seo_title','slug_url','meta_desc','type','id','created_at')->first();
+        $post = $post->
+                select('user_id','title','desc','seo_title','slug_url','meta_desc','type','id','created_at','post_number')->
+                with(['user'=> function($query){
+                    $query->select('id','username','image','name');
+                }])->
+                withCount('views','likes','shares','comments')->
+                first();
         if (!isset($post)) {
             return abort(404);
         }
@@ -165,7 +179,9 @@ class PostController extends Controller
         ]);
     }
 
+    // Update Post
     public function updatePost($type,$id,Request $request){
+        // dd($request->type);
         $auth_id = Auth::user()->id;
         if(isset($request->slug_url))
         {
@@ -234,8 +250,8 @@ class PostController extends Controller
         $request->validate([
             'title' => 'required|max:100',
             'desc' => 'required',
-            'seo_title' => 'required|max:100',
-            'meta_desc' => 'required|max:2500',
+            'seo_title' => 'max:100',
+            'meta_desc' => 'max:2500',
         ]);
 
         $post->title = $request->title;
@@ -298,20 +314,26 @@ class PostController extends Controller
     }
 
     // Public Post Detail
-    public function PublicPostDetailView($type,$slug){
-        $post = Post::where('slug_url',$slug)->where('type',$type)->
-                with(['user','views','likes','shares','comments' => function ($query) {
+    public function PublicPostDetailView($username,$post_number,$slug){
+        $post = Post::where('slug_url',$slug)->where('post_number',$post_number)->
+                select('id','created_at','type','title','desc','seo_title','meta_desc','slug_url','user_id','post_number')->
+                with(['user'=> function($query){
+                    $query->select('username','image','name','id')->
+                    with('followers');
+                },'views','likes','shares','comments' => function ($query) {
                     $query->where('parent_id', null)->with(['likes','replies'=>function($query){
-                        $query->paginate(5);
+                        $query->with(['likes','replies'=>function($query){
+                            $query->paginate(5);
+                        }])->paginate(5);
                     }])->orderBy('created_at', 'desc')->paginate(5);
-                }])->select('id','created_at','type','title','desc','seo_title','meta_desc','slug_url','user_id')->
+                }])->
                 first();
         if (!isset($post)) {
             return abort(404);
         }
-        $related_post = Post::where('type',$type)->where('user_id',$post->user_id)->where('id','<>',$post->id)->
+        $related_post = Post::where('type',0)->where('user_id',$post->user_id)->where('id','<>',$post->id)->
                 with(['user','views','likes','shares','comments'])->
-                select('id','created_at','type','title','desc','seo_title','meta_desc','slug_url','user_id')->
+                select('id','created_at','type','title','desc','seo_title','meta_desc','slug_url','user_id','post_number')->
                 latest()->first();
         return view('site.post.detail',[
             'post' => $post,
@@ -372,8 +394,10 @@ class PostController extends Controller
         ]);
     }
 
+    // Pulic Post LIke
     public function publicPostLike(Request $request){
-        $user_id = Auth::user()->id;
+        $user = Auth::user();
+        $user_id = $user->id;
         $request->validate([
             'post_id' => 'required',
             'post_type' => 'required',
@@ -394,6 +418,7 @@ class PostController extends Controller
         }
     }
 
+    // Private Post Like
     public function privatePostLike(Request $request){
         $user_id = Auth::user()->id;
         $request->validate([
@@ -416,6 +441,7 @@ class PostController extends Controller
         }
     }
 
+    // Draft Post LIke
     public function draftPostLike(Request $request){
         $user_id = Auth::user()->id;
         $request->validate([
@@ -465,17 +491,29 @@ class PostController extends Controller
 
     // Share Public Post
     public function PostShare(Request $request){
+        $user = Auth::user();
+        $user_id = $user->id;
         $post = Post::where('id', $request->post_id)->where('type', $request->post_type)->exists();
         if (!$post) {
             return response()->json(['status' => 0,'message' => 'Something went wrong',], 404);
         }
+        $share_post =Sharepost::where([['user_id','=',$user_id],['post_id','=', $request->post_id],['post_type','=',$request->post_type]])->
+                    latest()->first();
+        if(isset($share_post)){
+            return response()->json([
+                'status' => 1, 
+                'type' => 0,
+                'message' => "Success",            
+            ], 200);
+        }
         Sharepost::firstOrCreate([
             'post_id' => $request->post_id,
             'post_type' => $request->post_type,
-            'user_id' => Auth::user()->id,
+            'user_id' => $user_id,
         ]);
         return response()->json([
             'status' => 1, 
+            'type' => 1,
             'message' => "Success",            
         ], 200);
     }
@@ -518,12 +556,31 @@ class PostController extends Controller
                             orWhere('name','like','%'.$request->search.'%')->
                             orWhere('email','like','%'.$request->search.'%')->
                             whereNotIn('id',[Auth::user()->id])->
-                            with('followers','following','posts')->
+                            with('followers','following')->
                             select('name','username','id','image','thought_of_the_day','bio','website','email')->get();
+            
+            if($users->count() < 1){
+                $users =  User::
+                            select('name','username','id','image','thought_of_the_day','bio','website','email')->
+                            orderBy('created_at', 'desc')->take(10)->get();                
+            }
             return view('site.user.search-users',[
                 'users' => $users,
+                'search_query'=>$request->search,
             ]);
+
         }else{
+            $user = User::where('id',Auth::user()->id)->
+                with(['hideposts'=> function($query){
+                    $query->with(['post'=>function($query){
+                        $query->select('id');
+                    }]);
+                }])->first();
+            // User Hide Posts
+            $hidesPosts = [];
+            foreach ($user->hideposts as $key => $hidepost) {
+                $hidesPosts[] = $hidepost->post->id;            
+            }
             $posts =Post::where(function($q) use ($request){
                         $q->where('title', 'LIKE', '%'.$request->search.'%')
                         ->orWhere('desc', 'LIKE', '%'.$request->search.'%')
@@ -531,26 +588,58 @@ class PostController extends Controller
                         ->orWhere('seo_title', 'LIKE', '%'.$request->search.'%')
                         ->orWhere('meta_desc', 'LIKE', '%'.$request->search.'%');
                     })->
-                    with(['user'=> function($query){
+                    whereNotIn('posts.id', $hidesPosts)->
+                    withCount(['views','shares','comments'])->
+                    with(['likes','user'=> function($query){
                         $query->select('name','username','id','image')->
-                        with('followers','following');
-                    }])->get();
+                        withCount('followers')->
+                        with('following');
+                    }])->
+                    select('seo_title','title','desc','meta_desc','post_number','slug_url','created_at','user_id','id')->get();
+            if($posts->count() < 1){
+                $posts =Post::withCount(['views','shares','comments'])->
+                        whereNotIn('posts.id', $hidesPosts)->
+                        with(['likes','user'=> function($query){
+                            $query->select('name','username','id','image')->
+                            withCount('followers')->
+                            with('following');
+                        }])->
+                        whereNotIn('posts.id', $hidesPosts)->
+                        select('seo_title','meta_desc','post_number','slug_url','created_at','user_id','id')->
+                        orderBy('created_at', 'desc')->take(10)->get();
+            }
             return view('site.post.search-posts',[
                 'posts' => $posts,
+                'search_query'=>$request->search,
             ]);
         }
         return abort(404);
     }
 
     public function reportPost(Request $request){
+        $user = Auth::user();
+        $user_id = $user->id;
         if ($request->post_id) {
-            $post = Post::where('id',$request->post_id)->select('id')->first();
+            $post = Post::where('id',$request->post_id)->select('id','user_id')->first();
             if (isset($post)) {
                 $report =  new Reportpost();
-                $report->post_id = $post->id;
+                $report->post_id = $request->post_id;
                 $report->report = $request->report;
-                $report->user_id = Auth::user()->id;
+                $report->user_id = $user_id;
                 $report->save();
+
+                $user_reports = Reportpost::where('post_id',$request->post_id)->get();
+                if (isset($user_reports) || $user_reports->count() >= 10) {
+                    $user = User::where('id',$post->user_id)->first();
+                    $user->suspend_mode = 1;
+                    $user->save();
+                }
+
+                $report =  new Hidepost();
+                $report->post_id = $request->post_id;
+                $report->user_id = $user_id;
+                $report->save();
+
                 return response()->json(['status'=>1,'message'=>"Reported"], 200);
             }
         }
@@ -558,15 +647,35 @@ class PostController extends Controller
     }
 
     public function hidePost(Request $request){
+        $user = Auth::user();
+        $user_id = $user->id;
         $post = Post::where('id',$request->post_id)->select('id')->first();
         if (isset($post)) {
             $report =  new Hidepost();
             $report->post_id = $post->id;
-            $report->user_id = Auth::user()->id;
+            $report->user_id = $user_id;
             $report->save();
-            return response()->json(['status'=>1,'message'=>"Post Hide"], 200);
+            return response()->json(['status'=>1,'message'=>"Day Hide"], 200);
         }
         return response()->json(['status'=>0,'message'=>"Something Wrong"], 400);
+    }
+
+    public function printPost($username,$post_number,$slug){
+        $post = Post::where([
+                    ['slug_url', '=', $slug],
+                    ['post_number', '=', $post_number],
+                ])->join('users', 'users.id', '=', 'posts.user_id')
+                ->where('users.username', $username)
+                ->with(['likes', 'shares', 'comments', 'views', 'user'])
+                ->first();
+        
+        if (isset($post)) {
+            return view('site.post.print_post',[
+                'post' => $post,
+            ]);
+        }else{
+            return abort(404);
+        }
     }
     
 }

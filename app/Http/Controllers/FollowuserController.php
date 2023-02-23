@@ -37,9 +37,10 @@ class FollowuserController extends Controller
      */
     public function store(Request $request)
     {
+        $user= Auth::user();
         $user_ = User::where('username',$request->username)->select('username','id')->first();
         if (isset($user_)) {
-            $user_id = Auth::user()->id;
+            $user_id = $user->id;
             $exists_follow = Followuser::where('follower_user_id',$user_id)->where('following_user_id',$user_->id)->first();
             // $exists_follow = Followuser::where('following_user_id',$user_id)->where('follower_user_id',$user_->id)->first();
             if (isset($exists_follow)) {
@@ -102,31 +103,12 @@ class FollowuserController extends Controller
      */
     public function destroy($id)
     {
+        $user= Auth::user();
         $followuser = Followuser::where('id',$id)->first();
         if (isset($followuser)) {
             $followuser->delete();
             return response()->json(['status'=>1,'message'=>'follower Remove'], 200);
         }
-        // $user_ = User::where('username',$request->username)->select('username','id')->first();
-        // if (isset($user_)) {
-        //     $user_id = Auth::user()->id;
-        //     $exists_follow = Followuser::where('follower_user_id',$user_id)->where('following_user_id',$user_->id)->first();
-        //     // $exists_follow = Followuser::where('following_user_id',$user_id)->where('follower_user_id',$user_->id)->first();
-        //     if (isset($exists_follow)) {
-        //         $exists_follow->delete();
-        //         return response()->json(['status'=>1,'message'=>'Follow'], 200);
-        //     }
-
-        //     $follow_ = new Followuser();
-        //     $follow_->follower_user_id = $user_id;
-        //     $follow_->following_user_id = $user_->id;
-        //     $follow_->save();
-        //     return response()->json(['status'=>1,'message'=>'Following'], 200);
-
-        //     //  User $a wants to follow user $b:
-        //     // $a->following()->detach($b);
-        //     // $a->following()->attach($b);
-        // }
         return response()->json(['status'=>0,'message'=>'Something Went Wrong'], 400);
     }
 }

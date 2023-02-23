@@ -37,7 +37,8 @@ class LikecommentController extends Controller
      */
     public function store(Request $request)
     {
-        $user_id = Auth::user()->id;
+        $user= Auth::user();
+        $user_id = $user->id;
         $comment = Comment::where('id', $request->comment_id)->exists();
         if (!$comment) { return response()->json(['status' => 0,'message' => 'Something went wrong',], 404); }
         // UnLike Comment

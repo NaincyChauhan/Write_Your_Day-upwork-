@@ -178,3 +178,17 @@ function loadCommentAndReply(id_,container_,loading_) {
     });
 
 }
+
+function printPost() {
+    var postContent = document.getElementById('post-detail-main-container');
+    var printWindow = window.open('', '', 'height=1240,width10600');
+    // printWindow.document.write('<html><head>');
+    // printWindow.document.write($('head').html);
+    // printWindow.document.write('</head><body>');
+    printWindow.document.write(postContent);
+    // printWindow.document.write('</body></html>');
+    printWindow.document.close();
+    // printWindow.focus();
+    printWindow.print();
+    // printWindow.close();
+  }

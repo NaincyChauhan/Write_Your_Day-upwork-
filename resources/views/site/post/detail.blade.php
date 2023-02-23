@@ -28,11 +28,13 @@
 <section class="preview">
     <div class="container">
         <div class="row">
-            <div class="col-12">
+            <div class="col-12" id="post-detail-main-container">
                 <div class="preview-custmor-detail">
-                    <div class="preview-custmor-detail-img">
+                    <div class="preview-custmor-detail-img d-flex justify-content-center">
                         <div class="user-photo-post">
-                            <img src="{{ isset($post->user->image) ? asset('storage/users/'.$post->user->image) : asset('assets/images/images.png') }}">
+                            <a href="{{route('search-user-profile',['username'=>$post->user->username])}}">
+                                <img class="w-100 h-auto rounded-0" src="{{ isset($post->user->image) ? asset('storage/users/'.$post->user->image) : asset('assets/images/images.png') }}">
+                            </a>
                         </div>
                     </div>
                     <div class="profile-info">
@@ -44,7 +46,7 @@
                             <button class="message_btn"><a href="">Message</a></button>
                         @endif
                     </div>
-                    <a href="#" class="active folder-img"><img src="{{ asset('assets/images/folder.png') }}"></a>
+                    <a style="z-index: 1000;" href="{{route('print-post',['username'=>$post->user->username,'post_number'=>$post->post_number,'slug'=>$post->slug_url])}}" target="_blank" class="active folder-img"><img src="{{ asset('assets/images/folder.png') }}"></a>
                 </div>
                 <div class="review-detail ">
                     <ul class="date_time d-flex ">
@@ -147,19 +149,24 @@
     <div class="container">
         <!-- <------- main Li --------->
         @if (isset($related_post))            
-            @include('partial.related_post', ['post' => $related_post])
+            @include('partial.related_post', ['post_' => $related_post])
         @endif
     </div>
 </section>
 <div id="like-popup" >
 </div>
 
-<!-- Share Post -->
+<!-- Share Post Modal -->
 <div class="overlay hide" id="share_post_container_{{$post->id}}">
     <div class="ques_box ques_box_1">
-        <p class="ques_txt font-17">Copy Post Link</p>        
+        <div class="d-flex justify-content-between align-items-baseline">
+            <div>
+                <p class="ques_txt font-17">Copy Post Link</p>       
+            </div>
+            <span onclick="CopyPostUrl($(this),'{{route('detail-post-view',['username'=>$post->user->username,'post_number' => $post->post_number,'slug'=>$post->slug_url])}}',{{$post->id}});" class="copybutton"><i class="far fa-clipboard-list"></i></span>
+        </div>
         <div class="share_profile">
-            <p id="share_post_url">{{route('detail-post-view',['type'=>$post->type,'slug'=>$post->slug_url])}}</p> 
+            <p>{{$post->slug_url}}</p> 
         </div>     
         <div class="d-flex justify-content-center mt-4">           
             <button type="button" class="ques_btn suggested_btn text-primary" onclick="SharePostModal({{$post->id}});">

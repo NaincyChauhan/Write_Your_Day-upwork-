@@ -31,10 +31,11 @@ function LikePostRequest(id_,thisObj) {
                     // btn.html(`<img class="red-heart d-block" src="${window.location.origin}/assets/images/red-heart.png">
                     //             <span><span class="post_like_count">${like_count}</span> Likes</span>`);     
                     showLikeMessage(data.message);
-
                 }
+                console.log("function running 1");
             } else {
                 showLikeMessage(data.message);
+                console.log("function running 2");
             }
             btn.attr("disabled", false);
         },
@@ -42,6 +43,7 @@ function LikePostRequest(id_,thisObj) {
             $.each(data.responseJSON.errors, function (key, value) {
                 console.error("error", value);
             });
+            showLikeMessage(data.responseJSON.message);
             btn.attr("disabled", false);
         }
     });
@@ -64,7 +66,7 @@ function showLikeMessage(message_) {
 function sharePostRequest(id_) {
     var form = $(`#share_post_form_${id_}`),
         btn = $(`#share_post_btn_${id_}`);
-    SharePostModal(id_);
+        share_count = btn.find('.share_count');
     btn.attr("disabled", true);
     $.ajax({
         type: "POST",
@@ -73,9 +75,19 @@ function sharePostRequest(id_) {
         url: form.attr('action'),
         data: new FormData(form[0]), // serializes the form's elements.
         success: function (data) {
-            btn.attr("disabled", false);
+            if (data.status==0) {                
+                SharePostModal(id_);
+            }else{
+                btn.attr("disabled", false);
+                if (data.type==1) {
+                    // Plus                
+                    share_count_value = share_count.html();
+                    share_count.html(Number(share_count_value)+1);
+                }            
+            }
         },
         error: function (data) {
+            showLikeMessage(data.message);
             $.each(data.responseJSON.errors, function (key, value) {
                 console.error("error", value);
             });
@@ -128,6 +140,7 @@ function LikeCommentRequest(id_) {
             btn.attr("disabled", false);
         },
         error: function (data) {
+            showLikeMessage(data.message);
             $.each(data.responseJSON.errors, function (key, value) {
                 console.error("error", value);
             });
@@ -137,7 +150,7 @@ function LikeCommentRequest(id_) {
 }
 
 // Save Post 
-function SavePostRequest(id_) {
+function SavePostRequest(id_,type=0) {
     var form = $(`#save_post_form_${id_}`),
         btn = $(`#save_post_btn_${id_}`);
     btn.attr("disabled", true);
@@ -153,6 +166,11 @@ function SavePostRequest(id_) {
                     // Remove From Save
                     btn.html(`<img style="margin-bottom: -8px;" class="red-heart d-block" src="${window.location.origin}/assets/images/bookmark.png" />`);
                     showLikeMessage(data.message);
+                    console.log("function is running well",id_);
+                    if (type==1) {
+                        $(`#main_post_container_save_${id_}`).html("");
+                        $(`#main_post_container_save_${id_}`).css('display','none');
+                    }
                 }
                 if (parseInt(data.type) == 1) {
                     // Add To Save
@@ -166,6 +184,7 @@ function SavePostRequest(id_) {
             btn.attr("disabled", false);
         },
         error: function (data) {
+            showLikeMessage(data.message);
             $.each(data.responseJSON.errors, function (key, value) {
                 console.error("error", value);
             });
@@ -198,6 +217,7 @@ function FollowUnFollowRequest(id_, thisObj) {
             btn.attr("disabled", false);
         },
         error: function (data) {
+            showLikeMessage(data.message);
             $.each(data.responseJSON.errors, function (key, value) {
                 console.error("error", value);
             });
@@ -208,7 +228,6 @@ function FollowUnFollowRequest(id_, thisObj) {
 
 // Remove From Follower List
 function RemoverFromFollower(id_, thisObj) {
-    console.log("function is running well define");
     // return
     var form = $(`#remove_follower_user_form_${id_}`),
         btn = thisObj;
@@ -228,6 +247,7 @@ function RemoverFromFollower(id_, thisObj) {
             btn.attr("disabled", false);
         },
         error: function (data) {
+            showLikeMessage(data.message);
             $.each(data.responseJSON.errors, function (key, value) {
                 console.error("error", value);
             });
@@ -236,20 +256,13 @@ function RemoverFromFollower(id_, thisObj) {
     });
 }
 
-function ShowPostReportModal(id_) {
-    console.log($(`#report_post_container_${id_}`));
-    $(`#report_post_container_${id_}`).toggleClass('hide');
-}
-
 function ShowReportModal(id_) {
-    console.log("function is running well define here", id_);
     form = $('#post-report-form');
     $(form.find('#report_post_id')).val(id_);
     $('#report_msg_container').toggleClass('hide');
 }
 
 // Post Report
-//  User Comment Function
 $(function () {
     $('#post-report-form').validate({
         rules: {
@@ -286,9 +299,12 @@ $(function () {
                     btn.html('Send');
                     $('#report_msg').val("");
                     $('#report_msg_container').toggleClass('hide');
+                    var id_ = $(form.find('#report_post_id')).val();
+                    $(`#post_container_${id_}`).html("");
+                    $(`#post_container_${id_}`).css('display','none');
                 },
                 error: function (data) {
-                    showLikeMessage(data.responseJSON.messages);
+                    showLikeMessage(data.message);
                     $.each(data.responseJSON.errors, function (key, value) {
                         $(".report_msg_error").html(value);
                     });
@@ -312,14 +328,24 @@ function HidePostRequest(id_,btn) {
         data: new FormData(form[0]), // serializes the form's elements.
         success: function (data) {
             showLikeMessage(data.message);
-            btn.attr("disabled", false);
+            btn.attr("disabled", false);            
             $(`#post_container_${id_}`).html("");
             $(`#post_container_${id_}`).css('display','none');
         },
         error: function (data) {
-            showLikeMessage(data.responseJSON.messages);
+            showLikeMessage(data.message);
             btn.attr("disabled", false);
-            btn.html('Send');
         }
     });
+}
+
+function CopyPostUrl(thisObj,url,id_) {  
+    // Copy the text inside the text field
+    navigator.clipboard.writeText(url);
+    thisObj.html(`<i class="far fa-clipboard-check"></i>`);
+    showLikeMessage('Like Copied!');
+    $(`#share_post_container_${id_}`).toggleClass('hide');
+    setTimeout(function () {
+        thisObj.html(`<i class="far fa-clipboard-list"></i>`);
+    }, 10000);
 }

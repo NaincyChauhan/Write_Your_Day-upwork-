@@ -29,16 +29,18 @@
     <div class="container">
         <div class="row">
             <div class="col-12">
-                <div class="preview-custmor-detail">                    
+                <div class="preview-custmor-detail  d-flex justify-content-center">                    
                     <div class="user-photo-post">
-                        <img src="{{ isset($post->user->image) ? asset('storage/users/'.$post->user->image) : asset('assets/images/images.png') }}">
+                        <a href="{{route('search-user-profile',['username'=>$post->user->username])}}">
+                            <img class="w-100 h-auto rounded-0" src="{{ isset($post->user->image) ? asset('storage/users/'.$post->user->image) : asset('assets/images/images.png') }}">
+                        </a>
                     </div>
                     <div class="profile-info">
                         <h4>{{$post->user->name}}</h4>
                         <button class="main_btn follow_btn">Follow</button>
                         <button class="message_btn"><a href="">Message</a></button>
                     </div>
-                    <a href="#" class="active folder-img"><img src="{{ asset('assets/images/folder.png') }}"></a>
+                    <a style="z-index: 1000;" @disabled(true) target="_blank" class="active folder-img"><img src="{{ asset('assets/images/folder.png') }}"></a>
                 </div>
                 <div class="review-detail ">
                     <ul class="date_time d-flex ">

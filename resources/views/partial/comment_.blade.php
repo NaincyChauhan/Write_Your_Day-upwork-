@@ -1,7 +1,9 @@
 <div class="review-detail-comment-box-outer" id="post-comment-{{$comment->id}}">
     <div class="review-detail-comment-box">
         <div class="review-detail-comment-box-img">
-            <img class="rounded-circle" src="{{ isset($auth_user->image) ? asset('storage/users/'.$auth_user->image) : asset('assets/images/images.png') }}">
+            <div class="comment-user-image">
+                <img class="w-100 h-auto" src="{{ isset($auth_user->image) ? asset('storage/users/'.$auth_user->image) : asset('assets/images/images.png') }}">
+            </div>
         </div>
         <div class="review-detail-comment-box-content">
             <h4>{{$auth_user->name}}</h4>

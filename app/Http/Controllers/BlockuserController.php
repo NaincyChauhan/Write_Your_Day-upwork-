@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Blockuser;
 use Illuminate\Http\Request;
+use Auth;
 
 class BlockuserController extends Controller
 {
@@ -35,7 +36,19 @@ class BlockuserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $user_id = Auth::user()->id;
+        // UnLike Comment
+        $existing_blocked = Blockuser::where('block_by_user_id', $user_id)->where('blocked_user_id', $request->user_id)->select('id')->first();
+        if ($existing_blocked) {
+            $existing_blocked->delete();            
+            return response()->json(['status' => 1,'message' => 'Block ','type' => 0], 200);
+        }
+        // Like Comment        
+        $blockuser = new Blockuser();
+        $blockuser->block_by_user_id = $user_id;
+        $blockuser->blocked_user_id = $request->user_id;
+        $blockuser->save();
+        return response()->json(['status' => 1,'message' => 'Unblock','type' => 1], 200);
     }
 
     /**

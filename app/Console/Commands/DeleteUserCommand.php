@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\User;
+use Carbon\Carbon;
 
 class DeleteUserCommand extends Command
 {
@@ -12,7 +13,7 @@ class DeleteUserCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'delete:users';
+    protected $signature = 'delete-user-accounts';
 
     /**
      * The console command description.
@@ -28,12 +29,11 @@ class DeleteUserCommand extends Command
      */
     public function handle()
     {
-        $users = User::where('status', 'deleted')
-            ->where('deleted_at', '<=', now()->subDays(14))
-            ->get();
-
-        foreach ($users as $user) {
+        $users = User::withTrashed()->whereNotNull('deleted_at')->where('deleted_at', '<=', today()->subDays(14))->get();
+        foreach ($users  as $user) {
             $user->delete();
         }
+        \Log::info("Delete User Accounts ");
+        
     }
 }

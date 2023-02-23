@@ -21,9 +21,9 @@ return new class extends Migration
             $table->tinyInteger('type')->default(0)->comment('0 => Pulic, 1 => Private, 2=> Draft');
 
             // SEO Fields 
-            $table->string('seo_title', 100);
-            $table->string('slug_url', 100)->unique();
-            $table->string('meta_desc', 2500);
+            $table->string('seo_title', 100)->nullable();
+            $table->string('slug_url', 100);
+            $table->string('meta_desc', 2500)->nullable();
             $table->string('post_number')->nullable();
             $table->timestamps();
 

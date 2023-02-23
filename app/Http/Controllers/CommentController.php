@@ -120,7 +120,6 @@ class CommentController extends Controller
             ->where('parent_id',$parentId)
             ->with(['likes','replies'=>function($query){
                 $query->paginate(5);}])
-            ->orderBy('created_at', 'desc')
             ->offset($request->input('offset'))
             ->limit($request->input('limit'))
             ->get();

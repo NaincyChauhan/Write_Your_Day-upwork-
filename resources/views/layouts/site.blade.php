@@ -66,8 +66,9 @@
 
 <body>
     @php
-        $name = Auth::user()->name;
-        $image = Auth::user()->image;
+        $logged_user = Auth::user();
+        $name =  $logged_user->name;
+        $image =  $logged_user->image;
     @endphp
     {{-- {{dd( isset($name) ? $name :'user-name-is')}} --}}
     <header class="header bg-white">
@@ -116,7 +117,7 @@
                                         </ul>
                                     </div>
                                     <input type="hidden" name="type" class="search_type_input-1">
-                                    <input name="search" required type="text" placeholder="search....">
+                                    <input name="search" id="search_query" required type="text" placeholder="search....">
                                     <button>
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" width="14" height="14"
                                             role="img">
@@ -169,7 +170,7 @@
                                 </div>
                                 <h4 class="d-lg-none user-name">{!! Str::limit($name, 6, ' ...') !!}</h4>
                             </div>
-                            <ul class="submenu">
+                            <ul class="submenu" style="z-index: 1001;">
                                 <li>
                                     <a href="{{route('view-user-profile')}}">
                                         <div id="user-header-image">
@@ -179,7 +180,7 @@
                                     </a>
                                 </li>
                                 <li><a href="{{route('user-profile')}}">Settings</a></li>
-                                @if (Auth::user()->hasRole('superadmin'))
+                                @if ( $logged_user->hasRole('superadmin'))
                                 <li><a href="{{route('dashboard')}}">Dashboard</a></li>                                    
                                 @endif
                                 <li><a href="./profile-search.html">Saved</a></li>
@@ -192,7 +193,7 @@
                                 <small>Settings</small>
                             </a>
                         </li>
-                        @if (Auth::user()->hasRole('superadmin'))
+                        @if ( $logged_user->hasRole('superadmin'))
                                 <li class="nav-item logout d-lg-none ">
                                     <a class="header-message-box logout_link" href="{{route('dashboard')}}">
                                         <small>Dashboard</small>
@@ -245,6 +246,7 @@
     <script src="{{ asset('assets/js/bootstrap.min.js') }}"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script type="text/javascript" src="{{ asset('assets/js/custom.js') }}"></script>
+    <script src="{{ asset('app-assets/js/swal.min.js') }}"></script>
     @yield('js')
     <script>
         $('.dropdown-toggle').click(function (e) {
@@ -362,7 +364,7 @@
         });
         // });
     </script>
-    <script>
+    {{-- <script>
         $(function () {
             @if (!empty(Session:: get('success')))                
                 $('#session_message_area').html(
@@ -403,6 +405,24 @@
                 }, 5000);
             @endif
         });   
+    </script> --}}
+    <script>
+        $(function () {
+            @if (!empty(Session:: get('success')))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: "{{Session::get('success')}}",
+                });
+            @endif
+
+            @if (!empty(Session:: get('error')))
+                Swal.fire({
+                    title: 'Limit Reached! ',
+                    text: "{{Session::get('error')}}",
+                });
+            @endif
+        });  
     </script>
     <script>
         $(document).ready(function() {

@@ -25,6 +25,7 @@
 <link rel="stylesheet" href="{{ asset('assets/css/profile.css') }}">
 @endsection
 @section('content')
+<!--- Follower List -->
 <div class="followers_container overlay hide">
     <div class="followers_box">
         <div class="head d-flex align-items-center">
@@ -67,6 +68,7 @@
         </ul>
     </div>
 </div>
+<!--- Following List -->
 <div class="following_container hide overlay">
     <div class="following_box">
         <div class="head d-flex align-items-center">
@@ -97,6 +99,7 @@
     </div>
 </div>
 
+<!--- Report Post -->
 <div class="report_msg_container overlay hide">
     <div class="report_msg_box d-flex flex-column">
         <textarea name="report" id="report_msg" cols="30" rows="10" placeholder="What did glad do?"></textarea>
@@ -232,13 +235,23 @@
                 </li>
             </ul>
             <div class="tab-content" id="pills-tabContent">
+
+                <!--- Public Days List -->
                 <div class="tab-pane fade show active box_group" id="pills-days" role="tabpanel"
                     aria-labelledby="pills-days-tab">
                     @foreach ($publicposts as $post)                        
                         <div class="box_group" id="main_post_container_{{$post->id}}">
                             <ul class="msg_box mb-3 mb-sm-5">
                                 <li class="days-ago">
-                                    <p>{{ $post->post_number }}<sup>th</sup><br />day</p>
+                                    @if ($post->post_number==1)                                                    
+                                        <p>{{ $post->post_number }}<sup>st</sup><br />day</p>
+                                    @elseif($post->post_number==2)
+                                        <p>{{ $post->post_number }}<sup>nd</sup><br />day</p>
+                                    @elseif($post->post_number==3)
+                                        <p>{{ $post->post_number }}<sup>rd</sup><br />day</p>
+                                    @else
+                                        <p>{{ $post->post_number }}<sup>th</sup><br />day</p>
+                                    @endif   
                                 </li>
                                 <li class="row align-items-center">
                                     <div class="col-lg-12">
@@ -287,20 +300,20 @@
                                                 </li>
                                             </ul>
                                             <h3>
-                                                <a href="{{route('detail-post-view',['type'=>$post->type,'slug'=>$post->slug_url])}}">{{$post->title}}</a>
+                                                <a href="{{route('detail-post-view',['username'=>$post->user->username,'post_number' => $post->post_number,'slug'=>$post->slug_url])}}">{{isset($post->seo_title) ? $post->seo_title : $post->title}}</a>
                                             </h3>
                                             <p>
-                                                {!! Str::limit($post->desc, 200, ' ...') !!}
+                                                {!! Str::limit(isset($post->meta_desc) ? $post->meta_desc : $post->desc, 300, ' ...') !!}
                                             </p>
 
                                             <ul class="like_comment d-flex justify-content-between align-items-center">
                                                 <li class="d-flex align-items-center">
                                                     <!-- Post Views -->
-                                                    <small><img src="{{ asset('assets/images/eye.png') }}" /><span><span>{{$post->views()->count()}}</span>
+                                                    <small><img src="{{ asset('assets/images/eye.png') }}" /><span><span>{{$post->views_count}}</span>
                                                             Views</span></small>                                                    
                                                     <!-- Post Likes -->
                                                     <a class="heart like_post_">
-                                                        <form action="{{route('add-remove-like')}}" method="POST" id="like_post_form_{{$post->id}}">
+                                                        <form action="{{route('add-remove-like')}}" class="like_form" method="POST" id="like_post_form_{{$post->id}}">
                                                             @csrf
                                                             <input type="hidden" name="post_id" value="{{$post->id}}">
                                                             <input type="hidden" name="post_type" value="{{$post->type}}">
@@ -313,7 +326,7 @@
                                                         </form>
                                                     </a>
                                                     <!-- Post Comments -->
-                                                    <a><img src="{{ asset('assets/images/messsage.png') }}" /><span><span>{{$post->comments()->count()}}</span>
+                                                    <a><img src="{{ asset('assets/images/messsage.png') }}" /><span><span>{{$post->comments_count}}</span>
                                                             Comments</span>
                                                     </a>
                                                     <!-- Post Shares -->
@@ -322,15 +335,20 @@
                                                         <input type="hidden" name="post_id" value="{{$post->id}}">
                                                         <input type="hidden" name="post_type" value="{{$post->type}}">
                                                         <a type="button" onclick="sharePostRequest({{$post->id}});" id="share_post_btn_{{$post->id}}">
-                                                            <img src="{{ asset('assets/images/share.png') }}"><span><span class="share_count">{{$post->shares()->count()}}</span> Shares</span> 
+                                                            <img src="{{ asset('assets/images/share.png') }}"><span><span class="share_count">{{$post->shares_count}}</span> Shares</span> 
                                                         </a>
                                                     </form>
                                                     <!-- Share Post Modal -->
                                                     <div class="overlay hide" id="share_post_container_{{$post->id}}">
                                                         <div class="ques_box ques_box_1">
-                                                            <p class="ques_txt font-17">Copy Post Link</p>        
+                                                            <div class="d-flex justify-content-between align-items-baseline">
+                                                                <div>
+                                                                    <p class="ques_txt font-17">Copy Post Link</p>       
+                                                                </div>
+                                                                <span onclick="CopyPostUrl($(this),'{{route('detail-post-view',['username'=>$post->user->username,'post_number' => $post->post_number,'slug'=>$post->slug_url])}}',{{$post->id}});" class="copybutton"><i class="far fa-clipboard-list"></i></span>
+                                                            </div>
                                                             <div class="share_profile">
-                                                                <p>{{route('detail-post-view',['type'=>$post->type,'slug'=>$post->slug_url])}}</p> 
+                                                                <p>{{$post->slug_url}}</p> 
                                                             </div>     
                                                             <div class="d-flex justify-content-center mt-4">           
                                                                 <button type="button" class="ques_btn suggested_btn text-primary" onclick="SharePostModal({{$post->id}});">
@@ -369,6 +387,8 @@
                         </form>                            
                     @endforeach
                 </div>
+
+                <!--- Private Days List -->
                 <div class="tab-pane fade" id="pills-privte" role="tabpanel" aria-labelledby="pills-privte-tab">
                     @foreach ($privateposts as $post)                        
                     <div class="box_group" id="main_post_container_{{$post->id}}">
@@ -420,7 +440,7 @@
                                                         Views</span></small>                                                    
                                                 <!-- Post Likes -->
                                                 <a class="heart like_post_">
-                                                    <form action="{{route('add-remove-like-private')}}" method="POST" id="like_post_form_{{$post->id}}">
+                                                    <form  class="like_form" action="{{route('add-remove-like-private')}}" method="POST" id="like_post_form_{{$post->id}}">
                                                         @csrf
                                                         <input type="hidden" name="post_id" value="{{$post->id}}">
                                                         <input type="hidden" name="post_type" value="{{$post->type}}">
@@ -470,6 +490,8 @@
                     </form>
                     @endforeach
                 </div>
+
+                <!--- Draft Days List -->
                 <div class="tab-pane fade" id="pills-draft" role="tabpanel" aria-labelledby="pills-draft-tab">
                     @foreach ($draftposts as $post)                        
                         <div class="box_group" id="main_post_container_{{$post->id}}">
@@ -521,7 +543,7 @@
                                                             Views</span></small>                                                    
                                                     <!-- Post Likes -->
                                                     <a class="heart like_post_">
-                                                        <form action="{{route('add-remove-like-draft')}}" method="POST" id="like_post_form_{{$post->id}}">
+                                                        <form  class="like_form" action="{{route('add-remove-like-draft')}}" method="POST" id="like_post_form_{{$post->id}}">
                                                             @csrf
                                                             <input type="hidden" name="post_id" value="{{$post->id}}">
                                                             <input type="hidden" name="post_type" value="{{$post->type}}">
@@ -571,12 +593,14 @@
                         </form>
                     @endforeach
                 </div>
+
+                <!--- Save Days List -->
                 <div class="tab-pane fade" id="pills-saved" role="tabpanel" aria-labelledby="pills-saved-tab">
                     @foreach ($saveposts as $save)                        
-                        @php
-                            $post = $save->post;
-                        @endphp
-                        <div class="box_group" id="main_post_container_{{$post->id}}">
+                        <div class="box_group" id="main_post_container_save_{{$save->id}}">
+                            @php
+                                $post = $save->post;
+                            @endphp
                             <ul class="msg_box mb-3 mb-sm-5">
                                 <li class="days-ago">
                                     <p>{{ $post->post_number }}<sup>th</sup><br />day</p>
@@ -584,11 +608,11 @@
                                 <li class="row align-items-center">
                                     <div class="col-lg-12">
                                         <div class="msg_extras_container d-flex">                                            
-                                            <a class="heart">
-                                                <form action="{{route('save-post')}}" method="POST" id="save_post_form_{{$post->id}}">
+                                            <a class="heart" style="width: 17px;">
+                                                <form action="{{route('save-post')}}" method="POST" id="save_post_form_{{$save->id}}">
                                                     @csrf
                                                     <input type="hidden" name="post_id" value="{{$post->id}}">
-                                                    <button class="like_button p-0" type="button" onclick="SavePostRequest({{$post->id}});" id="save_post_btn_{{$post->id}}">
+                                                    <button class="like_button p-0" type="button" onclick="SavePostRequest({{$save->id}},1);" id="save_post_btn_{{$save->id}}">
                                                         @if ($post->saves()->where('user_id', Auth::user()->id)->exists())                                                
                                                             <img class="red-heart d-block" style="margin-bottom: -8px;" src="{{ asset('assets/images/bookmark-blue.png') }}">
                                                         @else
@@ -597,27 +621,6 @@
                                                     </button>
                                                 </form>
                                             </a>
-                                            <button class="msg_extras_btn d-flex flex-column">
-                                                <span class="caret"></span>
-                                                <span class="caret"></span>
-                                                <span class="caret"></span>
-                                            </button>
-                                            <ul class="msg_extras_list d-flex flex-column hide">   
-                                                <li class="msg_extra p-1 px-3 editButtonInner">
-                                                    <a class="editButton" href="{{route('edit-post-view',['type'=>$post->type,'slug'=>$post->slug_url])}}">
-                                                        <i class="fa fa-edit side_icon"></i>
-                                                        Edit
-                                                    </a>
-                                                </li>                                                
-                                                <li class="msg_extra p-1 px-3" onclick="ShowDeleteModal({{$post->id}})" id="delete_post_btn_{{$post->id}}">
-                                                    <i class="fa fa-trash-alt side_icon"></i>
-                                                    Delete
-                                                </li>                                                
-                                                <li class="msg_extra p-1 px-3 pb-2">
-                                                    <i class="fa fa-times-circle side_icon"></i>
-                                                    Cancel
-                                                </li>
-                                            </ul>
                                         </div>
                                         <div class="right_part">
                                             <ul class="date_time d-flex">
@@ -628,7 +631,7 @@
                                                 </li>
                                             </ul>
                                             <h3>
-                                                <a href="{{route('detail-post-view',['type'=>$post->type,'slug'=>$post->slug_url])}}">{{$post->title}}</a>
+                                                <a href="{{route('detail-post-view',['username'=>$post->user->username,'post_number' => $post->post_number,'slug'=>$post->slug_url])}}">{{$post->title}}</a>
                                             </h3>
                                             <p>
                                                 {!! Str::limit($post->desc, 200, ' ...') !!}
@@ -641,7 +644,7 @@
                                                             Views</span></small>                                                    
                                                     <!-- Post Likes -->
                                                     <a class="heart like_post_">
-                                                        <form action="{{route('add-remove-like')}}" method="POST" id="like_post_form_{{$post->id}}">
+                                                        <form action="{{route('add-remove-like')}}"  class="like_form" method="POST" id="like_post_form_{{$post->id}}">
                                                             @csrf
                                                             <input type="hidden" name="post_id" value="{{$post->id}}">
                                                             <input type="hidden" name="post_type" value="{{$post->type}}">
@@ -666,12 +669,18 @@
                                                             <img src="{{ asset('assets/images/share.png') }}"><span><span class="share_count">{{$post->shares()->count()}}</span> Shares</span> 
                                                         </a>
                                                     </form>
+
                                                     <!-- Share Post Modal -->
                                                     <div class="overlay hide" id="share_post_container_{{$post->id}}">
                                                         <div class="ques_box ques_box_1">
-                                                            <p class="ques_txt font-17">Copy Post Link</p>        
+                                                            <div class="d-flex justify-content-between align-items-baseline">
+                                                                <div>
+                                                                    <p class="ques_txt font-17">Copy Post Link</p>       
+                                                                </div>
+                                                                <span onclick="CopyPostUrl($(this),'{{route('detail-post-view',['username'=>$post->user->username,'post_number' => $post->post_number,'slug'=>$post->slug_url])}}',{{$post->id}});" class="copybutton"><i class="far fa-clipboard-list"></i></span>
+                                                            </div>
                                                             <div class="share_profile">
-                                                                <p>{{route('detail-post-view',['type'=>$post->type,'slug'=>$post->slug_url])}}</p> 
+                                                                <p>{{$post->slug_url}}</p> 
                                                             </div>     
                                                             <div class="d-flex justify-content-center mt-4">           
                                                                 <button type="button" class="ques_btn suggested_btn text-primary" onclick="SharePostModal({{$post->id}});">
@@ -687,29 +696,10 @@
                                 </li>
                             </ul>
                         </div>
-                        <form action="{{route('delete-public-post')}}" method="POST" id="delete_post_form_{{$post->id}}">
-                            @csrf
-                            <input type="hidden" name="post_type" value="{{$post->type}}">
-                            <input type="hidden" name="post_id" value="{{$post->id}}">
-                            <!-- Share Post Modal -->
-                            <div class="overlay hide" id="delete_post_container_{{$post->id}}">
-                                <div class="ques_box ques_box_1">
-                                    <p class="ques_txt font-17">Are You Sure You Want To Delete This Post</p>        
-                                    <div class="d-flex justify-content-center mt-4">           
-                                        <button type="button" class="btn btn-danger" id="delete_post_btn_{{$post->id}}" onclick="DeletePostRequest({{$post->id}})">
-                                            Delete
-                                        </button>
-                                    </div>    
-                                    <div class="d-flex justify-content-center mt-4">           
-                                        <button type="button" class="ques_btn suggested_btn text-primary" onclick="ShowDeleteModal({{$post->id}});">
-                                            Cancel
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>                            
                     @endforeach
                 </div>
+
+                <!--- Tagged Days List -->
                 <div class="tab-pane fade" id="pills-tagged" role="tabpanel" aria-labelledby="pills-tagged-tab">
                     @for ($i=0;$i<10;$i++)                        
                         <div class="box_group">

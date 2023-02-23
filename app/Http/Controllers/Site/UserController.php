@@ -127,10 +127,17 @@ class UserController extends Controller
         return view('site.user.view-profile',[
             'user' => User::where('id',Auth::user()->id)->with('following','followers')->
                       select('name','email','username','image','thought_of_the_day','website','gender','bio','id')->first(),
-            'publicposts' => Post::where('user_id',$auth->id)->latest()->get(),
-            'privateposts' => Privatepost::where('user_id',$auth->id)->latest()->get(),
-            'draftposts' => Draftpost::where('user_id',$auth->id)->latest()->get(),
-            'saveposts' => Savepost::where('user_id',$auth->id)->with(['post'=>function($query){$query->with('user');}])->latest()->get(),
+            'publicposts' =>Post::where('user_id',$auth->id)->
+                            with('likes')->
+                            withCount('views','shares','comments')->orderByDesc('created_at')->get(),
+            'privateposts' => Privatepost::where('user_id',$auth->id)->
+                                with('likes','views','shares','comments','user')->orderByDesc('created_at')->get(),
+            'draftposts' => Draftpost::where('user_id',$auth->id)->
+                            with('likes','views','shares','comments')->orderByDesc('created_at')->get(),
+            'saveposts' => Savepost::where('user_id',$auth->id)->
+                            with(['post'=>function($query){
+                                $query->with('user','likes','views','shares','comments');
+                            }])->orderByDesc('created_at')->get(),
         ]);
     }
 
@@ -409,13 +416,14 @@ class UserController extends Controller
     public function SearchUserProfile($username){
         $user = User::where('username',$username)->with(['posts','followers','following'])
                 ->select('name','username','image','bio','id')->first();
+        // dd($user->username);
         if (isset($user)) {
             if ($user->id == Auth::user()->id) {
                 return redirect()->route('view-user-profile');
             }
+            return view('site.user.search-profile',[
+                'user' => $user,
+            ]);
         }
-        return view('site.user.search-profile',[
-            'user' => $user,
-        ]);
     }
 }

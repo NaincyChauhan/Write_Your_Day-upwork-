@@ -45,7 +45,7 @@ function setFavicons(favImg) {
     setFavicon.setAttribute('href', favImg);
     headTitle.appendChild(setFavicon);
 }
-setFavicons('assets/images/1.png');
+setFavicons('./assets/images/1.png');
 
 //verification
 function verifyUser() {

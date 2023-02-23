@@ -3536,6 +3536,7 @@ section.sort-posts {
 #user-photo>.photo {
   max-width: 100%;
   border: none;
+  border-radius: 0px;
 }
 .follow-user-img{
   width: 48px;
@@ -3568,4 +3569,38 @@ section.sort-posts {
 .left_part .radious_img img {
   height: auto;
   border-radius: 0%;
+}
+.like_form{
+  margin-bottom: -4px;
+}
+#user_send_report{
+  margin-right: 15px;
+    background: var(--main_color);
+    color: #fff;
+}
+.copybutton{
+  font-size: 22px !important;
+    padding: 8px;
+    cursor: pointer;
+    color: #504646;
+}
+.search-user-image{
+  width: 104px;
+    height: 104px;
+    border-radius: 50%;
+    margin-right: 60px;
+    overflow: hidden;
+}
+.search-user-image > img{
+  border-radius: 0px !important;
+}
+.comment-user-image{
+  width: 57px;
+  height: 57px;
+  margin-right: 18px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+.comment-user-image > img{
+  border-radius: 0px !important;
 }

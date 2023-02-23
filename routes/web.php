@@ -16,6 +16,8 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\LikecommentController;
 use App\Http\Controllers\SavepostController;
 use App\Http\Controllers\FollowuserController;
+use App\Http\Controllers\BlockuserController;
+use App\Http\Controllers\ReportuserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -51,50 +53,59 @@ Route::get('get/session/data', [SiteUserController::class, 'callMailFunc']);
 
 // User Routes
 Route::group(['middleware' => ['auth:sanctum','verified']], function () {
-    Route::get('/', [SiteHomeController::class, 'index'])->name('home');
-    Route::get('/friends', [SiteHomeController::class, 'profileSearch'])->name('friends');
-    
-    // User Sections
-    Route::get('/profile', [SiteUserController::class, 'viewProfile'])->name('view-user-profile');
-    Route::get('/edit/profile', [SiteUserController::class, 'editProfile'])->name('user-profile');
-    Route::post('/update/profile', [SiteUserController::class, 'updateProfile'])->name('edit-profile');
-    Route::post('update-password', [UserController::class, 'updatePassword'])->name('update-password');
+    Route::group(['middleware' => ['auth:sanctum','verified','check_suspend_user']], function () {
+        Route::get('/', [SiteHomeController::class, 'index'])->name('home');
+        Route::get('/friends', [SiteHomeController::class, 'profileSearch'])->name('friends');
+        
+        // User Sections
+        Route::get('/profile', [SiteUserController::class, 'viewProfile'])->name('view-user-profile');
+        Route::get('/edit/profile', [SiteUserController::class, 'editProfile'])->name('user-profile');
+        Route::post('/update/profile', [SiteUserController::class, 'updateProfile'])->name('edit-profile');
+        Route::post('update-password', [UserController::class, 'updatePassword'])->name('update-password');
+        Route::post('user/delete/request', [SiteUserController::class, 'deleteRequest'])->name('user-delete-request');
+        Route::post('block/user/request', [BlockuserController::class, 'store'])->name('user-block-request');
+        Route::post('report/user/request', [ReportuserController::class, 'store'])->name('user-report-request');
+        Route::post('/update/profile/image', [SiteUserController::class, 'updateProfileImage'])->name('update-profile-image');
+        Route::get('/load/posts/', [SiteHomeController::class, 'LoadPostWithAjax'])->name('load-more-post');
+
+        // Post Sections
+        Route::get('/write-page', [SitePostController::class, 'CreatePost'])->name('create-post');
+        Route::post('/store-post', [SitePostController::class, 'StorePost'])->name('store-post');
+        Route::post('auto/draft/store-post', [SitePostController::class, 'autoDraftPostRequest'])->name('auto-draft-store-post');
+        Route::get('/edit/{type}/{slug}', [SitePostController::class, 'editPostView'])->name('edit-post-view');
+        Route::post('/update/post/{type}/{id}', [SitePostController::class, 'updatePost'])->name('update-post-view');
+        Route::get('{username}/day/{post_number}/{slug}', [SitePostController::class, 'PublicPostDetailView'])->name('detail-post-view');
+        Route::get('/detail/{type}/{slug}', [SitePostController::class, 'PrivatePostDetailView'])->name('detail-post-view-private');
+        Route::get('/day/detail/{type}/{slug}', [SitePostController::class, 'draftPostDetailView'])->name('detail-post-view-draft');
+        Route::post('/delete/public/post/', [SitePostController::class, 'deletePublicPost'])->name('delete-public-post');
+        Route::post('/delete/private/post/', [SitePostController::class, 'deletePrivatePost'])->name('delete-private-post');
+        Route::post('/delete/draft/post/', [SitePostController::class, 'deleteDraftPost'])->name('delete-draft-post');
+        Route::post('/report/post/', [SitePostController::class, 'reportPost'])->name('report-post');
+        Route::post('/hide/post/', [SitePostController::class, 'hidePost'])->name('hide-post');
+        Route::get('/print/{username}/{post_number}/{slug}', [SitePostController::class, 'printPost'])->name('print-post');
+
+        // Post Like,Share,Comment,View, Follow
+        Route::get('/add-post-view', [SitePostController::class, 'addPostView'])->name('add-post-view');
+        Route::post('/post-share', [SitePostController::class, 'PostShare'])->name('share-post');
+        Route::post('/comment', [CommentController::class, 'store'])->name('add-comment');
+        Route::post('/like/comment', [LikecommentController::class, 'store'])->name('like-comment');
+        Route::get('/load/comments', [CommentController::class, 'loadComments'])->name('load-comment');
+        Route::post('/like/post', [SitePostController::class, 'publicPostLike'])->name('add-remove-like');
+        Route::post('/like/private/post', [SitePostController::class, 'privatePostLike'])->name('add-remove-like-private');
+        Route::post('/like/draft/post', [SitePostController::class, 'draftPostLike'])->name('add-remove-like-draft');
+        Route::post('/save/post', [SavepostController::class, 'store'])->name('save-post');
+        Route::post('/follow/unfollow/user', [FollowuserController::class, 'store'])->name('follow-unfollow-user');
+        Route::post('/remove/follower/user/{id}', [FollowuserController::class, 'destroy'])->name('remove-follower-user');
+
+        // Search Post and Friends
+        Route::get('/search', [SitePostController::class, 'searchPostFriends'])->name('search-post-friends');
+        Route::get('/search/profile/{username}', [SiteUserController::class, 'SearchUserProfile'])->name('search-user-profile');
+    });
+    // Suspend User Urls
     Route::post('help-center', [HelpcenterController::class, 'store'])->name('help-center');
-    Route::post('user/delete/request', [SiteUserController::class, 'deleteRequest'])->name('user-delete-request');
-
-    // Post Sections
-    Route::get('/write-page', [SitePostController::class, 'CreatePost'])->name('create-post');
-    Route::post('/store-post', [SitePostController::class, 'StorePost'])->name('store-post');
-    Route::post('auto/draft/store-post', [SitePostController::class, 'autoDraftPostRequest'])->name('auto-draft-store-post');
-    Route::get('/edit/{type}/{slug}', [SitePostController::class, 'editPostView'])->name('edit-post-view');
-    Route::post('/update/post/{type}/{id}', [SitePostController::class, 'updatePost'])->name('update-post-view');
-    Route::get('/day/{type}/{slug}', [SitePostController::class, 'PublicPostDetailView'])->name('detail-post-view');
-    Route::get('/detail/{type}/{slug}', [SitePostController::class, 'PrivatePostDetailView'])->name('detail-post-view-private');
-    Route::get('/day/detail/{type}/{slug}', [SitePostController::class, 'draftPostDetailView'])->name('detail-post-view-draft');
-    Route::post('/delete/public/post/', [SitePostController::class, 'deletePublicPost'])->name('delete-public-post');
-    Route::post('/delete/private/post/', [SitePostController::class, 'deletePrivatePost'])->name('delete-private-post');
-    Route::post('/delete/draft/post/', [SitePostController::class, 'deleteDraftPost'])->name('delete-draft-post');
-    Route::post('/report/post/', [SitePostController::class, 'reportPost'])->name('report-post');
-    Route::post('/hide/post/', [SitePostController::class, 'hidePost'])->name('hide-post');
-    Route::get('/load/posts/', [SiteHomeController::class, 'LoadPostWithAjax'])->name('load-more-post');
-
-    // Post Like,Share,Comment,View, Follow
-    Route::get('/add-post-view', [SitePostController::class, 'addPostView'])->name('add-post-view');
-    Route::post('/post-share', [SitePostController::class, 'PostShare'])->name('share-post');
-    Route::post('/comment', [CommentController::class, 'store'])->name('add-comment');
-    Route::post('/like/comment', [LikecommentController::class, 'store'])->name('like-comment');
-    Route::get('/load/comments', [CommentController::class, 'loadComments'])->name('load-comment');
-    Route::post('/like/post', [SitePostController::class, 'publicPostLike'])->name('add-remove-like');
-    Route::post('/like/private/post', [SitePostController::class, 'privatePostLike'])->name('add-remove-like-private');
-    Route::post('/like/draft/post', [SitePostController::class, 'draftPostLike'])->name('add-remove-like-draft');
-    Route::post('/update/profile/image', [SiteUserController::class, 'updateProfileImage'])->name('update-profile-image');
-    Route::post('/save/post', [SavepostController::class, 'store'])->name('save-post');
-    Route::post('/follow/unfollow/user', [FollowuserController::class, 'store'])->name('follow-unfollow-user');
-    Route::post('/remove/follower/user/{id}', [FollowuserController::class, 'destroy'])->name('remove-follower-user');
-
-    // Search Post and Friends
-    Route::get('/search', [SitePostController::class, 'searchPostFriends'])->name('search-post-friends');
-    Route::get('/search/profile/{username}', [SiteUserController::class, 'SearchUserProfile'])->name('search-user-profile');
+    Route::get('/home/feed', [SiteHomeController::class, 'suspend_user_home'])->name('suspend_user_home');
+    Route::get('/load/posts/2', [SiteHomeController::class, 'LoadPostWithAjax_2'])->name('load-more-post-2');
+    Route::get('/account/help', [SiteHomeController::class, 'AccountHelp'])->name('account-help');
 });
 
 Route::group(['middleware' => ['auth:sanctum',  'verified', 'role']], function () {

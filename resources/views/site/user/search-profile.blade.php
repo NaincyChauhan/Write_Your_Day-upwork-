@@ -26,86 +26,129 @@
 <link rel="stylesheet" href="{{ asset('assets/css/profile.css') }}">
 @endsection
 @section('content')    
-<div class="followers_container overlay hide">
-    <div class="followers_box">
-        <div class="head d-flex align-items-center">
-            <h4 class="title">Followers</h4>
-            <span class="close_followers cancel_btn">X</span>
-        </div>
-        <ul class="follower_list">
-            @foreach ($user->followers as $follwer)                    
-                <div id="remove_follower_user_container_{{$follwer->id}}">
-                    @php
-                        $user_ = $follwer->follow_user;
-                    @endphp
-                    <li class="follower d-flex align-items-center">
-                        <div class="follow-user-img">
-                            <img class="w-100" src="{{ isset($user_->image) ? asset('storage/users/'.$user_->image) : asset('assets/images/images.png') }}" alt="profile_img" class="follower_img d-inline-block" />
-                        </div>
-                        <div class="follower_name">
-                            <p class="username">{{$user_->username}}</p>
-                            <p>{{$user_->name}}</p>
-                        </div>
-                        @php
-                            $is_following  = Auth::user()->following()->where('following_user_id', $user_->id)->exists();
-                        @endphp
-                        @if (Auth::user()->id !== $user_->id )   
-                            <button onclick="FollowUnFollowRequest({{$user_->id}},$(this));" class="main_btn follow_btn mla">
-                                {{$is_following == false ? 'Follow' : 'Following'}}
-                            </button>
-                        @endif
-                    </li>
-                    <form action="{{route('follow-unfollow-user')}}" id="follow_unfollow_user_form_{{$user_->id}}" method="POST">
-                        @csrf
-                        <input type="hidden" name="username" value="{{$user_->username}}">
-                    </form>
-                    <form action="{{route('remove-follower-user',['id'=>$follwer->id])}}" id="remove_follower_user_form_{{$follwer->id}}" method="POST">
-                        @csrf
-                    </form>
+        <div class="report_user_container overlay hide" id="report_user_container">
+            <form action="{{route('user-report-request')}}" method="POST" id="user-report-form">
+                @csrf
+                <div class="report_msg_box d-flex flex-column">
+                    <div class="main-form-class">
+                        <input type="hidden" name="user_id" value="{{$user->id}}">
+                        <textarea class="w-100"  maxlength="600" name="report" id="report_msg" cols="30" rows="10" placeholder="What did glad do?"></textarea>
+                        <span class="msg_error"></span>
+                    </div>
+                    <div class="report_btns">
+                        <button  type="submit" id="user_send_report" class="report_msg_btn">
+                            Send <i class="fa fa-paper-plane"></i>
+                        </button>
+                        <button  type="button"  id="" class="cancel_btn report_msg_btn" onclick="ShowUserReportModal()">
+                            Close <i class="fa fa-times"></i>
+                        </button>
+                    </div>
                 </div>
-            @endforeach
-        </ul>
-    </div>
-</div>
-<div class="following_container hide overlay">
-    <div class="following_box">
-        <div class="head d-flex align-items-center">
-            <h4 class="title">Following</h4>
-            <span class="close_following cancel_btn">X</span>
+            </form>
         </div>
-        <ul class="following_list">
-            @foreach ($user->following as $following_)                    
-                @php
-                    $user_ = $following_->following_user;
-                @endphp
-                <a>
-                    <li class="follower d-flex align-items-center">
-                        <div class="follow-user-img">
-                            <img class="w-100" src="{{ isset($user_->image) ? asset('storage/users/'.$user_->image) : asset('assets/images/images.png') }}" alt="profile_img" class="follower_img d-inline-block" />
-                        </div>
-                        <div class="follower_name">
-                            <p class="username">{{$user_->username}}</p>
-                            <p>{{$user_->name}}</p>
-                        </div>
+
+        <div class="report_msg_container overlay hide" id="report_msg_container">
+            <form action="{{route('report-post')}}" method="POST" id="post-report-form">
+                @csrf
+                <input type="hidden" name="post_id" id="report_post_id">
+                <div class="report_msg_box d-flex flex-column">
+                    <div class="main-form-class">
+                        <textarea class="w-100" name="report" id="report_msg" cols="30" rows="10"
+                        maxlength="600"
+                        placeholder="What did glad do?"></textarea>
+                        <span class="report_msg_error"></span>
+                    </div>
+                    <div class="report_btns">
+                        <button type="submit" id="send_report" class="report_msg_btn">
+                        Send <i class="fa fa-paper-plane"></i>
+                        </button>
+                        <button type="button" id="close_report" class="report_msg_btn cancel_btn">
+                        Close <i class="fa fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    <div class="followers_container overlay hide">
+        <div class="followers_box">
+            <div class="head d-flex align-items-center">
+                <h4 class="title">Followers</h4>
+                <span class="close_followers cancel_btn">X</span>
+            </div>
+            <ul class="follower_list">
+                @foreach ($user->followers as $follwer)                    
+                    <div id="remove_follower_user_container_{{$follwer->id}}">
+                        @php
+                            $user_ = $follwer->follow_user;
+                        @endphp
+                        <li class="follower d-flex align-items-center">
+                            <div class="follow-user-img">
+                                <img class="w-100" src="{{ isset($user_->image) ? asset('storage/users/'.$user_->image) : asset('assets/images/images.png') }}" alt="profile_img" class="follower_img d-inline-block" />
+                            </div>
+                            <div class="follower_name">
+                                <p class="username">{{$user_->username}}</p>
+                                <p>{{$user_->name}}</p>
+                            </div>
                             @php
-                                // $is_following  = $user_->following()->where('following_user_id', Auth::user()->id)->exists();
                                 $is_following  = Auth::user()->following()->where('following_user_id', $user_->id)->exists();
                             @endphp
-                            @if (Auth::user()->id != $user_->id )                            
-                                <button onclick="FollowUnFollowRequest({{$user_->id}},$(this));"  class="main_btn follow_btn mla">
+                            @if (Auth::user()->id !== $user_->id )   
+                                <button onclick="FollowUnFollowRequest({{$user_->id}},$(this));" class="main_btn follow_btn mla">
                                     {{$is_following == false ? 'Follow' : 'Following'}}
                                 </button>
                             @endif
-                    </li>
-                </a>
-                <form action="{{route('follow-unfollow-user')}}" id="follow_unfollow_user_form_{{$user_->id}}" method="POST">
-                    @csrf
-                    <input type="hidden" name="username" value="{{$user_->username}}">
-                </form>        
-            @endforeach
-        </ul>
+                        </li>
+                        <form action="{{route('follow-unfollow-user')}}" id="follow_unfollow_user_form_{{$user_->id}}" method="POST">
+                            @csrf
+                            <input type="hidden" name="username" value="{{$user_->username}}">
+                        </form>
+                        <form action="{{route('remove-follower-user',['id'=>$follwer->id])}}" id="remove_follower_user_form_{{$follwer->id}}" method="POST">
+                            @csrf
+                        </form>
+                    </div>
+                @endforeach
+            </ul>
+        </div>
     </div>
-</div>
+    <div class="following_container hide overlay">
+        <div class="following_box">
+            <div class="head d-flex align-items-center">
+                <h4 class="title">Following</h4>
+                <span class="close_following cancel_btn">X</span>
+            </div>
+            <ul class="following_list">
+                @foreach ($user->following as $following_)                    
+                    @php
+                        $user_ = $following_->following_user;
+                    @endphp
+                    <a>
+                        <li class="follower d-flex align-items-center">
+                            <div class="follow-user-img">
+                                <img class="w-100" src="{{ isset($user_->image) ? asset('storage/users/'.$user_->image) : asset('assets/images/images.png') }}" alt="profile_img" class="follower_img d-inline-block" />
+                            </div>
+                            <div class="follower_name">
+                                <p class="username">{{$user_->username}}</p>
+                                <p>{{$user_->name}}</p>
+                            </div>
+                                @php
+                                    // $is_following  = $user_->following()->where('following_user_id', Auth::user()->id)->exists();
+                                    $is_following  = Auth::user()->following()->where('following_user_id', $user_->id)->exists();
+                                @endphp
+                                @if (Auth::user()->id != $user_->id )                            
+                                    <button onclick="FollowUnFollowRequest({{$user_->id}},$(this));"  class="main_btn follow_btn mla">
+                                        {{$is_following == false ? 'Follow' : 'Following'}}
+                                    </button>
+                                @endif
+                        </li>
+                    </a>
+                    <form action="{{route('follow-unfollow-user')}}" id="follow_unfollow_user_form_{{$user_->id}}" method="POST">
+                        @csrf
+                        <input type="hidden" name="username" value="{{$user_->username}}">
+                    </form>        
+                @endforeach
+            </ul>
+        </div>
+    </div>
     <section class="profile-detail-outer position-relative">
         <div class="container">
             <div class="row">
@@ -134,8 +177,8 @@
                         </button>
                         <div class="overlay_container hide" id="user_profile_more_option">
                             <ul class="more_options">
-                                <li class="option" id="block">Block</li>
-                                <li class="option report">Report</li>
+                                <li onclick="BlockPostRequest($(this));" class="option" id="block">{{auth()->user()->blocking->contains('blocked_user_id', $user->id) ? 'Unblock' : 'Block'}}</li>
+                                <li class="option" onclick="ShowUserReportModal();">Report</li>
                                 <li class="option" id="cancel">Cancel</li>
                             </ul>
                         </div>
@@ -149,7 +192,7 @@
                             <div
                                 class="d-flex profile-name mb-3 align-items-center justify-content-center flex-wrap flex-sm-nowrap">
                                 <h4 class="mb-0 d-flex align-items-center justify-content-center gap-3">
-                                    <span> {{$user->name}}
+                                    <span>{{ Str::title($user->name) }}
                                         <span class="d-inline-flex align-items-center"><img src="{{asset('assets/img/verified.svg')}}"
                                                 alt="verified" width="18" height="18" /></span></span>
                                     <div class="profile-detail-content-btn d-inline-block d-sm-none">
@@ -233,16 +276,24 @@
                         <div class="tab-content" id="pills-tabContent">
                             <div class="tab-pane fade show active box_group" id="pills-days" role="tabpanel"
                                 aria-labelledby="pills-days-tab">
-                                @foreach ($user->posts as $post)
+                                @foreach ($user->posts()->orderByDesc('created_at')->get() as $post)
                                     <div class="box_group" id="main_post_container_{{$post->id}}">
                                         <ul class="msg_box mb-3 mb-sm-5">
                                             <li class="days-ago">
-                                                <p>{{ $post->post_number }}<sup>th</sup><br />day</p>
+                                                @if ($post->post_number==1)                                                    
+                                                    <p>{{ $post->post_number }}<sup>st</sup><br />day</p>
+                                                @elseif($post->post_number==2)
+                                                    <p>{{ $post->post_number }}<sup>nd</sup><br />day</p>
+                                                @elseif($post->post_number==3)
+                                                    <p>{{ $post->post_number }}<sup>rd</sup><br />day</p>
+                                                @else
+                                                    <p>{{ $post->post_number }}<sup>th</sup><br />day</p>
+                                                @endif   
                                             </li>
                                             <li class="row align-items-center">
                                                 <div class="col-lg-12">
                                                     <div class="msg_extras_container d-flex">
-                                                        <a class="heart">
+                                                        <a class="heart" style="width: 17px;">
                                                             <form action="{{route('save-post')}}" method="POST" id="save_post_form_{{$post->id}}">
                                                                 @csrf
                                                                 <input type="hidden" name="post_id" value="{{$post->id}}">
@@ -255,24 +306,6 @@
                                                                 </button>
                                                             </form>
                                                         </a>
-                                                        <button class="msg_extras_btn d-flex flex-column">
-                                                            <span class="caret"></span>
-                                                            <span class="caret"></span>
-                                                            <span class="caret"></span>
-                                                        </button>
-                                                        <ul class="msg_extras_list d-flex flex-column hide">
-                                                            {{-- <li class="msg_extra p-1 px-3 pt-2">
-                                                                <i class="fa fa-eye-slash side_icon"></i> Hide
-                                                            </li> --}}
-                                                            <li class="msg_extra p-1 px-3"  onclick="ShowPostReportModal({{$post->id}})">
-                                                                <i class="fa fa-user-alt-slash side_icon"></i>
-                                                                Report
-                                                            </li>
-                                                            <li class="msg_extra p-1 px-3 pb-2">
-                                                                <i class="fa fa-times-circle side_icon"></i>
-                                                                Cancel
-                                                            </li>
-                                                        </ul>
                                                     </div>
                                                     <div class="right_part">
                                                         <ul class="date_time d-flex">
@@ -283,10 +316,10 @@
                                                             </li>
                                                         </ul>
                                                         <h3>
-                                                            <a href="{{route('detail-post-view',['type'=>$post->type,'slug'=>$post->slug_url])}}">{{$post->title}}</a>
+                                                            <a href="{{route('detail-post-view',['username'=>$post->user->username,'post_number' => $post->post_number,'slug'=>$post->slug_url])}}">{{isset($post->seo_title) ? $post->seo_title : $post->title}}</a>
                                                         </h3>
                                                         <p>
-                                                            {!! Str::limit($post->desc, 200, ' ...') !!}
+                                                            {!! Str::limit(isset($post->meta_desc) ? $post->meta_desc : $post->desc, 200, ' ...') !!}
                                                         </p>
     
                                                         <ul
@@ -295,7 +328,7 @@
                                                                 <small><img src="{{ asset('assets/images/eye.png') }}" /><span><span>{{$post->views()->count()}}</span>
                                                                     Views</span></small>    
                                                                 <a class="heart like_post_">
-                                                                    <form action="{{route('add-remove-like')}}" method="POST" id="like_post_form_{{$post->id}}">
+                                                                    <form class="mb-0" style="margin-top: -5px;" action="{{route('add-remove-like')}}" method="POST" id="like_post_form_{{$post->id}}">
                                                                         @csrf
                                                                         <input type="hidden" name="post_id" value="{{$post->id}}">
                                                                         <input type="hidden" name="post_type" value="{{$post->type}}">
@@ -311,7 +344,7 @@
                                                                  <a class="d-flex"><img src="{{ asset('assets/images/messsage.png') }}" /><span class="d-flex"><span class="d-block pr-4">{{$post->comments()->count()}}</span>
                                                                         Comments</span>
                                                                 </a>
-                                                                <form action="{{route('share-post')}}" method="POST"  id="share_post_form_{{$post->id}}">
+                                                                <form class="mb-0" action="{{route('share-post')}}" method="POST"  id="share_post_form_{{$post->id}}">
                                                                     @csrf
                                                                     <input type="hidden" name="post_id" value="{{$post->id}}">
                                                                     <input type="hidden" name="post_type" value="{{$post->type}}">
@@ -322,9 +355,14 @@
                                                                 <!-- Share Post Modal -->
                                                                 <div class="overlay hide" id="share_post_container_{{$post->id}}">
                                                                     <div class="ques_box ques_box_1">
-                                                                        <p class="ques_txt font-17">Copy Post Link</p>        
+                                                                        <div class="d-flex justify-content-between align-items-baseline">
+                                                                            <div>
+                                                                                <p class="ques_txt font-17">Copy Post Link</p>       
+                                                                            </div>
+                                                                            <span onclick="CopyPostUrl($(this),'{{route('detail-post-view',['username'=>$post->user->username,'post_number' => $post->post_number,'slug'=>$post->slug_url])}}',{{$post->id}});" class="copybutton"><i class="far fa-clipboard-list"></i></span>
+                                                                        </div>
                                                                         <div class="share_profile">
-                                                                            <p>{{route('detail-post-view',['type'=>$post->type,'slug'=>$post->slug_url])}}</p> 
+                                                                            <p>{{$post->slug_url}}</p> 
                                                                         </div>     
                                                                         <div class="d-flex justify-content-center mt-4">           
                                                                             <button type="button" class="ques_btn suggested_btn text-primary" onclick="SharePostModal({{$post->id}});">
@@ -339,20 +377,6 @@
                                                 </div>
                                             </li>
                                         </ul>
-                                    </div>
-                                    <div class="report_msg_container overlay hide" id="report_post_container_{{$post->id}}">
-                                        <div class="report_msg_box d-flex flex-column">
-                                            <textarea name="report" id="report_msg" cols="30" rows="10" placeholder="What did glad do?"></textarea>
-                                            <span class="msg_error"></span>
-                                            <div class="report_btns">
-                                                <button id="send_report" class="report_msg_btn">
-                                                    Send <i class="fa fa-paper-plane"></i>
-                                                </button>
-                                                <button id="" class="cancel_btn report_msg_btn" onclick="ShowPostReportModal({{$post->id}})">
-                                                    Close <i class="fa fa-times"></i>
-                                                </button>
-                                            </div>
-                                        </div>
                                     </div>
                                 @endforeach
                             </div>
@@ -451,6 +475,10 @@
         @csrf
         <input type="hidden" name="username" value="{{$user->username}}">
     </form>
+    <form action="{{route('user-block-request')}}" id="block_user_form" method="POST">
+        @csrf
+        <input type="hidden" name="user_id" value="{{$user->id}}">
+    </form>
 @endsection
 <div id="like-popup" >
 </div>
@@ -459,6 +487,7 @@
 <script src="{{ asset('app-assets/plugins/jquery-validation/jquery.validate.min.js') }}"></script>
 <script src="{{ asset('assets/js/msg_extras.js') }}"></script>
 <script src="{{ asset('assets/js/like_share_post.js') }}"></script>
+<script src="{{ asset('assets/js/block_user.js') }}"></script>
 <script>
     function ShowMoreOption() {
         $('#user_profile_more_option').toggleClass('hide');

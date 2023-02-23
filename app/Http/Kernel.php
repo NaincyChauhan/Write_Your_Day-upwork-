@@ -55,6 +55,7 @@ class Kernel extends HttpKernel
     protected $routeMiddleware = [
         'auth' => \App\Http\Middleware\Authenticate::class,
         'role' => \App\Http\Middleware\CheckRoleMiddleware::class,
+        'check_suspend_user' => \App\Http\Middleware\CheckSuspendUser::class,
         'ip' => \App\Http\Middleware\CheckIPMiddleware::class,
         'permission' => \App\Http\Middleware\PermissionMiddleware::class,
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
