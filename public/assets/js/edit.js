@@ -617,6 +617,22 @@ $(function () {
     });
 });
 
+// // Disable Space
+// $(document).ready(function(){
+//     const websiteInput = document.getElementById("website");
+//     websiteInput.addEventListener("keydown", function(event) {
+//         if (event.code === "Space") {
+//         event.preventDefault();
+//         }
+//     });
+
+//     websiteInput.addEventListener("paste", function(event) {
+//         event.preventDefault();
+//         const text = event.clipboardData.getData("text/plain");
+//         const modifiedText = text.replace(/\s/g, "");
+//         document.execCommand("insertText", false, modifiedText);
+//     });
+// });
 // //Tabs Layout Code
 // $("#tabs").tabs({
 //     activate: function (event, ui) {

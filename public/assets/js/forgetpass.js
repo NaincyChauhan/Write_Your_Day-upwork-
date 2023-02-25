@@ -20,8 +20,6 @@ for (let i = 0; i < tooglePasswords.length; i++) {
     }
 }
 $('#send_otp').click(()=>{
-    console.log("send otp function is running");
-    console.log("email value",emailValue,userEmail);
     resendOTP();  
 })
 

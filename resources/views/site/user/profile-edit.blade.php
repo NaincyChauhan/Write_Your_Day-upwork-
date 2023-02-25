@@ -135,7 +135,7 @@
                             <label for="website">Website</label>
                         </div>
                         <div class="grid-65">
-                            <input name="website" value="{{$user->website}}" type="text" id="website" tabindex="4" placeholder="www.writeyourday.com" />
+                            <input name="website" value="{{$user->website}}" type="url" id="website" tabindex="4" placeholder="https://www.writeyourday.com" />
                             <p id="website_error" class="error invalid-feedback"></p>
                         </div>
                     </fieldset>

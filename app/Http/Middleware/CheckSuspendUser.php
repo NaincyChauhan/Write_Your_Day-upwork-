@@ -21,6 +21,10 @@ class CheckSuspendUser
         {
             return redirect()->route('suspend_user_home');
         }
+        // if($user->suspend_mode == 0)
+        // {
+        //     return redirect()->route('home');
+        // }
         return $next($request);
     }
 }

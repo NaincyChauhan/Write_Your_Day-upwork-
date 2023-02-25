@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Comment;
 use App\Models\User;
+use App\Models\Post;
 use Illuminate\Http\Request;
+use App\Notifications\UserNotification;
 use Auth;
 
 class CommentController extends Controller
@@ -44,20 +46,42 @@ class CommentController extends Controller
             'post_id' => 'required',
         ]);
 
-        $comment = new Comment();
-        $comment->content = $request->content;
-        $comment->post_id = $request->post_id;
-        $comment->post_type = $request->post_type;
-        $comment->user_id = $auth_user->id;
-        if (isset($request->parent_id)) {
-            $comment->parent_id = $request->parent_id;
+        $post = Post::where('id',$request->post_id)->
+                select('title','id','user_id','slug_url','post_number')->
+                with(['user'=> function ($query){
+                    $query->select('name','username','id');
+                }])->first();
+        if (isset($post)) {
+            $comment = new Comment();
+            $comment->content = $request->content;
+            $comment->post_id = $request->post_id;
+            $comment->post_type = $request->post_type;
+            $comment->user_id = $auth_user->id;
+            if (isset($request->parent_id)) {
+                $comment->parent_id = $request->parent_id;
+            }
+            $comment->save();
+            
+            if ($auth_user->id != $post->user->id) {
+                $data = [
+                    'user_name' => $auth_user->name,
+                    'user_image' => $auth_user->image,
+                    'subject' => 'commented to your post.',
+                    'desc' => $post->title,
+                    'comment_title'=> substr($request->content,0,10),
+                    'link' =>route('detail-post-view',[
+                            'username'=>$post->user->username,
+                            'post_number'=>$post->post_number,
+                            'slug'=>$post->slug_url]).'#posts_comments_',
+                ];
+                $post->user->notify(new UserNotification($data));    
+            }
+            return view('partial.comment_',[
+                'auth_user' => $auth_user,
+                'comment' => $comment,
+            ]);
         }
-        $comment->save();
-
-        return view('partial.comment_',[
-            'auth_user' => $auth_user,
-            'comment' => $comment,
-        ]);
+        return response()->json(['status'=>0,'message'=>"Something Went Wrong"], 200);
     }
 
     /**

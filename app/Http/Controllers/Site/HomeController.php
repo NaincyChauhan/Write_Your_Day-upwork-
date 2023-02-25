@@ -53,19 +53,31 @@ class HomeController extends Controller
         Session::put('viewed_posts', $viewedPosts);    
 
         // Get Popular Post if todayPosts
-        $popularPosts = Popularpost::with(['post'=>function($query){
-                                                $query->
-                                                withCount('comments','views','shares')->
-                                                with(['likes','user'=>function($query){
-                                                    $query->select('id','username','image','name')
-                                                        ->withCount(['followers']);
-                                                }]);
-                                            }])->take(2)->inRandomOrder()->get();
+        $popularPosts = Popularpost::
+        with(['post'=>function($query) use ($hidesPosts){
+            $query->select('posts.*')->
+            withCount('comments','views','shares')->
+            with(['likes','user'=>function($query){
+                $query->select('id','username','image','name')
+                    ->withCount(['followers']);
+            }]);
+        }])->whereNotIn('post_id', $hidesPosts)->take(2)->inRandomOrder()->get();
+
+        // Load Scroll Posts -------->
+        $posts_ = Post::withCount(['views', 'likes', 'shares','comments'])->
+                        with(['likes','user'=>function($query){
+                            $query->select('id','username','image','name')
+                                    ->withCount(['followers']);
+                        }])
+                        ->whereNotIn('posts.id', $hidesPosts)
+                        ->orderByDesc('created_at')
+                        ->paginate(10, ['*'], 'page', 1);
         
         return view('site.home',[
             'followers_posts' => $todayPosts,
             'posts' => $popularPosts,
             'logged_user' => $auth_user,
+            'posts_' => $posts_
         ]);
     }
 
@@ -109,19 +121,31 @@ class HomeController extends Controller
         Session::put('viewed_posts', $viewedPosts);    
 
         // Get Popular Post if todayPosts
-        $popularPosts = Popularpost::with(['post'=>function($query){
-            $query->
+        $popularPosts = Popularpost::
+        with(['post'=>function($query) use ($hidesPosts){
+            $query->select('posts.*')->
             withCount('comments','views','shares')->
             with(['likes','user'=>function($query){
                 $query->select('id','username','image','name')
                     ->withCount(['followers']);
             }]);
-        }])->take(2)->inRandomOrder()->get();
+        }])->whereNotIn('post_id', $hidesPosts)->take(2)->inRandomOrder()->get();
+
+        // Load Scroll Posts -------->
+        $posts_ = Post::withCount(['views', 'likes', 'shares','comments'])->
+                        with(['likes','user'=>function($query){
+                            $query->select('id','username','image','name')
+                                    ->withCount(['followers']);
+                        }])
+                        ->whereNotIn('posts.id', $hidesPosts)
+                        ->orderByDesc('created_at')
+                        ->paginate(10, ['*'], 'page', 1);
         
         return view('site.suspend_home',[
             'followers_posts' => $todayPosts,
             'posts' => $popularPosts,
             'logged_user' => $auth_user,
+            'posts_' => $posts_
         ]);
     }
 
@@ -234,22 +258,33 @@ class HomeController extends Controller
         foreach ($user->hideposts as $key => $hidepost) {
             $hidesPosts[] = $hidepost->post->id;            
         }
-        // Get Popular Post if todayPosts
-        $popularPosts = Post::withCount(['views', 'likes', 'shares','comments'])->
+        // Load 100 Post Query ---------->
+        // Get Posts
+        // $posts = Post::withCount(['views', 'likes', 'shares','comments'])->
+        //                 with(['likes','user'=>function($query){
+        //                     $query->select('id','username','image','name')
+        //                             ->withCount(['followers']);
+        //                 }])
+        //                 ->whereNotIn('posts.id', $hidesPosts)
+        //                 ->orderByDesc('created_at')
+        //                 ->offset($request->input('offset'))
+        //                 ->limit($request->input('limit'))
+        //                 ->get();
+        // Load 100 Post Query ---------->
+
+        // Load Scroll Posts -------->
+        $posts = Post::withCount(['views', 'likes', 'shares','comments'])->
                         with(['likes','user'=>function($query){
                             $query->select('id','username','image','name')
                                     ->withCount(['followers']);
                         }])
-                        // ->orderByDesc('views_count')
-                        // ->orderByDesc('likes_count')
-                        // ->orderByDesc('shares_count')
                         ->whereNotIn('posts.id', $hidesPosts)
                         ->orderByDesc('created_at')
-                        ->offset($request->input('offset'))
-                        ->limit($request->input('limit'))
-                        ->get();
+                        ->paginate(10, ['*'], 'page', $request->page);
+        // Load Scroll Posts -------->
+
         // return response()->json(['status'=>1,'data'=>$popularPosts], 200);
-        return view('partial.single_post',['posts'=>$popularPosts]);
+        return view('partial.single_post',['posts'=>$posts]);
     }
 
     public function LoadPostWithAjax_2(Request $request){
@@ -264,20 +299,30 @@ class HomeController extends Controller
         foreach ($user->hideposts as $key => $hidepost) {
             $hidesPosts[] = $hidepost->post->id;            
         }
-        // Get Popular Post if todayPosts
-        $popularPosts = Post::withCount(['views', 'likes', 'shares','comments'])->
+        // Load 100 Post Query ---------->
+        // Get Posts
+        // $posts = Post::withCount(['views', 'likes', 'shares','comments'])->
+        //                 with(['likes','user'=>function($query){
+        //                     $query->select('id','username','image','name')
+        //                             ->withCount(['followers']);
+        //                 }])
+        //                 ->whereNotIn('posts.id', $hidesPosts)
+        //                 ->orderByDesc('created_at')
+        //                 ->offset($request->input('offset'))
+        //                 ->limit($request->input('limit'))
+        //                 ->get();
+        // Load 100 Post Query ---------->
+
+        // Load Scroll Posts -------->
+        $posts = Post::withCount(['views', 'likes', 'shares','comments'])->
                         with(['likes','user'=>function($query){
                             $query->select('id','username','image','name')
                                     ->withCount(['followers']);
                         }])
-                        // ->orderByDesc('views_count')
-                        // ->orderByDesc('likes_count')
-                        // ->orderByDesc('shares_count')
                         ->whereNotIn('posts.id', $hidesPosts)
                         ->orderByDesc('created_at')
-                        ->offset($request->input('offset'))
-                        ->limit($request->input('limit'))
-                        ->get();
+                        ->paginate(10, ['*'], 'page', $request->page);
+        // Load Scroll Posts -------->
         // return response()->json(['status'=>1,'data'=>$popularPosts], 200);
         return view('partial.single_post_2',['posts'=>$popularPosts]);
     }

@@ -13,6 +13,7 @@ use App\Models\Sharepost;
 use App\Models\Comment;
 use App\Models\Reportpost;
 use App\Models\Hidepost;
+use App\Notifications\UserNotification;
 use Carbon\Carbon;
 use App\Http\Controllers\Controller;
 use Auth;
@@ -23,23 +24,22 @@ class PostController extends Controller
     // Crate Post View
     public function CreatePost(){
         $user = Auth::user();
-        $postsToday = $user->posts()->whereDate('created_at', today())->count();
         $public_post =  Post::where('user_id',$user->id)->whereDate('created_at', today())->count();
         $public_private = Privatepost::where('user_id',$user->id)->whereDate('created_at', today())->count();
         $public_draft =  Draftpost::where('user_id',$user->id)->whereDate('created_at', today())->count();
         if ($public_post >= 1) {
             return back()->with([
-                'error' => "Public: One Day per day limit reached!",
+                'error' => "One Day per day limit reached!",
             ]);
         }
         if ($public_private >= 1) {
             return back()->with([
-                'error' => "Private: Day limit reached, but today's Private Day can be edited and toggled Public!",
+                'error' => "Day limit reached, but today's Private Day can be edited and toggled Public!",
             ]);
         }
         if ( $public_draft >= 1) {
             return back()->with([
-                'error' => "Draft: Day limit reached, but today's Draft Day can be edited and toggled Public/Private!",
+                'error' => "Day limit reached, but today's Draft Day can be edited and toggled Public/Private!",
             ]);
         }
         $new_post = new Draftpost();
@@ -154,16 +154,18 @@ class PostController extends Controller
         $user = Auth::user();
         $user_id = $user->id;
         if ($type == 0) {
-            $post = Post::where([['slug_url', '=' ,$slug],['type', '=' ,$type],['user_id','=',$user_id]]);
+            $post = Post::where([['slug_url', '=' ,$slug],['type', '=' ,$type],['user_id','=',$user_id]])->
+            select('user_id','title','desc','seo_title','slug_url','meta_desc','type','id','created_at','post_number');
         }
         if ($type == 1) {
-            $post = Privatepost::where([['slug_url', '=' ,$slug],['type', '=' ,$type],['user_id','=',$user_id]]);
+            $post = Privatepost::where([['slug_url', '=' ,$slug],['type', '=' ,$type],['user_id','=',$user_id]])->
+            select('user_id','title','desc','seo_title','slug_url','meta_desc','type','id','created_at');
         }
         if ($type == 2) {
-            $post = Draftpost::where([['slug_url', '=' ,$slug],['type', '=' ,$type],['user_id','=',$user_id]]);
+            $post = Draftpost::where([['slug_url', '=' ,$slug],['type', '=' ,$type],['user_id','=',$user_id]])->
+            select('user_id','title','desc','seo_title','slug_url','meta_desc','type','id','created_at');
         }
         $post = $post->
-                select('user_id','title','desc','seo_title','slug_url','meta_desc','type','id','created_at','post_number')->
                 with(['user'=> function($query){
                     $query->select('id','username','image','name');
                 }])->
@@ -181,9 +183,9 @@ class PostController extends Controller
 
     // Update Post
     public function updatePost($type,$id,Request $request){
-        // dd($request->type);
-        $auth_id = Auth::user()->id;
-        if(isset($request->slug_url))
+        $user = Auth::user();
+        $auth_id = $user->id;
+        if(isset($request->title))
         {
             $request['slug_url'] = (string) Str::of($request->slug_url)->slug('-');
         }
@@ -220,6 +222,37 @@ class PostController extends Controller
         if (!isset($post) || $auth_id != $post->user_id) {
             return abort(404);
         }
+
+        if ($post->type != $request->type) {
+            // dd("debugging1111 post type".$post->type."  this is new type".$request->type);
+            $public_post =  Post::where('user_id',$user->id)->whereDate('created_at', today())->select('id','type','created_at')->first();
+            // dd("this is today created post". $public_post . " __ this is edited post". $post->created_at );
+            if (isset($public_post) && $public_post->created_at->startOfDay() != $post->created_at->startOfDay()) {
+                return response()->json([
+                    'status' => 0, 
+                    'message' => "One Day per day limit reached!",            
+                ], 200);
+            }
+
+            // Check Private Post Type
+            $private_post = Privatepost::where('user_id',$user->id)->whereDate('created_at', today())->select('id','type','created_at')->first();
+            if (isset($private_post) && $private_post->created_at->startOfDay() != $post->created_at->startOfDay()) {
+                return response()->json([
+                    'status' => 0, 
+                    'message' => "Day limit reached, but today's Private Day can be edited and toggled Public!",            
+                ], 200);
+            }
+
+            // check Draft Post 
+            $draft_post =  Draftpost::where('user_id',$user->id)->whereDate('created_at', today())->select('id','type','created_at')->first();
+            if (isset($draft_post) && $draft_post->created_at->startOfDay() != $post->created_at->startOfDay()) {
+                return response()->json([
+                    'status' => 0, 
+                    'message' => "Day limit reached, but today's Draft Day can be edited and toggled Public/Private!",            
+                ], 200);
+            }
+        }
+        // dd("debugging2222 post type".$post->type."  this is new type".$request->type);
 
         // Create New Post
         if ($request->type==0 && $type!=0) {
@@ -402,7 +435,11 @@ class PostController extends Controller
             'post_id' => 'required',
             'post_type' => 'required',
         ]);
-        $post = Post::where('id', $request->post_id)->where('type', $request->post_type)->with('likes')->select('id','type')->first();
+        $post = Post::where('id', $request->post_id)->
+                where('type', $request->post_type)->with(['likes','user'=>function($query){
+                    $query->select('username','id','name');
+                }])->
+                select('id','type','user_id','slug_url','post_number','title')->first();
         if (!$post) {
             return response()->json(['status' => 0,'message' => 'Something went wrong',], 404);
         }
@@ -413,6 +450,21 @@ class PostController extends Controller
         }
 
         $like_post=  $this->LikePost($request,$user_id);
+        if ($user_id != $post->user_id) {
+            $data = [
+                'user_name' => $user->name,
+                'user_image' => $user->image,
+                'subject' => 'Reacted To Your Post',
+                'desc' => $post->title,
+                'comment_title'=>'',
+                'link' => route('detail-post-view',[
+                    'username'=>$post->user->username,
+                    'post_number'=>$post->post_number,
+                    'slug'=>$post->slug_url
+                ]),
+            ];
+            $this->sendNotification($data,$post->user_id);
+        }
         if ($like_post) {
             return response()->json(['status' => 1,'message' => 'Post Liked! ','type' => 1], 200);
         }
@@ -551,69 +603,95 @@ class PostController extends Controller
     // Search Post and Friends
     public function searchPostFriends(Request $request){
         if ($request->type == 1) {
-            // dd("the request type is Friends", $request->type);
-            $users =  User:: Where('username','like','%'.$request->search.'%')->
-                            orWhere('name','like','%'.$request->search.'%')->
-                            orWhere('email','like','%'.$request->search.'%')->
-                            whereNotIn('id',[Auth::user()->id])->
-                            with('followers','following')->
-                            select('name','username','id','image','thought_of_the_day','bio','website','email')->get();
-            
-            if($users->count() < 1){
-                $users =  User::
-                            select('name','username','id','image','thought_of_the_day','bio','website','email')->
-                            orderBy('created_at', 'desc')->take(10)->get();                
-            }
+            $users = $this->searchUser($request);
             return view('site.user.search-users',[
                 'users' => $users,
                 'search_query'=>$request->search,
             ]);
 
         }else{
-            $user = User::where('id',Auth::user()->id)->
-                with(['hideposts'=> function($query){
-                    $query->with(['post'=>function($query){
-                        $query->select('id');
-                    }]);
-                }])->first();
-            // User Hide Posts
-            $hidesPosts = [];
-            foreach ($user->hideposts as $key => $hidepost) {
-                $hidesPosts[] = $hidepost->post->id;            
-            }
-            $posts =Post::where(function($q) use ($request){
-                        $q->where('title', 'LIKE', '%'.$request->search.'%')
-                        ->orWhere('desc', 'LIKE', '%'.$request->search.'%')
-                        ->orWhere('slug_url', 'LIKE', '%'.$request->search.'%')
-                        ->orWhere('seo_title', 'LIKE', '%'.$request->search.'%')
-                        ->orWhere('meta_desc', 'LIKE', '%'.$request->search.'%');
-                    })->
-                    whereNotIn('posts.id', $hidesPosts)->
-                    withCount(['views','shares','comments'])->
-                    with(['likes','user'=> function($query){
-                        $query->select('name','username','id','image')->
-                        withCount('followers')->
-                        with('following');
-                    }])->
-                    select('seo_title','title','desc','meta_desc','post_number','slug_url','created_at','user_id','id')->get();
-            if($posts->count() < 1){
-                $posts =Post::withCount(['views','shares','comments'])->
-                        whereNotIn('posts.id', $hidesPosts)->
-                        with(['likes','user'=> function($query){
-                            $query->select('name','username','id','image')->
-                            withCount('followers')->
-                            with('following');
-                        }])->
-                        whereNotIn('posts.id', $hidesPosts)->
-                        select('seo_title','meta_desc','post_number','slug_url','created_at','user_id','id')->
-                        orderBy('created_at', 'desc')->take(10)->get();
-            }
+            $posts = $this->searchPost($request);
             return view('site.post.search-posts',[
                 'posts' => $posts,
                 'search_query'=>$request->search,
             ]);
         }
         return abort(404);
+    }
+
+    // Search Post and Friends
+    public function searchUser($request){
+        $users =  User:: Where('username','like','%'.$request->search.'%')->
+            orWhere('name','like','%'.$request->search.'%')->
+            orWhere('email','like','%'.$request->search.'%')->
+            whereNotIn('id',[Auth::user()->id])->
+            with('followers','following')->
+            select('name','username','id','image','thought_of_the_day','bio','website','email')->
+            paginate(2, ['*'], 'page', isset($request->page) ? $request->page : 1);
+
+        // if($users->count() < 1){
+        //     $users =  User::
+        //             select('name','username','id','image','thought_of_the_day','bio','website','email')->
+        //             orderBy('created_at', 'desc')->take(10)->get();                
+        // }
+        return $users;
+    }
+
+    public function searchPost($request){
+        $user = User::where('id',Auth::user()->id)->
+        with(['hideposts'=> function($query){
+            $query->with(['post'=>function($query){
+                $query->select('id');
+            }]);
+        }])->first();
+        // User Hide Posts
+        $hidesPosts = [];
+        foreach ($user->hideposts as $key => $hidepost) {
+            $hidesPosts[] = $hidepost->post->id;            
+        }
+        $posts =Post::where(function($q) use ($request){
+                    $q->where('title', 'LIKE', '%'.$request->search.'%')
+                    ->orWhere('desc', 'LIKE', '%'.$request->search.'%')
+                    ->orWhere('slug_url', 'LIKE', '%'.$request->search.'%')
+                    ->orWhere('seo_title', 'LIKE', '%'.$request->search.'%')
+                    ->orWhere('meta_desc', 'LIKE', '%'.$request->search.'%');
+                })->
+                whereNotIn('posts.id', $hidesPosts)->
+                select('seo_title','title','desc','meta_desc','post_number','slug_url','created_at','user_id','id','type')->
+                withCount(['views','shares','comments'])->
+                with(['likes','user'=> function($query){
+                    $query->select('name','username','id','image')->
+                    withCount('followers')->
+                    with('following');
+                }])->
+                paginate(10, ['*'], 'page', isset($request->page) ? $request->page : 1);
+        // if($posts->count() < 1){
+        //     $posts =Post::withCount(['views','shares','comments'])->
+        //             whereNotIn('posts.id', $hidesPosts)->
+        //             with(['likes','user'=> function($query){
+        //                 $query->select('name','username','id','image')->
+        //                 withCount('followers')->
+        //                 with('following');
+        //             }])->
+        //             whereNotIn('posts.id', $hidesPosts)->
+        //             select('seo_title','meta_desc','post_number','slug_url','created_at','user_id','id')->
+        //             orderBy('created_at', 'desc')->take(10)->get();
+        // }
+        return $posts;
+    }
+
+    public function searchWithAjax(Request $request){
+        if ($request->type == 1) {
+            $users = $this->searchUser($request);
+            return view('partial.search_users',[
+                'users' => $users,
+            ]);
+        }else{
+            $posts = $this->searchPost($request);
+            return view('partial.search_posts',[
+                'posts' => $posts,
+            ]);
+        }
     }
 
     public function reportPost(Request $request){
@@ -678,4 +756,8 @@ class PostController extends Controller
         }
     }
     
+    private function sendNotification($data,$user_id){
+        $user = User::where('id',$user_id)->first();        
+        $user->notify(new UserNotification($data));
+    }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Followuser;
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Notifications\UserNotification;
 use Auth;
 
 class FollowuserController extends Controller
@@ -38,7 +39,7 @@ class FollowuserController extends Controller
     public function store(Request $request)
     {
         $user= Auth::user();
-        $user_ = User::where('username',$request->username)->select('username','id')->first();
+        $user_ = User::where('username',$request->username)->select('username','id','name')->first();
         if (isset($user_)) {
             $user_id = $user->id;
             $exists_follow = Followuser::where('follower_user_id',$user_id)->where('following_user_id',$user_->id)->first();
@@ -52,11 +53,16 @@ class FollowuserController extends Controller
             $follow_->follower_user_id = $user_id;
             $follow_->following_user_id = $user_->id;
             $follow_->save();
+            $data = [
+                'user_name' => $user->name,
+                'user_image' => $user->image,
+                'subject' => 'Start Following You.',
+                'desc' => 'Start Following You.',
+                'comment_title'=>'',
+                'link' => route('search-user-profile',['username'=>$user->username]),
+            ];
+            $user_->notify(new UserNotification($data));
             return response()->json(['status'=>1,'message'=>'Following'], 200);
-
-            //  User $a wants to follow user $b:
-            // $a->following()->detach($b);
-            // $a->following()->attach($b);
         }
         return response()->json(['status'=>0,'message'=>'Something Went Wrong'], 400);
     }

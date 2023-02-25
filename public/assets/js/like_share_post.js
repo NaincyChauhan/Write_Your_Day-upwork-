@@ -32,10 +32,8 @@ function LikePostRequest(id_,thisObj) {
                     //             <span><span class="post_like_count">${like_count}</span> Likes</span>`);     
                     showLikeMessage(data.message);
                 }
-                console.log("function running 1");
             } else {
                 showLikeMessage(data.message);
-                console.log("function running 2");
             }
             btn.attr("disabled", false);
         },
@@ -68,6 +66,7 @@ function sharePostRequest(id_) {
         btn = $(`#share_post_btn_${id_}`);
         share_count = btn.find('.share_count');
     btn.attr("disabled", true);
+    SharePostModal(id_);
     $.ajax({
         type: "POST",
         processData: false,
@@ -76,7 +75,6 @@ function sharePostRequest(id_) {
         data: new FormData(form[0]), // serializes the form's elements.
         success: function (data) {
             if (data.status==0) {                
-                SharePostModal(id_);
             }else{
                 btn.attr("disabled", false);
                 if (data.type==1) {
@@ -166,7 +164,6 @@ function SavePostRequest(id_,type=0) {
                     // Remove From Save
                     btn.html(`<img style="margin-bottom: -8px;" class="red-heart d-block" src="${window.location.origin}/assets/images/bookmark.png" />`);
                     showLikeMessage(data.message);
-                    console.log("function is running well",id_);
                     if (type==1) {
                         $(`#main_post_container_save_${id_}`).html("");
                         $(`#main_post_container_save_${id_}`).css('display','none');
@@ -196,7 +193,6 @@ function SavePostRequest(id_,type=0) {
 
 // Follow, UnFollow user 
 function FollowUnFollowRequest(id_, thisObj) {
-    console.log("function is running well", id_);
     var form = $(`#follow_unfollow_user_form_${id_}`),
         btn = thisObj;
     btn.attr("disabled", true);
@@ -209,10 +205,8 @@ function FollowUnFollowRequest(id_, thisObj) {
         success: function (data) {
             if (parseInt(data.status) == 1) {
                 btn.html(data.message);
-                console.log(data.message);
             } else {
                 showLikeMessage(data.message);
-                console.log(data.message);
             }
             btn.attr("disabled", false);
         },
@@ -344,8 +338,7 @@ function CopyPostUrl(thisObj,url,id_) {
     navigator.clipboard.writeText(url);
     thisObj.html(`<i class="far fa-clipboard-check"></i>`);
     showLikeMessage('Like Copied!');
-    $(`#share_post_container_${id_}`).toggleClass('hide');
     setTimeout(function () {
         thisObj.html(`<i class="far fa-clipboard-list"></i>`);
-    }, 10000);
+    }, 5000);
 }

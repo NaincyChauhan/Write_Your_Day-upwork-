@@ -1,0 +1,18 @@
+a{
+    cursor: pointer;
+}
+.notification-list_content > a{
+    text-decoration: none;
+}
+
+.notification-list_content > a .notification-list_detail>p>b
+{
+    color: black;
+}
+
+.notification-list_content > a .notification-list_detail>p {
+    color: #1b1e20;
+}
+.notification-list_feature-img > a > p{
+    width: 85px;
+}

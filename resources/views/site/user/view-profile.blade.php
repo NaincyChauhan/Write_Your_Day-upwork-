@@ -340,7 +340,7 @@
                                                     </form>
                                                     <!-- Share Post Modal -->
                                                     <div class="overlay hide" id="share_post_container_{{$post->id}}">
-                                                        <div class="ques_box ques_box_1">
+                                                        <div class="ques_box ques_box_1" style="max-width: 31em;">
                                                             <div class="d-flex justify-content-between align-items-baseline">
                                                                 <div>
                                                                     <p class="ques_txt font-17">Copy Post Link</p>       
@@ -348,7 +348,7 @@
                                                                 <span onclick="CopyPostUrl($(this),'{{route('detail-post-view',['username'=>$post->user->username,'post_number' => $post->post_number,'slug'=>$post->slug_url])}}',{{$post->id}});" class="copybutton"><i class="far fa-clipboard-list"></i></span>
                                                             </div>
                                                             <div class="share_profile">
-                                                                <p>{{$post->slug_url}}</p> 
+                                                                <p>{{Str::limit( route('detail-post-view',['username'=>$post->user->username,'post_number' => $post->post_number,'slug'=>$post->slug_url]), 50, ' ...')}}</p> 
                                                             </div>     
                                                             <div class="d-flex justify-content-center mt-4">           
                                                                 <button type="button" class="ques_btn suggested_btn text-primary" onclick="SharePostModal({{$post->id}});">
@@ -672,7 +672,7 @@
 
                                                     <!-- Share Post Modal -->
                                                     <div class="overlay hide" id="share_post_container_{{$post->id}}">
-                                                        <div class="ques_box ques_box_1">
+                                                        <div class="ques_box ques_box_1" style="max-width: 31em;">
                                                             <div class="d-flex justify-content-between align-items-baseline">
                                                                 <div>
                                                                     <p class="ques_txt font-17">Copy Post Link</p>       
@@ -680,7 +680,7 @@
                                                                 <span onclick="CopyPostUrl($(this),'{{route('detail-post-view',['username'=>$post->user->username,'post_number' => $post->post_number,'slug'=>$post->slug_url])}}',{{$post->id}});" class="copybutton"><i class="far fa-clipboard-list"></i></span>
                                                             </div>
                                                             <div class="share_profile">
-                                                                <p>{{$post->slug_url}}</p> 
+                                                                <p>{{Str::limit( route('detail-post-view',['username'=>$post->user->username,'post_number' => $post->post_number,'slug'=>$post->slug_url]), 50, ' ...')}}</p> 
                                                             </div>     
                                                             <div class="d-flex justify-content-center mt-4">           
                                                                 <button type="button" class="ques_btn suggested_btn text-primary" onclick="SharePostModal({{$post->id}});">

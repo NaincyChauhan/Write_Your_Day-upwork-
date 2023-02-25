@@ -37,6 +37,10 @@ class Popularpost extends Command
                         ->take(10)
                         ->get();                
         
+        $get_popular_post = GetPopularpost::get();
+        foreach ($get_popular_post as $key => $post) {
+            $post->delete();
+        }
         foreach ($popularPosts as $key => $post) {
             $popular_post = new GetPopularpost();
             $popular_post->post_id = $post->id;

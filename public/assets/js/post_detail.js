@@ -77,8 +77,6 @@ function showReplyBox(id_) {
 }
 
 function CommentReply(id_) {
-    console.log("function is runnin well define");
-    console.log("function is runnin well debugging1111",$(`#writereply-box-${id_}`));
     const form = $(`#reply-comment-form-${id_}`);
     const btn = $(`#reply-comment-btn-${id_}`);
     var commentError = form.find('.comment-error');

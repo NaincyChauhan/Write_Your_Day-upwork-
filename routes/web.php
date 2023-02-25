@@ -53,7 +53,7 @@ Route::get('get/session/data', [SiteUserController::class, 'callMailFunc']);
 
 // User Routes
 Route::group(['middleware' => ['auth:sanctum','verified']], function () {
-    Route::group(['middleware' => ['auth:sanctum','verified','check_suspend_user']], function () {
+    Route::group(['middleware' => ['check_suspend_user']], function () {
         Route::get('/', [SiteHomeController::class, 'index'])->name('home');
         Route::get('/friends', [SiteHomeController::class, 'profileSearch'])->name('friends');
         
@@ -99,13 +99,23 @@ Route::group(['middleware' => ['auth:sanctum','verified']], function () {
 
         // Search Post and Friends
         Route::get('/search', [SitePostController::class, 'searchPostFriends'])->name('search-post-friends');
+        Route::get('/ajax/search', [SitePostController::class, 'searchWithAjax'])->name('search-post-friends-ajax');
         Route::get('/search/profile/{username}', [SiteUserController::class, 'SearchUserProfile'])->name('search-user-profile');
+
+        // Notifications
+        Route::get('/notifications/mark-as-read/{id}', [SiteUserController::class, 'NotificationmarkAsRead'])->name('notifications-mark-as-read');
+        Route::get('/notifications', [SiteUserController::class, 'UserNotifications'])->name('user-notifications');
+        Route::get('/notifications/count', [SiteUserController::class, 'UserNotificationsCount'])->name('user-notifications-count');
+        Route::get('read/notifications', [SiteUserController::class, 'UserReadNotification'])->name('get-more-read-notifications');
     });
-    // Suspend User Urls
-    Route::post('help-center', [HelpcenterController::class, 'store'])->name('help-center');
-    Route::get('/home/feed', [SiteHomeController::class, 'suspend_user_home'])->name('suspend_user_home');
-    Route::get('/load/posts/2', [SiteHomeController::class, 'LoadPostWithAjax_2'])->name('load-more-post-2');
-    Route::get('/account/help', [SiteHomeController::class, 'AccountHelp'])->name('account-help');
+
+    Route::group(['middleware' => ['check_not_suspend_user']], function () {
+        // Suspend User Urls
+        Route::post('help-center', [HelpcenterController::class, 'store'])->name('help-center');
+        Route::get('/home/feed', [SiteHomeController::class, 'suspend_user_home'])->name('suspend_user_home');
+        Route::get('/load/posts/2', [SiteHomeController::class, 'LoadPostWithAjax_2'])->name('load-more-post-2');
+        Route::get('/account/help', [SiteHomeController::class, 'AccountHelp'])->name('account-help');
+    });
 });
 
 Route::group(['middleware' => ['auth:sanctum',  'verified', 'role']], function () {

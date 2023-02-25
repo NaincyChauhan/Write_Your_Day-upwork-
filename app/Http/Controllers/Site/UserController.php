@@ -16,6 +16,8 @@ use App\Models\Policies;
 use Session, Auth,Hash,Mail;
 use App\Mail\UserMail;
 use Carbon\Carbon;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class UserController extends Controller
 {
@@ -284,6 +286,7 @@ class UserController extends Controller
         ], 200);
     }
 
+    // User Forget Password View
     public function forgetPasswordView(){
         if (Auth::check() && Auth::user()) {
             return redirect()->route('home');
@@ -386,6 +389,7 @@ class UserController extends Controller
         }
     }
 
+    // User Update Profile View
     public function updateProfileImage(Request $request){
         $request->validate([
             'image' => ['required','mimetypes:image/jpg,image/png,image/jpeg,image/webp','max:5000','min:1'],
@@ -425,5 +429,74 @@ class UserController extends Controller
                 'user' => $user,
             ]);
         }
+    }
+
+    // Set Notification As Read
+    public function NotificationmarkAsRead($id)
+    {
+        $user = auth()->user();
+        $notification = $user->notifications()->where('id', $id)->first();
+        if ($notification) {
+            $notification->markAsRead();
+            return response()->json(['status'=>1,'message'=>'Success'], 200);
+        }
+        return response()->json(['status'=>0,'message'=>'Error'], 400);
+    }
+
+    // User Notification Count
+    public function UserNotificationsCount(){
+        $user = auth()->user();
+        return response()->json([
+            'status'=>1,
+            'data'=>$user->unreadNotifications->count()
+        ],200);
+    }
+
+    // Get All User Notification
+    public function UserNotifications(Request $request){
+        $user = Auth::user(); //auth()->user()
+        $unreadNotifications = $user->unreadNotifications()->get();
+        $readNotifications = $user->readNotifications()->get();
+
+        // $notifications = $unreadNotifications->concat($readNotifications)->paginate(10);
+        $notifications = $unreadNotifications->concat($readNotifications);
+        $currentPage = Paginator::resolveCurrentPage() ?: 1;
+        $perPage = 10;
+        $notifications = new LengthAwarePaginator(
+            $notifications->forPage($currentPage, $perPage),
+            $notifications->count(),
+            $perPage,
+            $currentPage
+        );
+
+        // return view('notifications.index', compact('notifications'));
+        if (isset($request->page) && $request->page > 1) {
+            return view('partial.notifications',['notifications'=>$notifications]);
+        }
+        return view('site.user.notifications',['notifications'=>$notifications]);
+        // dd("dikdflsdfalsdf",$page);
+    }
+
+    // Get User ReadNotification
+    public function UserReadNotification(Request $request){
+        $user = auth()->user();
+        $notifications = $user->readNotifications->offset($request->offset)->limit($request->limit);
+        return response()->json([
+            'status' => 1,
+            'message' => 'Success',
+            'data' => $notifications,
+        ], 200);
+    }
+
+    // Get User UnReadNotification
+    public function UserUnReadNotification(Request $request){
+        $user = auth()->user();
+        $notifications = $user->unreadNotifications->offset($request->offset)->limit($request->limit);
+        return response()->json([
+            'status' => 1,
+            'message' => 'Success',
+            'data' => $notifications,
+            'type' => 1
+        ], 200);
     }
 }

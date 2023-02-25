@@ -41,8 +41,8 @@
                     <div class="write-page-btn">
                         <button type="button" class="preview-btn">Preview</button>
                         <div class="dropdown">
-                            <button  class="dropdown-toggle" type="button" id="dropdownMenuButton1" onclick="$('#type-dropdown-menu').toggleClass('show');">
-                                Publish <img width="15" height="15" src="{{asset('assets/images/next-white.png') }}">
+                            <button  class="dropdown-toggle" type="button">
+                                Publish <img width="15" height="15"  id="dropdownMenuButton1" onclick="$('#type-dropdown-menu').toggleClass('show');" src="{{asset('assets/images/next-white.png') }}">
                             </button>
                             <ul class="dropdown-menu" id="type-dropdown-menu" aria-labelledby="dropdownMenuButton1">
                                 <li><button class="dropdown-item post-type-button {{$post->type==0 ? 'selected' : ''}}"  type="submit" type-value="0" href="#">Public</button></li>
@@ -58,8 +58,8 @@
                             <ul class="date_time d-flex ">
                                 <li><p id="preview-time" class="date-time-text-edit"><i class="far fa-clock"></i>{{ date("h:i A - M d, Y", strtotime($post->created_at)) }}</p></li>
                             </ul>
-                            <textarea name="title" maxlength="100" placeholder="Type your title" id="blog-title">{{$post->title}}</textarea>
-                            <span id="title_max_length">100 Charcter</span>
+                            <textarea name="title" rows="1" maxlength="55" placeholder="Type your title" id="blog-title">{{$post->title}}</textarea>
+                            <span id="title_max_length">55 Charcter</span>
                         </div>
                         <div id="title_error" class="text-danger d-block">
                         </div>
@@ -80,8 +80,8 @@
                             <ul class="date_time d-flex ">
                                 <li><p class="date-time-text-edit"><i class="far fa-clock"></i>{{ date("h:i A - M d, Y", strtotime($post->created_at)) }}</p></li>
                             </ul>
-                            <h4 id="post-title-preview">{{$post->seo_title}}</h4>
-                            <p id="post-preview-desc-text">{{$post->meta_desc}}</p>                        
+                            <h4 id="post-title-preview">{{isset($post->seo_title) ? $post->seo_title : $post->title}}</h4>
+                            <p id="post-preview-desc-text">{{isset($post->meta_desc) ? $post->meta_desc : $post->title}}</p>                        
                         </div>
                     </div>
                     <div class="write-page-input-box">
@@ -100,8 +100,8 @@
                         <div>
                             <div class="write-page-input">
                                 <label>Meta description </label>
-                                <textarea id="meta_desc" maxlength="2500" name="meta_desc">{{$post->meta_desc}}</textarea>
-                                <span id="meta_desc_max_length">2500 charcter</span>
+                                <textarea id="meta_desc" maxlength="165" name="meta_desc">{{$post->meta_desc}}</textarea>
+                                <span id="meta_desc_max_length">165 charcter</span>
                             </div>
                             <div id="meta_desc_error" class="text-danger d-block">
                             </div>
@@ -173,12 +173,6 @@
 @endsection
 
 @section('js')
-    <script>
-        // SEO Title
-        $("#slug_url").on("input", function () {
-            $('#post-slug-url').html(("{{ config('app.url') }}"+"/post/"+$(this).val().replace(/\s+/g, '-')));
-        });
-    </script>
     <script src="{{ asset('app-assets/vendors/js/vendor.bundle.base.js') }}"></script>
     <script src="{{ asset('app-assets/plugins/jquery-validation/jquery.validate.min.js') }}"></script>
     <script src="{{asset('assets/js/snippet.js') }}"></script>

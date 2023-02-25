@@ -41,8 +41,8 @@
                     <div class="write-page-btn">
                         <button type="button" class="preview-btn">Preview</button>
                         <div class="dropdown">
-                            <button  class="dropdown-toggle" type="button" id="dropdownMenuButton1" onclick="$('#type-dropdown-menu').toggleClass('show');">
-                                Publish <img width="15" height="15" src="{{asset('assets/images/next-white.png') }}">
+                            <button  class="dropdown-toggle" type="button">
+                                Publish <img width="15" height="15"  id="dropdownMenuButton1" onclick="$('#type-dropdown-menu').toggleClass('show');" src="{{asset('assets/images/next-white.png') }}">
                             </button>
                             <ul class="dropdown-menu" id="type-dropdown-menu" aria-labelledby="dropdownMenuButton1">
                                 <li><button class="dropdown-item post-type-button {{$new_post->type==0 ? 'selected' : ''}}"  type="submit" type-value="0" href="#">Public</button></li>
@@ -87,8 +87,8 @@
                             <ul class="date_time d-flex ">
                                 <li><p class="date-time-text"><i class="far fa-clock"></i>10:00 AM - 20 feb, 2020 </p></li>
                             </ul>
-                            <h4 id="post-title-preview">{{$new_post->seo_title}}</h4>
-                            <p id="post-preview-desc-text">{{$new_post->meta_desc}}</p>                          
+                            <h4 id="post-title-preview">{{isset($new_post->seo_title) ? $new_post->seo_title : $new_post->title}}</h4>
+                            <p id="post-preview-desc-text">{{isset($new_post->meta_desc) ? $new_post->meta_desc : $new_post->title}}</p>                          
                         </div>
                     </div>
                     <div class="write-page-input-box">
@@ -107,8 +107,8 @@
                         <div>
                             <div class="write-page-input">
                                 <label>Meta description </label>
-                                <textarea id="meta_desc" maxlength="2500" name="meta_desc"></textarea>
-                                <span id="meta_desc_max_length">2500 charcter</span>
+                                <textarea id="meta_desc" maxlength="165" name="meta_desc"></textarea>
+                                <span id="meta_desc_max_length">165 charcter</span>
                             </div>
                             <div id="meta_desc_error" class="text-danger d-block">
                             </div>

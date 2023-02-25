@@ -3604,3 +3604,7 @@ section.sort-posts {
 .comment-user-image > img{
   border-radius: 0px !important;
 }
+.share_profile{
+  font-size: 14px;
+  line-break: anywhere;
+}

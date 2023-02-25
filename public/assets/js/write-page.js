@@ -12,50 +12,111 @@ let userBlogContentInput;
 // ClassicEditor.builtinPlugins = [WordCountPlugin]
 
 ClassicEditor
-    .create(document.querySelector('#toolbar-grouping'), {
-        toolbar: [
-            'heading', '|',
-            'fontfamily', 'fontsize', '|',
-            'alignment', '|',
-            'fontColor', 'fontBackgroundColor', '|',
-            'bold', 'italic', 'underline', '|',
-            'link', '|',
-            'bulletedList', 'numberedList', '|',
-            'outdent', 'indent', '|',
-            'uploadImage', 'blockQuote', '|',
-            'undo', 'redo'
-        ],
-        heading: {
-            options: [
-                { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
-                { model: 'heading1', view: 'h1', title: 'Heading 1', class: 'ck-heading_heading1' },
-                { model: 'heading2', view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2' },
-                { model: 'heading3', view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3' },
-                { model: 'heading4', view: 'h4', title: 'Heading 4', class: 'ck-heading_heading4' },
-                { model: 'heading5', view: 'h5', title: 'Heading 5', class: 'ck-heading_heading5' },
-                { model: 'heading6', view: 'h6', title: 'Heading 6', class: 'ck-heading_heading6' }
-            ]
-        },
-        // plugins: ['WordCount'],
-        // extraPlugins: ['MaxLength'],
-        // extraPlugins: 'wordcount',
-        maxLength: {
-            maxCharCount: 200, // set the maximum character count here
-            message: 'You have reached the maximum character count.', // message to show when the limit is exceeded
+.create(document.querySelector('#toolbar-grouping'), {
+    toolbar: [
+        'heading', '|',
+        'fontfamily', 'fontsize', '|',
+        'alignment', '|',
+        'fontColor', 'fontBackgroundColor', '|',
+        'bold', 'italic', 'underline', '|',
+        'link', '|',
+        'bulletedList', 'numberedList', '|',
+        'outdent', 'indent', '|',
+        'uploadImage', 'blockQuote', '|',
+        'undo', 'redo'
+    ],
+    heading: {
+        options: [
+            { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
+            { model: 'heading1', view: 'h1', title: 'Heading 1', class: 'ck-heading_heading1' },
+            { model: 'heading2', view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2' },
+            { model: 'heading3', view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3' },
+            { model: 'heading4', view: 'h4', title: 'Heading 4', class: 'ck-heading_heading4' },
+            { model: 'heading5', view: 'h5', title: 'Heading 5', class: 'ck-heading_heading5' },
+            { model: 'heading6', view: 'h6', title: 'Heading 6', class: 'ck-heading_heading6' }
+        ]
+    },
+    // plugins: ['WordCount']
+})
+.then(e => { 
+    userBlogContentInput = () => e.getData();
+    // myFunction(e);
+    // Listen for the input event on the editor instance
+    e.model.document.on('change:data', () => {
+        // Get the maximum length of the content
+        var maxLength = 2500;
+        // Get the current length of the content
+        var currentLength = e.getData().length;
+        if ($('#meta_desc').val() == "") {            
+            $('#post-preview-desc-text').html(e.getData());
         }
-    })
-    .then(e => {
-        userBlogContentInput = () => e.getData();
-        // const wordCountPlugin = e.plugins.get( 'WordCount' );
-        // console.log(wordCountPlugin);
-        // console.log(e.plugins.get("WordCount"));
-        // window.editor = e;
-        // console.log("debugging11",window.editor);
-        // document.getElementById("demo-word-count").appendChild(e.plugins.get("WordCount").wordCountContainer) 
-    })
-    .catch(error => {
-        console.error(error);
+        // Check if the current length exceeds the maximum length
+        if (currentLength > maxLength) {
+            // Do something if the content is too long
+            console.log('Content is too long');
+            e.isReadOnly = true;
+        } else {
+            // Do something if the content is within the allowed length
+            console.log('Content is within the allowed length');
+            e.isReadOnly = false;
+        }
     });
+    // Get the maximum length of the content
+    var maxLength = 500;
+    // editor = e;
+
+    // Listen for the input event on the editor instance
+    // e.editing.view.document.on('input', () => {
+    //     // Get the current length of the content
+    //     var currentLength = e.getData().length;
+
+    //     // Check if the current length exceeds the maximum length
+    //     if (currentLength > maxLength) {
+    //         // Get the last inserted element
+    //         const element = e.editing.view.document.lastChild.getLastChild();
+    //         if (element) {
+    //             // Delete the last inserted element
+    //             element.remove();
+    //         }
+
+    //         // Disable the e
+    //         e.editing.view.change(writer => {
+    //             writer.setAttribute('contenteditable', 'false', e.editing.view.document.getRoot());
+    //         });
+    //     } else {
+    //         // Enable the e
+    //         e.editing.view.change(writer => {
+    //             writer.removeAttribute('contenteditable', e.editing.view.document.getRoot());
+    //         });
+    //     }
+    // });
+
+    // const wordCountPlugin = e.plugins.get( 'WordCount' );
+    // console.log(wordCountPlugin);
+    // console.log(e.plugins.get("WordCount"));
+    // window.editor = e;
+    // document.getElementById("demo-word-count").appendChild(e.plugins.get("WordCount").wordCountContainer) 
+})
+.catch(error => {
+    console.error(error);
+});
+
+function myFunction(editor) {
+    // Get the maximum length of the content
+    var maxLength = 500;
+
+    // Get the current length of the content
+    var currentLength = editor.getData().length;
+
+    // Check if the current length exceeds the maximum length
+    if (currentLength > maxLength) {
+        // Do something if the content is too long
+        console.log('Content is too long');
+    } else {
+        // Do something if the content is within the allowed length
+        console.log('Content is within the allowed length');
+    }
+}
 
 
 function countChar(val) {
@@ -110,17 +171,24 @@ $('.post-type-button').click(function () {
 $("#blog-title").on("input", function () {
     const post_title = $("#blog-title").val();
     $('#title_max_length').html(`Remaining Character ${55 - Number(post_title.length)}`)
-    $('#slug_url').val(post_title);
+    $('#slug_url').val(($(this).val().replace(/\s+/g, '-')));
+    if ($('#seo_title').val() == "") {     
+        $('#post-title-preview').html(post_title);
+    }
 });
 
 // Seo Title
 $("#seo_title").on("input", function () {
+    if ($(this).val() == "") {
+        $('#post-title-preview').html($('#blog-title').val());
+    }
     $('#post-title-preview').html($(this).val());
 });
 
 // Meta Descripation
 $("#meta_desc").on("input", function () {
     $('#post-preview-desc-text').html($(this).val().substring(0, 200)+".");
+    $('#meta_desc_max_length').html(`Remaining Character ${165 - Number($(this).val().length)}`);
 });
 
 // Create User Post
@@ -147,7 +215,6 @@ $(function () {
         },
         submitHandler: function (f) {
             clearErrors();
-            // console.log("this is function");
             // return;
             var btn = $('#type-dropdown-menu'),
                 form = $('#create-post-form');
@@ -161,10 +228,18 @@ $(function () {
                 success: function (data) {
                     // clearErrors();
                     if (parseInt(data.status) == 1) {
-                        MessageShow('alert-success', data.message, 'session_message_area');
+                        // MessageShow('alert-success', data.message, 'session_message_area');
+                        Swal.fire({
+                            title: 'Success',
+                            text: data.message,
+                        });
                         window.location.pathname = "/";
                     } else {
-                        MessageShow('alert-danger', data.message, 'session_message_area');
+                        // MessageShow('alert-danger', , 'session_message_area');
+                        Swal.fire({
+                            title: 'Limit Reached! ',
+                            text: data.message,
+                        });
                     }
                     btn.attr("disabled", false);
                 },
@@ -280,3 +355,10 @@ function SaveSeoData(thisObj){
     $('#slug_url').attr('readonly',true);
     $('#meta_desc').attr('readonly',true);
 }
+
+  document.getElementById("blog-title").addEventListener("paste", function(e) {
+    e.preventDefault();
+    var text = e.clipboardData.getData("text/plain");
+    text = text.replace(/\r?\n|\r/g, "");
+    document.execCommand("insertText", false, text);
+  });
