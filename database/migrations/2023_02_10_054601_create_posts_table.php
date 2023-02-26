@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('title', 100);
             $table->longText('desc');
             $table->tinyInteger('type')->default(0)->comment('0 => Pulic, 1 => Private, 2=> Draft');
+            $table->unsignedInteger('max_edit_time')->default(86400)->after('body');
 
             // SEO Fields 
             $table->string('seo_title', 100)->nullable();

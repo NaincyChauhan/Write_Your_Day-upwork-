@@ -79,7 +79,7 @@
                     </ul>
                     <h3><a href="{{route('detail-post-view',['username'=>$post->user->username,'post_number' => $post->post_number,'slug'=>$post->slug_url])}}">{{isset($post->seo_title) ? $post->seo_title : $post->title}}</a></h3>
                     <p>
-                        {!! Str::limit(isset($post->meta_desc) ? $post->meta_desc : $post->desc, 200, ' ...') !!}
+                        {!! Str::limit(isset($post->meta_desc) ? $post->meta_desc : $post->desc, 165, ' ...') !!}
                     </p>
 
                     <ul class="like_comment d-flex justify-content-md-between align-items-center ">
@@ -117,7 +117,7 @@
                                 @csrf
                                 <input type="hidden" name="post_id" value="{{$post->id}}">
                                 <input type="hidden" name="post_type" value="{{$post->type}}">
-                                <a class="d-flex" type="button" onclick="sharePostRequest({{$post->id}});"
+                                <a class="d-flex" type="button" onclick="SharePostModal({{$post->id}});"
                                     id="share_post_btn_{{$post->id}}">
                                     <img src="{{ asset('assets/images/share.png') }}"><span class="d-flex"><span
                                             class="share_count d-block pr-4">{{$post->shares_count}}</span>
@@ -131,7 +131,9 @@
                                         <div>
                                             <p class="ques_txt font-17">Copy Post Link</p>       
                                         </div>
-                                        <span onclick="CopyPostUrl($(this),'{{route('detail-post-view',['username'=>$post->user->username,'post_number' => $post->post_number,'slug'=>$post->slug_url])}}',{{$post->id}});" class="copybutton"><i class="far fa-clipboard-list"></i></span>
+                                        <span onclick="CopyPostUrl($(this),'{{route('detail-post-view',['username'=>$post->user->username,'post_number' => $post->post_number,'slug'=>$post->slug_url])}}',{{$post->id}});" class="copybutton">
+                                            <i onclick="sharePostRequest({{$post->id}});" class="far fa-clipboard-list"></i>
+                                        </span>
                                     </div>
                                     <div class="share_profile">
                                         <p>{{Str::limit( route('detail-post-view',['username'=>$post->user->username,'post_number' => $post->post_number,'slug'=>$post->slug_url]), 50, ' ...')}}</p> 

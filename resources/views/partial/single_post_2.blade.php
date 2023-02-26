@@ -64,7 +64,7 @@
                     </ul>
                     <h3><a>{{isset($post->seo_title) ? $post->seo_title : $post->title}}</a></h3>
                     <p>
-                        {!! Str::limit(isset($post->meta_desc) ? $post->meta_desc : $post->desc, 200, ' ...') !!}
+                        {!! Str::limit(isset($post->meta_desc) ? $post->meta_desc : $post->desc, 165, ' ...') !!}
                     </p>
 
                     <ul class="like_comment d-flex justify-content-md-between align-items-center ">

@@ -212,3 +212,43 @@
     background: #4285f4;
     color: white;
 }
+.post-type-button:hover{
+    background: #6997e3 !important;
+    color: white !important;
+}
+.dropdown .dropdown-toggle .my_drop_down_button{
+    background-color: transparent;
+    border: none;
+    color: #fff;
+    padding: 0px;
+    border-radius: 0px;
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: 0;
+}
+.write-page-btn .dropdown-toggle-1{
+    padding: 12px 29px;
+    border: 0;
+    border-radius: 50px;
+    font-size: 16px;
+    line-height: 1;
+    font-weight: 400;
+    color: #fff;
+    background-color: var(--main_color);
+    margin-right: 30px;
+    transition: all 0.4s;
+    border: 1px solid var(--main_color);
+}
+
+#main-edit-form-btn{
+    border: none;
+    background: transparent;
+    color: #fff;
+}
+.dropdown-toggle-1 .dropdown .dropdown-menu .post-type-button{
+    padding: 0.46em 1rem;
+}
+.dropdown-toggle-1 .dropdown .dropdown-menu{
+    margin-top: 15px;
+    margin-left: -87px;
+}

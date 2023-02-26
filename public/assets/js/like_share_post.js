@@ -66,7 +66,7 @@ function sharePostRequest(id_) {
         btn = $(`#share_post_btn_${id_}`);
         share_count = btn.find('.share_count');
     btn.attr("disabled", true);
-    SharePostModal(id_);
+    // SharePostModal(id_);
     $.ajax({
         type: "POST",
         processData: false,

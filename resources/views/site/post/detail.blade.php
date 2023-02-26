@@ -23,6 +23,17 @@
 <meta name="twitter:image" content="{{ asset('storage/products/writeyourday.jpeg') }}" />
 @endsection
 @section('css')
+<style>
+    #myTooltip {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    padding: 5px;
+    background-color: #555;
+    color: #fff;
+    }
+</style>
 @endsection
 @section('content')
 <section class="preview">
@@ -46,7 +57,7 @@
                             <button class="message_btn"><a href="">Message</a></button>
                         @endif
                     </div>
-                    <a style="z-index: 1000;" href="{{route('print-post',['username'=>$post->user->username,'post_number'=>$post->post_number,'slug'=>$post->slug_url])}}" target="_blank" class="active folder-img"><img src="{{ asset('assets/images/folder.png') }}"></a>
+                    <a style="z-index: 10;" href="{{route('print-post',['username'=>$post->user->username,'post_number'=>$post->post_number,'slug'=>$post->slug_url])}}" target="_blank" class="active folder-img"><img src="{{ asset('assets/images/folder.png') }}"></a>
                 </div>
                 <div class="review-detail ">
                     <ul class="date_time d-flex ">
@@ -86,7 +97,7 @@
                                     @csrf
                                     <input type="hidden" name="post_id" value="{{$post->id}}">
                                     <input type="hidden" name="post_type" value="{{$post->type}}">
-                                    <a type="button" onclick='sharePostRequest({{$post->id}},"{{$post->slug_url}}");' id="share_post_btn_{{$post->id}}">
+                                    <a type="button" onclick="SharePostModal({{$post->id}});" id="share_post_btn_{{$post->id}}">
                                         <img src="{{ asset('assets/images/share.png') }}"><span><span class="share_count">{{$post->shares()->count()}}</span> Shares</span> 
                                     </a>
                                 </form>
@@ -163,7 +174,9 @@
             <div>
                 <p class="ques_txt font-17">Copy Post Link</p>       
             </div>
-            <span onclick="CopyPostUrl($(this),'{{route('detail-post-view',['username'=>$post->user->username,'post_number' => $post->post_number,'slug'=>$post->slug_url])}}',{{$post->id}});" class="copybutton"><i class="far fa-clipboard-list"></i></span>
+            <span onclick="CopyPostUrl($(this),'{{route('detail-post-view',['username'=>$post->user->username,'post_number' => $post->post_number,'slug'=>$post->slug_url])}}',{{$post->id}});" class="copybutton">
+                <i onclick="sharePostRequest({{$post->id}});" class="far fa-clipboard-list"></i>
+            </span>
         </div>
         <div class="share_profile">
             <p>{{Str::limit( route('detail-post-view',['username'=>$post->user->username,'post_number' => $post->post_number,'slug'=>$post->slug_url]), 50, ' ...')}}</p> 
@@ -176,10 +189,41 @@
     </div>
 </div>
 
+<div>
+    <div id="myTooltip">This is a tooltip</div>
+    <button id="myButton">Click Me</button>
+</div>
 @endsection
 
 @section('js')
+    <script src="{{ asset('app-assets/vendors/js/vendor.bundle.base.js') }}"></script>
+    <script src="{{ asset('app-assets/plugins/jquery-validation/jquery.validate.min.js') }}"></script>
+    <script src="{{asset('assets/js/msg_extras.js') }}"></script>
+    <script src="{{asset('assets/js/post_detail.js') }}"></script>
+    <script src="{{asset('assets/js/like_share_post.js') }}"></script>
     <script>
+        function printPageArea(areaID){
+            var printContent = document.getElementById(areaID).innerHTML;
+            var originalContent = document.body.innerHTML;
+            document.body.innerHTML = printContent;
+            window.print();
+            document.body.innerHTML = originalContent;
+        }
+    </script>
+    <script>
+        const button = document.getElementById("myButton");
+        const tooltip = document.getElementById("myTooltip");
+
+        button.addEventListener("click", function() {
+        tooltip.style.display = "block";
+        });
+
+        document.addEventListener("click", function(event) {
+        if (event.target !== button) {
+            tooltip.style.display = "none";
+        }
+        });
+
         $(document).ready(function () {
             setTimeout(function () {
                 AddView("{{route('add-post-view')}}","{{$post->id}}","{{$post->type}}");
@@ -191,9 +235,4 @@
             container.append(``);
         }
     </script>
-    <script src="{{ asset('app-assets/vendors/js/vendor.bundle.base.js') }}"></script>
-    <script src="{{ asset('app-assets/plugins/jquery-validation/jquery.validate.min.js') }}"></script>
-    <script src="{{asset('assets/js/msg_extras.js') }}"></script>
-    <script src="{{asset('assets/js/post_detail.js') }}"></script>
-    <script src="{{asset('assets/js/like_share_post.js') }}"></script>
 @endsection

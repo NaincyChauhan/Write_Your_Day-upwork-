@@ -47,9 +47,6 @@ ClassicEditor
         var maxLength = 2500;
         // Get the current length of the content
         var currentLength = e.getData().length;
-        if ($('#meta_desc').val() == "") {            
-            $('#post-preview-desc-text').html(e.getData());
-        }
         // Check if the current length exceeds the maximum length
         if (currentLength > maxLength) {
             // Do something if the content is too long
@@ -162,33 +159,20 @@ window.onclick = e => {
 // Don't Remove
 
 $('.post-type-button').click(function () {
+    $('#main-edit-form-btn').html($(this).attr('type-string'));
+    $('.post-type-button').each(function (index,element) {
+        $(element).removeClass('selected');
+    })
+    $(this).addClass('selected');
     $('#inputType').val($(this).attr('type-value'));
-    // ('#LogInForm').submit();
-    // $('#type-dropdown-menu').toggleClass('show');
+    $('#type-dropdown-menu').toggleClass('show');
 });
 
 // Title Length
 $("#blog-title").on("input", function () {
     const post_title = $("#blog-title").val();
     $('#title_max_length').html(`Remaining Character ${55 - Number(post_title.length)}`)
-    $('#slug_url').val(($(this).val().replace(/\s+/g, '-')));
-    if ($('#seo_title').val() == "") {     
-        $('#post-title-preview').html(post_title);
-    }
-});
-
-// Seo Title
-$("#seo_title").on("input", function () {
-    if ($(this).val() == "") {
-        $('#post-title-preview').html($('#blog-title').val());
-    }
-    $('#post-title-preview').html($(this).val());
-});
-
-// Meta Descripation
-$("#meta_desc").on("input", function () {
-    $('#post-preview-desc-text').html($(this).val().substring(0, 200)+".");
-    $('#meta_desc_max_length').html(`Remaining Character ${165 - Number($(this).val().length)}`);
+    $('#slug_url').val(($(this).val().replace(/\s+/g, '-').toLowerCase()));
 });
 
 // Create User Post
@@ -215,8 +199,7 @@ $(function () {
         },
         submitHandler: function (f) {
             clearErrors();
-            // return;
-            var btn = $('#type-dropdown-menu'),
+            var btn = $('#main-edit-form-btn'),
                 form = $('#create-post-form');
             btn.attr('disabled', true);
             $.ajax({
@@ -234,10 +217,15 @@ $(function () {
                             text: data.message,
                         });
                         window.location.pathname = "/";
-                    } else {
-                        // MessageShow('alert-danger', , 'session_message_area');
+                    } if (parseInt(data.status) == 0) {
                         Swal.fire({
                             title: 'Limit Reached! ',
+                            text: data.message,
+                        });
+                    }
+                    if (parseInt(data.status) == 2) {
+                        Swal.fire({
+                            title: 'Not Editable! ',
                             text: data.message,
                         });
                     }
@@ -262,9 +250,87 @@ $(function () {
     });
 });
 
-// Clear All Input Errors
+
+// Update User Post Meta
+$(function () {
+    $('#save-meta-data-form').validate({
+        errorElement: 'div',
+        errorPlacement: function (error, element) {
+            error.addClass('invalid-feedback');
+            element.closest('.write-page-input').append(error);
+        },
+        highlight: function (element, errorClass, validClass) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            $(element).removeClass('is-invalid');
+        },
+        submitHandler: function (f) {
+            clearErrors_meta();
+            var btn = $('#save-meta-data-btn'),
+                form = $('#save-meta-data-form');
+            btn.attr('disabled', true);
+            $.ajax({
+                type: "POST",
+                processData: false,
+                contentType: false,
+                url: form.attr('action'),
+                data: new FormData(form[0]), // serializes the form's elements.
+                success: function (data) {
+                    if (parseInt(data.status) == 1) {
+                        Swal.fire({
+                            title: 'Success',
+                            text: data.message,
+                        });
+                        $('#seo_title').attr('readonly',true);
+                        $('#meta_desc').attr('readonly',true);
+                    } if (parseInt(data.status) == 0) {
+                        Swal.fire({
+                            title: 'Error',
+                            text: data.message,
+                        });
+                    }
+                    if (parseInt(data.status) == 2) {
+                        Swal.fire({
+                            title: 'Not Editable! ',
+                            text: data.message,
+                        });
+                    }
+                    btn.html("Saved");
+                },
+                error: function (data) {
+                    if (data.responseJSON.errors) {                        
+                        $.each(data.responseJSON.errors, function (key, value) {
+                            $(`#${key}` + "_error").html(value);
+                        });
+                    }else{
+                        if ((data.responseJSON.messages)) {                            
+                            MessageShow('alert-danger', data.responseJSON.messages, 'session_message_area');
+                        }
+                    }
+                    btn.attr("disabled", false);
+                }
+            });
+            return false;
+        }
+    });
+});
+
+// $('#main-edit-form-btn').click(function () {
+//     $('#create-post-form').submit();
+// })
+
+// Clear Post Input Errors
 function clearErrors() {
-    const Error_Messages = ['title', 'desc', 'seo_title', 'meta_desc', 'slug_url'];
+    const Error_Messages = ['title', 'desc', 'seo_title'];
+    $.each(Error_Messages, function (key, value) {
+        $(`#${value}` + "_error").html("");
+    });
+}
+
+// Clear Meta Input Errors
+function clearErrors_meta() {
+    const Error_Messages = ['meta_desc', 'slug_url'];
     $.each(Error_Messages, function (key, value) {
         $(`#${value}` + "_error").html("");
     });
@@ -347,14 +413,32 @@ $(document).ready(function(){
             event.preventDefault();
         }
     });
-});
+    $('#blog-title').on("input", function () {
+        if($(this).val().length < 30){
+            $('#title_error').html("Please enter at least 30 characters.");
+        }else{
+            $('#title_error').html("");
+        }
+    });
 
-function SaveSeoData(thisObj){
-    thisObj.html('Saved');
-    $('#seo_title').attr('readonly',true);
-    $('#slug_url').attr('readonly',true);
-    $('#meta_desc').attr('readonly',true);
-}
+    $('#seo_title').keyup(function() {
+        if ($(this).val().trim() == '') {
+            $('#post-title-preview').html("Write Your Today's Day Title");
+        }else{
+            $('#post-title-preview').html($(this).val());
+        }
+    });
+
+    // Meta Descripation
+    $("#meta_desc").keyup(function() {
+        if ($(this).val().trim() == '')  {
+            $('#post-preview-desc-text').html("Write Your Day Custom Description");
+        }else{
+            $('#post-preview-desc-text').html($(this).val());
+        }
+        $('#meta_desc_max_length').html(`Remaining Character ${165 - Number($(this).val().length)}`);
+    });
+});
 
   document.getElementById("blog-title").addEventListener("paste", function(e) {
     e.preventDefault();

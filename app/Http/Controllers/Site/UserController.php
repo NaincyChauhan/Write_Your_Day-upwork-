@@ -252,9 +252,9 @@ class UserController extends Controller
         $request->validate([
             'name' => ['required', 'string', 'max:20','min:3'],
             'username' => 'required|max:20|min:3|unique:users,username,'.$user->id,   
-            'thought_of_the_day' => ['max:120','min:10'],
+            'thought_of_the_day' => ['max:120',isset($request->thought_of_the_day) ? 'min:10' : ""],
             'gender' => 'required',
-            'bio' => ['required', 'max:120','min:10'],
+            'bio' => ['max:120',isset($request->bio) ? 'min:10' : ""],
         ]);
 
         //Uploading Image
@@ -274,7 +274,7 @@ class UserController extends Controller
         $user->username = $request->username;
         $user->thought_of_the_day = $request->thought_of_the_day;
         $user->gender = $request->gender;
-        $user->bio = $request->bio;
+        $user->bio = nl2br($request->bio);
         $user->website = $request->website;
         $user->save();
 

@@ -17,6 +17,7 @@ use App\Notifications\UserNotification;
 use Carbon\Carbon;
 use App\Http\Controllers\Controller;
 use Auth;
+use Dompdf\Dompdf;
 use Illuminate\Support\Str;
 
 class PostController extends Controller
@@ -60,25 +61,13 @@ class PostController extends Controller
     public function StorePost(Request $request){
         if (isset($request->post_id)) {
             $draft_post = Draftpost::where('id',$request->post_id)->first();
-            if(isset($request->title))
-            {
-                $request['slug_url'] = (string) Str::of($request->title)->slug('-');
-            }
-            if ($request->type == 2) {
-                $request->validate([
-                    'title' => 'required|max:100',
-                    'slug_url' => 'required|max:100',
-                ]);
+            $slug_url = (string) Str::of($request->title)->slug('-');
+            $request->validate([
+                'title' => 'required|max:55|min:30',
+                'desc' => 'required',
+            ]);    
+            if ($request->type == 2) {                
                 $post = $draft_post;
-            }
-            if ($request->type==0 || $request->type==1) {
-                $request->validate([
-                    'title' => 'required|max:100',
-                    'slug_url' => 'required|max:100',
-                    'desc' => 'required',
-                    'seo_title' => 'max:100',
-                    'meta_desc' => 'max:2500',
-                ]);
             }
             if ($request->type == 0) {
                 $post = new Post();
@@ -86,8 +75,9 @@ class PostController extends Controller
                 if (isset($last_post)) {
                     if ($last_post->post_number == 365 || $last_post->post_number > 365) {
                         $post->post_number = 1;
+                    }else{
+                        $post->post_number = $last_post->post_number+1;
                     }
-                    $post->post_number = $last_post->post_number+1;
                 }else{
                     $post->post_number = 1;
                 }
@@ -98,10 +88,10 @@ class PostController extends Controller
             $post->title = $request->title;
             $post->user_id = Auth::user()->id;
             $post->type = $request->type;
-            $post->slug_url = $request->slug_url;
+            $post->slug_url = $slug_url;
             $post->desc = $request->desc;
-            $post->seo_title = $request->seo_title;
-            $post->meta_desc = $request->meta_desc;
+            $post->seo_title = $draft_post->seo_title;
+            $post->meta_desc = $draft_post->meta_desc;
             $post->save();
 
             // Remove to Draft Posts
@@ -185,48 +175,47 @@ class PostController extends Controller
     public function updatePost($type,$id,Request $request){
         $user = Auth::user();
         $auth_id = $user->id;
-        if(isset($request->title))
-        {
-            $request['slug_url'] = (string) Str::of($request->slug_url)->slug('-');
-        }
+        
+        $request->validate([
+            'title' => 'required|max:55|min:30',
+            'desc' => 'required',
+        ]);
+
+        $slug_url = (string) Str::of($request->title)->slug('-');
 
         // Check Post  Type
         if ($type==0) {
-            $post = Post::where('id',$id)->latest()->first();
+            $post = Post::where('id',$id)->where('user_id',$auth_id)->latest()->first();
+            if (!$post->canBeEdited()) {
+                return response()->json([
+                    'status' => 2, 
+                    'message' => "You cannot edit Publish Day After 24 Hours.",            
+                ], 200);
+            }
             if (($request->type !=0 )&& ($request->type==1 || $request->type==2)) {
                 $deletePost = Post::where('id',$id)->latest()->first();
-            }            
-            $request->validate([
-                'slug_url' => 'required|max:100|unique:posts,slug_url,'.$post->id,
-            ]);
+            }
         }
         if ($type==1) {
-            $post = Privatepost::where('id',$id)->latest()->first();
+            $post = Privatepost::where('id',$id)->where('user_id',$auth_id)->latest()->first();
             if ($request->type !=1) {
-                $deletePost = Privatepost::where('id',$id)->latest()->first();
-            }  
-            $request->validate([
-                'slug_url' => 'required|max:100|unique:privateposts,slug_url,'.$post->id,
-            ]);
+                $deletePost = Privatepost::where('id',$id)->where('user_id',$auth_id)->latest()->first();
+            } 
         }
         if($type==2){
-            $post = Draftpost::where('id',$id)->latest()->first();
+            $post = Draftpost::where('id',$id)->where('user_id',$auth_id)->latest()->first();
             if ($request->type !=2) {
-                $deletePost = Draftpost::where('id',$id)->latest()->first();
+                $deletePost = Draftpost::where('id',$id)->where('user_id',$auth_id)->latest()->first();
             }
-            $request->validate([
-                'slug_url' => 'required|max:100|unique:draftposts,slug_url,'.$post->id,
-            ]);
         }
         // Check Post is exits
-        if (!isset($post) || $auth_id != $post->user_id) {
+        if (!isset($post)) {
             return abort(404);
         }
 
+        // Check User Can Create another Post
         if ($post->type != $request->type) {
-            // dd("debugging1111 post type".$post->type."  this is new type".$request->type);
             $public_post =  Post::where('user_id',$user->id)->whereDate('created_at', today())->select('id','type','created_at')->first();
-            // dd("this is today created post". $public_post . " __ this is edited post". $post->created_at );
             if (isset($public_post) && $public_post->created_at->startOfDay() != $post->created_at->startOfDay()) {
                 return response()->json([
                     'status' => 0, 
@@ -252,17 +241,23 @@ class PostController extends Controller
                 ], 200);
             }
         }
-        // dd("debugging2222 post type".$post->type."  this is new type".$request->type);
+
+        $old_meta_title = $post->seo_title;
+        $old_meta_desc = $post->meta_desc;
 
         // Create New Post
         if ($request->type==0 && $type!=0) {
             $post = new Post();
             $request->validate([
-                'slug_url' => 'required|unique:posts|max:100',               
+                'slug_url' => 'required|max:100',               
             ]);
             $last_post = Post::where('user_id',$auth_id)->where('type',0)->select('post_number')->latest()->first();
             if (isset($last_post)) {
-                $post->post_number = $last_post->post_number+1;
+                if ($last_post->post_number == 365 || $last_post->post_number > 365) {
+                    $post->post_number = 1;
+                }else{
+                    $post->post_number = $last_post->post_number+1;
+                }
             }else{
                 $post->post_number = 1;
             }
@@ -270,30 +265,23 @@ class PostController extends Controller
         if ($request->type==1 && $type!=1) {
             $post = new Privatepost();
             $request->validate([
-                'slug_url' => 'required|unique:privateposts|max:100',               
+                'slug_url' => 'required|max:100',               
             ]);
         }
         if ($request->type==2 && $type!=2) {
             $post = new Draftpost();
             $request->validate([
-                'slug_url' => 'required|unique:draftposts|max:100',               
+                'slug_url' => 'required|max:100',               
             ]);
         }        
-
-        $request->validate([
-            'title' => 'required|max:100',
-            'desc' => 'required',
-            'seo_title' => 'max:100',
-            'meta_desc' => 'max:2500',
-        ]);
 
         $post->title = $request->title;
         $post->user_id = Auth::user()->id;
         $post->type = $request->type;
-        $post->slug_url = $request->slug_url;
+        $post->slug_url = $slug_url;
         $post->desc = $request->desc;
-        $post->seo_title = $request->seo_title;
-        $post->meta_desc = $request->meta_desc;
+        $post->seo_title = $old_meta_title;
+        $post->meta_desc = $old_meta_desc;
         $post->save();
         
         if (isset($deletePost)) {
@@ -343,6 +331,48 @@ class PostController extends Controller
         return response()->json([
             'status' => 1, 
             'message' => "Success! Day has been updated Successfully.",            
+        ], 200);
+    }
+
+    // Store Post Meata Data
+    public function StorePostMetaData($type,$id,Request $request){
+        // dd("something went worng here");
+        $auth_id = Auth::user()->id;
+        // Check Post  Type
+        if ($type==0) {
+            $post = Post::where('id',$id)->latest()->first();
+            if (!$post->canBeEdited()) {
+                return response()->json([
+                    'status' => 2, 
+                    'message' => "You cannot edit Publish Day After 24 Hours.",            
+                ], 200);
+            }
+        }
+        if ($type==1) {
+            $post = Privatepost::where('id',$id)->latest()
+            ->select('id','meta_desc','seo_title','type')->first();
+        }
+        if($type==2){
+            $post = Draftpost::where('id',$id)->latest()
+            ->select('id','meta_desc','seo_title','type')->first();
+        }
+        // Check Post is exits
+        if (!isset($post)) {
+            return response()->json([
+                'status' => 0, 
+                'message' => "Something Went Wrong.",            
+            ], 200);
+        }
+        $request->validate([
+            'seo_title' => 'max:55',
+            'meta_desc' => 'max:165',
+        ]);
+        $post->seo_title = $request->seo_title;
+        $post->meta_desc = $request->meta_desc;
+        $post->save();
+        return response()->json([
+            'status' => 1, 
+            'message' => "Data Has Been Updated Successfully.",            
         ], 200);
     }
 
@@ -707,7 +737,7 @@ class PostController extends Controller
                 $report->save();
 
                 $user_reports = Reportpost::where('post_id',$request->post_id)->get();
-                if (isset($user_reports) || $user_reports->count() >= 10) {
+                if (isset($user_reports) && $user_reports->count() >= 10) {
                     $user = User::where('id',$post->user_id)->first();
                     $user->suspend_mode = 1;
                     $user->save();
@@ -744,7 +774,8 @@ class PostController extends Controller
                     ['post_number', '=', $post_number],
                 ])->join('users', 'users.id', '=', 'posts.user_id')
                 ->where('users.username', $username)
-                ->with(['likes', 'shares', 'comments', 'views', 'user'])
+                ->withCount(['likes', 'shares', 'comments', 'views'])
+                ->with( 'user')
                 ->first();
         
         if (isset($post)) {
@@ -759,5 +790,47 @@ class PostController extends Controller
     private function sendNotification($data,$user_id){
         $user = User::where('id',$user_id)->first();        
         $user->notify(new UserNotification($data));
+    }
+
+    public function generatePdf()
+    {
+        // Define the HTML content that you want to include in the PDF
+        $html = '<div class="custom-element">
+                    <h2>My Custom Element</h2>
+                    <p>This is my custom element content.</p>
+                 </div>';
+
+        // Create a new Dompdf instance
+        $dompdf = new Dompdf();
+
+        // Set the base path for resolving relative URLs
+        $dompdf->set_base_path(public_path());
+
+        // Set the CSS file to be loaded
+        $dompdf->set_option('isRemoteEnabled', true);
+        $dompdf->set_option('defaultFont', 'Helvetica');
+        $dompdf->set_option('isHtml5ParserEnabled', true);
+        $dompdf->set_option('isPhpEnabled', true);
+        $dompdf->set_option('isFontSubsettingEnabled', true);
+        $dompdf->set_option('chroot', public_path());
+        $dompdf->set_option('debugKeepTemp', true);
+        $dompdf->set_option('debugCss', true);
+        $dompdf->set_option('debugLayout', true);
+        $dompdf->set_option('debugLayoutLines', true);
+
+        // Load the CSS file
+        $dompdf->set_option('css', public_path('custom.css'));
+
+        // Load the HTML content into the Dompdf instance
+        $dompdf->loadHtml($html);
+
+        // Render the PDF
+        $dompdf->render();
+
+        // Return the PDF as a response
+        return response($dompdf->output(), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="custom_element.pdf"',
+        ]);
     }
 }

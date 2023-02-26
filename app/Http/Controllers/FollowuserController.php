@@ -112,8 +112,10 @@ class FollowuserController extends Controller
         $user= Auth::user();
         $followuser = Followuser::where('id',$id)->first();
         if (isset($followuser)) {
-            $followuser->delete();
-            return response()->json(['status'=>1,'message'=>'follower Remove'], 200);
+            if ($followuser->following_user_id == $user->id) {
+                $followuser->delete();
+                return response()->json(['status'=>1,'message'=>'follower Remove'], 200);
+            }
         }
         return response()->json(['status'=>0,'message'=>'Something Went Wrong'], 400);
     }

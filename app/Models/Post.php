@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class Post extends Model
 {
@@ -43,11 +44,11 @@ class Post extends Model
         return $this->belongsTo(Hidepost::class);
     }
 
-    public function get_avg()
+    public function canBeEdited()
     {
-        // return $this->views->count();
-        $_avg = $this->views->count() + $this->likes->count();
-        $_avg_2 = $_avg / 2;
-        return $_avg_2;
+        $created = Carbon::parse($this->created_at);
+        $maxEditTime = $this->max_edit_time;
+
+        return Carbon::now()->lt($created->addSeconds($maxEditTime));
     }
 }

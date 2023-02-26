@@ -48,6 +48,7 @@ Route::get('forget/password', [SiteUserController::class, 'forgetPasswordView'])
 Route::post('forget-password', [SiteUserController::class, 'forgetPassword'])->name('forget-password');
 
 Route::get('get/session/data', [SiteUserController::class, 'callMailFunc']);
+Route::get('genrate/pdf', [SitePostController::class, 'generatePDF']);
 
 // password/reset
 
@@ -71,6 +72,7 @@ Route::group(['middleware' => ['auth:sanctum','verified']], function () {
         // Post Sections
         Route::get('/write-page', [SitePostController::class, 'CreatePost'])->name('create-post');
         Route::post('/store-post', [SitePostController::class, 'StorePost'])->name('store-post');
+        Route::post('/save/post/meta/data/{type}/{id}', [SitePostController::class, 'StorePostMetaData'])->name('store-post-meta-data');
         Route::post('auto/draft/store-post', [SitePostController::class, 'autoDraftPostRequest'])->name('auto-draft-store-post');
         Route::get('/edit/{type}/{slug}', [SitePostController::class, 'editPostView'])->name('edit-post-view');
         Route::post('/update/post/{type}/{id}', [SitePostController::class, 'updatePost'])->name('update-post-view');

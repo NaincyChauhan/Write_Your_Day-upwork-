@@ -4,9 +4,9 @@ function ShowDeleteModal(id_) {
 }
 
 // Delete Post
-function DeletePostRequest(id_) {
+function DeletePostRequest(id_,thisObj) {
     var form = $(`#delete_post_form_${id_}`),
-        btn = $(`#delete_post_btn_${id_}`);
+        btn = thisObj;
     btn.attr("disabled", true);
     btn.html("Deleting...");
     $.ajax({

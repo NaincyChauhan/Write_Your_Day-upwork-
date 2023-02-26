@@ -16,6 +16,27 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="{{ asset('assets/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
+    <style>
+        @media (max-width: 768px)
+        {
+            .review-detail-content-view ul.like_comment li:nth-last-child(2) span {
+                display: inherit;
+            }
+        }
+        @media (max-width: 768px){
+            .review-detail-content-view ul.like_comment li:last-child span {
+                display: inherit;
+            }
+        }
+
+        @media print {
+        /* hide the links at the top and bottom of the page */
+        header, footer {
+            display: none;
+        }
+        }
+
+    </style>
 </head>
 
 <body>
@@ -49,22 +70,22 @@
                         <div class="review-detail-content-view">
                             <ul class="like_comment d-flex justify-content-between align-items-center mt-0">
                                 <li>
-                                    <small><img src="{{ asset('assets/images/eye.png') }}"><span><span>{{$post->views()->count()}}</span> Views</span></small>
+                                    <small><img src="{{ asset('assets/images/eye.png') }}"><span><span>{{$post->views_count}}</span> Views</span></small>
                                 </li>
                                 <li>
                                     <a class="heart">
                                         <img class="simple-heart" src="{{ asset('assets/images/heart.png') }}">
-                                        <span><span class="post_like_count">{{$post->likes()->count()}}</span> Likes</span>
+                                        <span><span class="post_like_count">{{$post->likes_count}}</span> Likes</span>
                                     </a>
                                 </li>
                                 <li>
                                     <a href="">
                                         <img src="{{ asset('assets/images/share.png') }}">
-                                        <span><span class="share_count">{{$post->shares()->count()}}</span> Shares</span> 
+                                        <span><span class="share_count">{{$post->shares_count}}</span> Shares</span> 
                                     </a>
                                 </li>
                                 <li>
-                                    <a><img src="{{ asset('assets/images/messsage.png') }}"><span><span>{{$post->comments()->count()}}</span> Comments</span>
+                                    <a><img src="{{ asset('assets/images/messsage.png') }}"><span><span>{{$post->comments_count}}</span> Comments</span>
                                     </a>
                                 </li>
                             </ul>
@@ -74,13 +95,6 @@
             </div>
         </div>
     </section>
-
-    <div class="footer text-center">
-        <div class="container">
-            <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry</p>
-        </div>
-    </div>
-
     <script>
         window.print();
     </script>

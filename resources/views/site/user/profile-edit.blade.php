@@ -187,9 +187,9 @@
                             <label for="description">Bio</label>
                         </div>
                         <div class="grid-65">
-                            <textarea  name="bio"  id="description" cols="30" rows="auto" tabindex="3" placeholder="Bio"
-                                >{{$user->bio}}</textarea>
-                                <p id="bio_error" class="error invalid-feedback"></p>
+                            <textarea rows="4" maxlength="120"  name="bio"  id="description" cols="4" tabindex="3" placeholder="Bio">{!! str_replace('<br />', '', $user->bio) !!}
+                            </textarea>
+                            <p id="bio_error" class="error invalid-feedback"></p>
                         </div>
                     </fieldset>
 

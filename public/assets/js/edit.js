@@ -280,13 +280,11 @@ $(function () {
             name: "required",
             username: "required",
             gender: "required",
-            bio: "required",
         },
         messages: {
             name: "Oops.! The name field is required.",
             username: "Oops.! The Username field is required.",
             gender: "Oops.! The Gender field is required.",
-            bio: "Oops.! The Bio field is required.",
         },
         errorElement: 'p',
         errorPlacement: function (error, element) {
@@ -615,6 +613,14 @@ $(function () {
             return false;
         }
     });
+});
+
+var textarea = document.getElementById("description");
+textarea.addEventListener("input", function() {
+    var lines = textarea.value.split("\n");
+    if (lines.length > 4) {
+        textarea.value = lines.slice(0, 4).join("\n");
+    }
 });
 
 // // Disable Space

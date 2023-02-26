@@ -1,0 +1,13 @@
+.custom-element {
+    background-color: red;
+    padding: 10px;
+    border: 1px solid #ddd;
+  }
+  .custom-element h2 {
+    font-size: 20px;
+    margin-top: 0;
+  }
+  .custom-element p {
+    font-size: 16px;
+    margin-bottom: 0;
+  }

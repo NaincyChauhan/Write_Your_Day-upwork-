@@ -46,7 +46,7 @@ class ReportuserController extends Controller
             $report->save();
 
             $user_reports = Reportuser::where('reported_user_id',$user->id)->get();
-            if (isset($user_reports) || $user_reports->count() >= 10) {
+            if (isset($user_reports) && $user_reports->count() >= 10) {
                 $user->suspend_mode == 1;
                 $user->save();
             }

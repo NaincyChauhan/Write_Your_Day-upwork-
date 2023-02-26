@@ -166,9 +166,8 @@
                 </div>
                 <div class="col-sm-7 px-4 mb-3 px-sm-2">
                   <p class="username"><b>{{$user->username}}</b></p>
-                  {{-- <p>CEO - of ABC Company</p> --}}
                   <p class="text-start">
-                    {{$user->bio}}
+                    {!! $user->bio !!}
                   </p>
                   <div class="profile-detail-a mt-0 d-block text-start">
                     <a href="{{$user->webiste}}">{{$user->website}}</a>
@@ -334,7 +333,7 @@
                                                         @csrf
                                                         <input type="hidden" name="post_id" value="{{$post->id}}">
                                                         <input type="hidden" name="post_type" value="{{$post->type}}">
-                                                        <a type="button" onclick="sharePostRequest({{$post->id}});" id="share_post_btn_{{$post->id}}">
+                                                        <a type="button" onclick="SharePostModal({{$post->id}});" id="share_post_btn_{{$post->id}}">
                                                             <img src="{{ asset('assets/images/share.png') }}"><span><span class="share_count">{{$post->shares_count}}</span> Shares</span> 
                                                         </a>
                                                     </form>
@@ -345,10 +344,12 @@
                                                                 <div>
                                                                     <p class="ques_txt font-17">Copy Post Link</p>       
                                                                 </div>
-                                                                <span onclick="CopyPostUrl($(this),'{{route('detail-post-view',['username'=>$post->user->username,'post_number' => $post->post_number,'slug'=>$post->slug_url])}}',{{$post->id}});" class="copybutton"><i class="far fa-clipboard-list"></i></span>
+                                                                <span onclick="CopyPostUrl($(this),'{{route('detail-post-view',['username'=>$post->user->username,'post_number' => $post->post_number,'slug'=>$post->slug_url])}}',{{$post->id}});" class="copybutton">
+                                                                    <i onclick="sharePostRequest({{$post->id}});" class="far fa-clipboard-list"></i>
+                                                                </span>
                                                             </div>
                                                             <div class="share_profile">
-                                                                <p>{{Str::limit( route('detail-post-view',['username'=>$post->user->username,'post_number' => $post->post_number,'slug'=>$post->slug_url]), 50, ' ...')}}</p> 
+                                                                <p style="font-size: 15px;">{{Str::limit( route('detail-post-view',['username'=>$post->user->username,'post_number' => $post->post_number,'slug'=>$post->slug_url]), 50, ' ...')}}</p> 
                                                             </div>     
                                                             <div class="d-flex justify-content-center mt-4">           
                                                                 <button type="button" class="ques_btn suggested_btn text-primary" onclick="SharePostModal({{$post->id}});">
@@ -373,7 +374,7 @@
                                 <div class="ques_box ques_box_1">
                                     <p class="ques_txt font-17">Are You Sure You Want To Delete This Post</p>        
                                     <div class="d-flex justify-content-center mt-4">           
-                                        <button type="button" class="btn btn-danger" id="delete_post_btn_{{$post->id}}" onclick="DeletePostRequest({{$post->id}})">
+                                        <button type="button" class="btn btn-danger" id="delete_post_btn_{{$post->id}}" onclick="DeletePostRequest({{$post->id}},$(this))">
                                             Delete
                                         </button>
                                     </div>    
@@ -430,7 +431,7 @@
                                             <a href="{{route('detail-post-view-private',['type'=>$post->type,'slug'=>$post->slug_url])}}">{{$post->title}}</a>
                                         </h3>
                                         <p>
-                                            {!! Str::limit($post->desc, 200, ' ...') !!}
+                                            {!! Str::limit($post->desc, 165, ' ...') !!}
                                         </p>
 
                                         <ul class="like_comment d-flex justify-content-between align-items-center">
@@ -476,7 +477,7 @@
                             <div class="ques_box ques_box_1">
                                 <p class="ques_txt font-17">Are You Sure You Want To Delete This Post</p>        
                                 <div class="d-flex justify-content-center mt-4">           
-                                    <button type="button" class="btn btn-danger" id="delete_post_btn_{{$post->id}}" onclick="DeletePostRequest({{$post->id}})">
+                                    <button type="button" class="btn btn-danger" id="delete_post_btn_{{$post->id}}" onclick="DeletePostRequest({{$post->id}},$(this))">
                                         Delete
                                     </button>
                                 </div>    
@@ -533,7 +534,7 @@
                                                 <a href="{{route('detail-post-view-draft',['type'=>$post->type,'slug'=>$post->slug_url])}}">{{$post->title}}</a>
                                             </h3>
                                             <p>
-                                                {!! Str::limit($post->desc, 200, ' ...') !!}
+                                                {!! Str::limit($post->desc, 165, ' ...') !!}
                                             </p>
 
                                             <ul class="like_comment d-flex justify-content-between align-items-center">
@@ -579,7 +580,7 @@
                                 <div class="ques_box ques_box_1">
                                     <p class="ques_txt font-17">Are You Sure You Want To Delete This Post</p>        
                                     <div class="d-flex justify-content-center mt-4">           
-                                        <button type="button" class="btn btn-danger" id="delete_post_btn_{{$post->id}}" onclick="DeletePostRequest({{$post->id}})">
+                                        <button type="button" class="btn btn-danger" id="delete_post_btn_{{$post->id}}" onclick="DeletePostRequest({{$post->id}},$(this))">
                                             Delete
                                         </button>
                                     </div>    
@@ -634,7 +635,7 @@
                                                 <a href="{{route('detail-post-view',['username'=>$post->user->username,'post_number' => $post->post_number,'slug'=>$post->slug_url])}}">{{$post->title}}</a>
                                             </h3>
                                             <p>
-                                                {!! Str::limit($post->desc, 200, ' ...') !!}
+                                                {!! Str::limit($post->desc, 165, ' ...') !!}
                                             </p>
 
                                             <ul class="like_comment d-flex justify-content-between align-items-center">
@@ -665,7 +666,7 @@
                                                         @csrf
                                                         <input type="hidden" name="post_id" value="{{$post->id}}">
                                                         <input type="hidden" name="post_type" value="{{$post->type}}">
-                                                        <a type="button" onclick="sharePostRequest({{$post->id}});" id="share_post_btn_{{$post->id}}">
+                                                        <a type="button" onclick="SharePostModal({{$post->id}});" id="share_post_btn_{{$post->id}}">
                                                             <img src="{{ asset('assets/images/share.png') }}"><span><span class="share_count">{{$post->shares()->count()}}</span> Shares</span> 
                                                         </a>
                                                     </form>
@@ -677,7 +678,9 @@
                                                                 <div>
                                                                     <p class="ques_txt font-17">Copy Post Link</p>       
                                                                 </div>
-                                                                <span onclick="CopyPostUrl($(this),'{{route('detail-post-view',['username'=>$post->user->username,'post_number' => $post->post_number,'slug'=>$post->slug_url])}}',{{$post->id}});" class="copybutton"><i class="far fa-clipboard-list"></i></span>
+                                                                <span onclick="CopyPostUrl($(this),'{{route('detail-post-view',['username'=>$post->user->username,'post_number' => $post->post_number,'slug'=>$post->slug_url])}}',{{$post->id}});" class="copybutton">
+                                                                    <i onclick="sharePostRequest({{$post->id}});" class="far fa-clipboard-list"></i>
+                                                                </span>
                                                             </div>
                                                             <div class="share_profile">
                                                                 <p>{{Str::limit( route('detail-post-view',['username'=>$post->user->username,'post_number' => $post->post_number,'slug'=>$post->slug_url]), 50, ' ...')}}</p> 

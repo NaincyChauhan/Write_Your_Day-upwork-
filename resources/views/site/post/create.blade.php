@@ -33,30 +33,38 @@
 <!---- Write Post Section ---->
 <section class="write-page-outer">
     <div class="container">
-        <form id="create-post-form" action="{{route('store-post')}}" method="POST" enctype="multipart/form-data">
-            @csrf
-            <input type="hidden" name="post_id" value="{{$new_post->id}}">
-            <div class="row">
-                <div class="col-12">
+        <div class="row">
+            <div class="col-12">
+                <form id="create-post-form" action="{{route('store-post')}}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <input type="hidden" name="post_id" value="{{$new_post->id}}">
                     <div class="write-page-btn">
                         <button type="button" class="preview-btn">Preview</button>
-                        <div class="dropdown">
-                            <button  class="dropdown-toggle" type="button">
-                                Publish <img width="15" height="15"  id="dropdownMenuButton1" onclick="$('#type-dropdown-menu').toggleClass('show');" src="{{asset('assets/images/next-white.png') }}">
-                            </button>
-                            <ul class="dropdown-menu" id="type-dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                <li><button class="dropdown-item post-type-button {{$new_post->type==0 ? 'selected' : ''}}"  type="submit" type-value="0" href="#">Public</button></li>
-                                <li><button class="dropdown-item post-type-button {{$new_post->type==1 ? 'selected' : ''}}"  type="submit" type-value="1" href="#">Private</button></li>
-                                <li><button class="dropdown-item post-type-button {{$new_post->type==2 ? 'selected' : ''}}" type="submit" type-value="2" href="#">Draft</button></li>
-                            </ul>
-                        </div>  
-                        {{-- <div>
-                            <select class="form-select" name="type" id="post-type-select" aria-label="Default select example">
-                                <option class="post-select-option" value="2" selected>Draft</option>
-                                <option class="post-select-option" value="0">Public</option>
-                                <option class="post-select-option" value="1">Private</option>
-                            </select>
-                        </div> --}}
+                        <div class="d-flex dropdown-toggle-1">
+                            <button class="my_drop_down_button" type="submit" id="main-edit-form-btn">
+                                <span>
+                                    @if ($new_post->type==0)
+                                        Public
+                                    @elseif($new_post->type==1)
+                                        Private
+                                    @else
+                                        Draft
+                                    @endif
+                                </span>
+                            </button>  
+                            <div class="dropdown">
+                                <div class="dropdown-toggle">                                
+                                    <button class="my_drop_down_button" type="button">
+                                        <img width="15" height="15"  id="dropdownMenuButton1" onclick="$('#type-dropdown-menu').toggleClass('show');" src="{{asset('assets/images/next-white.png') }}">
+                                    </button>
+                                </div>
+                                <ul class="dropdown-menu" id="type-dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                    <li><a class="dropdown-item post-type-button {{$new_post->type==0 ? 'selected' : ''}}"  type-string="Public"  type-value="0" href="#">Public</a></li>
+                                    <li><a class="dropdown-item post-type-button {{$new_post->type==1 ? 'selected' : ''}}"  type-string="Private" type-value="1" href="#">Private</a></li>
+                                    <li><a class="dropdown-item post-type-button {{$new_post->type==2 ? 'selected' : ''}}" type-string="Draft" type-value="2" href="#">Draft</a></li>
+                                </ul>
+                            </div>  
+                        </div>
                     </div>
                     <input type="hidden" name="type" id="inputType" value="{{$new_post->type}}">
                     <h4>Type your day title <span class="required">*</span></h4>
@@ -65,7 +73,7 @@
                             <ul class="date_time d-flex ">
                                 <li><p id="preview-time" class="date-time-text"><i class="far fa-clock"></i>10:00 AM - 20 feb, 2023 </p></li>
                             </ul>
-                            <textarea name="title" maxlength="55" placeholder="Type your title" id="blog-title">{{$new_post->title}}</textarea>
+                            <textarea name="title" minlength="30" maxlength="55" placeholder="Type your title" id="blog-title">{{$new_post->title}}</textarea>
                             <span id="title_max_length">55 Charcter</span>
                         </div>
                         <div id="title_error" class="text-danger d-block">
@@ -73,7 +81,7 @@
                     </div>
                     <div class="write-page-title-editor">
                         <h4>Type your day description <span class="required">*</span></h4>
-                        <textarea class="w-100 ckeditor-placeholder" maxlength="250" cols="0" id="toolbar-grouping" name="desc" rows="0">
+                        <textarea minlength="30" class="w-100 ckeditor-placeholder" maxlength="250" cols="0" id="toolbar-grouping" name="desc" rows="0">
                             
                         </textarea>
                         <div id="demo-word-count" class="word-count">
@@ -81,43 +89,77 @@
                         <div id="desc_error" class="text-danger d-block">
                         </div>
                     </div>
+                </form>
                     <div class="post-preview">
                         <h4>Post Preview</h4>
-                        <div class="post-preview-box">
-                            <ul class="date_time d-flex ">
-                                <li><p class="date-time-text"><i class="far fa-clock"></i>10:00 AM - 20 feb, 2020 </p></li>
-                            </ul>
-                            <h4 id="post-title-preview">{{isset($new_post->seo_title) ? $new_post->seo_title : $new_post->title}}</h4>
-                            <p id="post-preview-desc-text">{{isset($new_post->meta_desc) ? $new_post->meta_desc : $new_post->title}}</p>                          
-                        </div>
                     </div>
-                    <div class="write-page-input-box">
-                        <div class="write-page-input">
-                            <label>SEO TITLE</label>
-                            <input type="text" maxlength="55" id="seo_title" name="seo_title">
-                            <div id="seo_title_error" class="text-danger d-block">
-                            </div>
-                        </div>
-                        <div class="write-page-input">
-                            <label>SLUG URL</label>
-                            <input type="text" readonly maxlength="100" id="slug_url" value="{{$new_post->title}}" name="slug_url">
-                            <div id="slug_url_error" class="text-danger d-block">
-                            </div>
-                        </div>
-                        <div>
+                    <div class="box_group">
+                        <ul class="msg_box mb-3 mb-sm-5">
+                            <li class="days-ago">
+                                <p>
+                                    Your
+                                    <sup></sup>
+                                <br />day</p>
+                            </li>
+                            <li class="row align-items-center">
+                                <div class="col-lg-12">
+                                    <div class="msg_extras_container d-flex">
+                                        <a class="heart">
+                                            <img class="simple-heart" src="{{asset('assets/images/bookmark.png')}}" />
+                                            <img class="red-heart" src="{{asset('assets/images/bookmark-blue.png')}}" />
+                                        </a>
+                                        <button type="button" class="msg_extras_btn d-flex flex-column">
+                                            <span class="caret"></span>
+                                            <span class="caret"></span>
+                                            <span class="caret"></span>
+                                        </button>
+                                    </div>
+                                    <div class="right_part">
+                                        <ul class="date_time d-flex">
+                                            <li>
+                                                <p>
+                                                    <i class="far fa-clock"></i>{{ date("h:i A - M d, Y", strtotime($new_post->created_at)) }}
+                                                </p>
+                                            </li>
+                                        </ul>
+                                        <h3>
+                                            <a id="post-title-preview">Write Your Today's Day Title</a>
+                                        </h3>
+                                        <p id="post-preview-desc-text">Write Your Day Custom Description</p>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <form id="save-meta-data-form" action="{{route('store-post-meta-data',['type'=>$new_post->type,'id'=>$new_post->id])}}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="write-page-input-box">
                             <div class="write-page-input">
-                                <label>Meta description </label>
-                                <textarea id="meta_desc" maxlength="165" name="meta_desc"></textarea>
-                                <span id="meta_desc_max_length">165 charcter</span>
+                                <label>SEO TITLE</label>
+                                <input minlength="30" type="text" maxlength="55" name="seo_title"  id="seo_title">
+                                <div id="seo_title_error" class="text-danger d-block">
+                                </div>
                             </div>
-                            <div id="meta_desc_error" class="text-danger d-block">
+                            <div class="write-page-input">
+                                <label>SLUG URL</label>
+                                <input value="{{$new_post->slug_url}}" readonly type="text" maxlength="55" id="slug_url">
+                                <div id="slug_url_error" class="text-danger d-block">
+                                </div>
                             </div>
+                            <div>
+                                <div class="write-page-input">
+                                    <label>Meta description </label>
+                                    <textarea minlength="60" id="meta_desc"  name="meta_desc" maxlength="165"></textarea>
+                                    <span id="meta_desc_max_length">165 charcter</span>
+                                </div>
+                                <div id="meta_desc_error" class="text-danger d-block">
+                                </div>
+                            </div>
+                            <button type="submit" id="save-meta-data-btn">Save Changes</button>
                         </div>
-                        <button type="button" onclick="SaveSeoData($(this));" id="create-post-btn">Save Changes</button>
-                    </div>
+                    </form>
                 </div>
             </div>
-        </form>
     </div>
 </section>
 

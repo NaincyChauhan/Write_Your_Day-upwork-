@@ -33,7 +33,7 @@ return new class extends Migration
             $table->string('website')->nullable();
             $table->tinyInteger('gender')->default(0)->comment("0 => Rather Not Say, 1 => other, 2 => Male, 3 => Female")->nullable();
             $table->tinyInteger('phone_verified')->default(0)->comment("0 => Not Verify, 1 => Verify");
-            $table->longText('bio')->default("Lorem Ipsum has been the industry's standard dummy")->nullable();
+            $table->string('bio',200)->default("Lorem Ipsum has been the industry's standard dummy")->nullable();
             $table->timestamp('deleted_at')->nullable();
         });
     }
